@@ -47,8 +47,8 @@ addPlayerButton.addEventListener("click", () => {
     startScreen.style.display = "none";
     colorSetupScreen.style.display = "block";
 
-    // 🚀 Hent kameraer kun når brugeren går til farvevælgeren
-    getCameras();
+    console.log("Tilføj spiller trykket - henter kameraer...");
+    getCameras(); // 🚀 Nu hentes kameraer kun, når brugeren går ind i farvevælgeren.
 });
 
 // 🎯 **Skift til opsæt race**
@@ -72,14 +72,9 @@ backToStartRaceButton.addEventListener("click", () => {
 
 // 🎯 **Hent kameraer og tilføj dem til dropdown**
 function getCameras() {
-    navigator.mediaDevices.getUserMedia({ video: true }) // 🛠 Anmod om kameraadgang FØRST
-        .then(stream => {
-            // 🛠 Stop straks streamen, da vi kun vil have adgang til enhedsinformation
-            stream.getTracks().forEach(track => track.stop());
+    console.log("getCameras() kaldt!");
 
-            // 🛠 Nu kan vi hente enhedsoplysninger
-            return navigator.mediaDevices.enumerateDevices();
-        })
+    navigator.mediaDevices.enumerateDevices()
         .then(devices => {
             const videoDevices = devices.filter(device => device.kind === "videoinput");
 
@@ -88,7 +83,7 @@ function getCameras() {
                 return;
             }
 
-            cameraSelect.innerHTML = ""; // Ryd dropdown
+            cameraSelect.innerHTML = ""; // 🔥 Rydder dropdown, så den ikke duplicerer kameraer
 
             videoDevices.forEach((device, index) => {
                 let option = document.createElement("option");
@@ -97,17 +92,11 @@ function getCameras() {
                 cameraSelect.appendChild(option);
             });
 
-            if (videoDevices.length > 1) {
-                alert("Vælg dit ønskede kamera i dropdown-menuen.");
-            } else {
-                cameraSelect.value = videoDevices[0].deviceId;
-            }
-
             console.log("Fundne kameraer:", videoDevices);
         })
         .catch(err => {
             console.error("Fejl ved hentning af kameraer:", err);
-            alert("Kunne ikke hente kameraer. Tjek kameraindstillinger og giv browseren adgang.");
+            alert("Kunne ikke hente kameraer. Tjek kameraindstillinger.");
         });
 }
 
@@ -115,16 +104,23 @@ let activeStream = null; // Holder styr på det aktive kamerastream
 
 let activeStream = null;
 
-function startSelectedCamera(deviceId) {
-    // Stop eksisterende kamerastream, hvis det kører
+function startSelectedCamera() {
+    let selectedDeviceId = cameraSelect.value;
+
+    if (!selectedDeviceId) {
+        alert("Vælg et kamera fra listen!");
+        return;
+    }
+
+    // 🔥 Stop eksisterende stream, hvis det allerede kører
     if (activeStream) {
         activeStream.getTracks().forEach(track => track.stop());
     }
 
-    console.log("Starter kamera:", deviceId);
+    console.log("Starter kamera:", selectedDeviceId);
 
     navigator.mediaDevices.getUserMedia({
-        video: { deviceId: { exact: deviceId } }
+        video: { deviceId: { exact: selectedDeviceId } }
     })
     .then(stream => {
         activeStream = stream;
@@ -260,11 +256,6 @@ savePlayerButton.addEventListener("click", () => {
     players.push(player);
     updatePlayerList();
 
-    // Ryd felter
-    playerNameInput.value = "";
-    selectedColor = null;
-    colorDisplay.style.backgroundColor = "transparent";
-
     // 🎯 **Stop kameraet, når spilleren gemmes**
     stopCamera();
 
@@ -278,9 +269,9 @@ savePlayerButton.addEventListener("click", () => {
 // 🎯 **Stop kameraet, når spilleren gemmes**
 function stopCamera() {
     if (activeStream) {
-        activeStream.getTracks().forEach(track => track.stop()); // Stop alle aktive kameratracks
-        video.srcObject = null; // Fjern stream fra video-elementet
-        activeStream = null; // Nulstil aktiv stream
+        activeStream.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+        activeStream = null;
         console.log("Kamera stoppet.");
     }
 }
