@@ -243,17 +243,17 @@ savePlayerButton.addEventListener("click", () => {
     players.push(player);
     updatePlayerList();
 
-    // 🎯 **Stop kameraet**
-function stopCamera() {
-    if (activeStream) {
-        activeStream.getTracks().forEach(track => track.stop());
-        video.srcObject = null;
-        activeStream = null;
-        console.log("Kamera stoppet.");
-    }
-}
+    // 🎯 **Stop kameraet, når spilleren gemmes**
+    stopCamera();
 
-// 🎯 **Stop kameraet, når spilleren gemmes**
+    // Skift tilbage til startskærm
+    colorSetupScreen.style.display = "none";
+    startScreen.style.display = "block";
+
+    console.log("Spiller gemt:", player);
+});
+
+// 🎯 **Stop kameraet funktion (udenfor `savePlayerButton`!)**
 function stopCamera() {
     if (activeStream) {
         activeStream.getTracks().forEach(track => track.stop());
