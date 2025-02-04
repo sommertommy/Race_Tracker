@@ -113,27 +113,21 @@ function getCameras() {
 
 let activeStream = null; // Holder styr på det aktive kamerastream
 
-// 🎯 **Start det valgte kamera (kun når brugeren vælger det)**
-function startSelectedCamera() {
-    let selectedDeviceId = cameraSelect.value;
+let activeStream = null;
 
-    if (!selectedDeviceId) {
-        alert("Vælg et kamera fra listen!");
-        return;
-    }
-
-    // 🛠 Stop eksisterende kamerastream, hvis det kører
+function startSelectedCamera(deviceId) {
+    // Stop eksisterende kamerastream, hvis det kører
     if (activeStream) {
         activeStream.getTracks().forEach(track => track.stop());
     }
 
-    console.log("Starter kamera:", selectedDeviceId);
+    console.log("Starter kamera:", deviceId);
 
     navigator.mediaDevices.getUserMedia({
-        video: { deviceId: { exact: selectedDeviceId } }
+        video: { deviceId: { exact: deviceId } }
     })
     .then(stream => {
-        activeStream = stream; // Gem det aktive stream
+        activeStream = stream;
         video.srcObject = stream;
         video.play();
     })
