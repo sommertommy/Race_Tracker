@@ -33,6 +33,14 @@ const adjustColorButton = document.getElementById("adjustColor");
 const cameraSelect = document.getElementById("cameraSelect");
 const useSelectedCameraButton = document.getElementById("useSelectedCamera");
 
+// 🎯 **Hent referencer til race UI-elementer**
+const startRaceButton = document.getElementById("startRace");
+const raceScreen = document.getElementById("raceScreen");
+const raceVideo = document.getElementById("raceVideo");
+const currentPlayerDisplay = document.getElementById("currentPlayer");
+const currentLapsDisplay = document.getElementById("currentLaps");
+const backToSetupRaceButton = document.getElementById("backToSetupRace");
+
 let selectedColor = null;
 let tolerance = 50;
 let threshold = 100;
@@ -40,6 +48,11 @@ let isTracking = false;
 let players = [];
 let raceSettings = { rounds: 10 };
 let activeStream = null;
+
+let activeRacePlayer = null;
+let lapsCompleted = 0;
+let raceActive = false;
+let lastDetectionTime = 0;
 
 // 🎯 **Skift til farvevalg (hent kameraer kun, når brugeren trykker)**
 addPlayerButton.addEventListener("click", () => {
@@ -68,6 +81,39 @@ backToStartRaceButton.addEventListener("click", () => {
     raceSetupScreen.style.display = "none";
     startScreen.style.display = "block";
 });
+
+// 🎯 **Start Race**
+startRaceButton.addEventListener("click", () => {
+    if (players.length === 0) {
+        alert("Tilføj mindst én spiller før du starter racet!");
+        return;
+    }
+
+    // Skift til race-skærm
+    raceSetupScreen.style.display = "none";
+    raceScreen.style.display = "block";
+
+    // Vælg første spiller
+    activeRacePlayer = players[0];
+    lapsCompleted = 0;
+    raceActive = true;
+
+    // Opdater UI
+    currentPlayerDisplay.textContent = `Spiller: ${activeRacePlayer.name}`;
+    currentLapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
+
+    // Start kamera
+    startRaceCamera();
+});
+
+// 🎯 **Tilbage til setup race**
+backToSetupRaceButton.addEventListener("click", () => {
+    raceScreen.style.display = "none";
+    raceSetupScreen.style.display = "block";
+    raceActive = false;
+    stopCamera();
+});
+
 
 // 🎯 **Gem race-indstillinger**
 saveRaceButton.addEventListener("click", () => {
@@ -117,7 +163,62 @@ function getCameras() {
         });
 }
 
+// 🎯 **Start race-kamera**
+function startRaceCamera() {
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            raceVideo.srcObject = stream;
+            activeStream = stream;
+            raceVideo.play();
+            detectColorInRace();
+        })
+        .catch(err => {
+            console.error("Fejl ved adgang til kamera", err);
+            alert("Kunne ikke starte kameraet.");
+        });
+}
 
+
+// 🎯 **Farvedetektion under racet**
+function detectColorInRace() {
+    if (!raceActive || !activeRacePlayer) return;
+
+    const raceCanvas = document.createElement("canvas");
+    raceCanvas.width = raceVideo.videoWidth;
+    raceCanvas.height = raceVideo.videoHeight;
+    const raceCtx = raceCanvas.getContext("2d");
+
+    raceCtx.drawImage(raceVideo, 0, 0, raceCanvas.width, raceCanvas.height);
+    const imageData = raceCtx.getImageData(0, 0, raceCanvas.width, raceCanvas.height);
+    const data = imageData.data;
+
+    let detected = false;
+
+    for (let i = 0; i < data.length; i += 4) {
+        const r = data[i], g = data[i + 1], b = data[i + 2];
+
+        if (colorMatch(r, g, b, activeRacePlayer.color, activeRacePlayer.tolerance)) {
+            const now = Date.now();
+
+            if (now - lastDetectionTime > 1000) { // 1 sek pause før ny registrering
+                lapsCompleted++;
+                currentLapsDisplay.textContent = `Runder: ${lapsCompleted}/${raceSettings.rounds}`;
+                lastDetectionTime = now;
+            }
+
+            detected = true;
+            break;
+        }
+    }
+
+    if (lapsCompleted < raceSettings.rounds) {
+        requestAnimationFrame(detectColorInRace);
+    } else {
+        alert(`${activeRacePlayer.name} har fuldført racet!`);
+        raceActive = false;
+        stopCamera();
+    }
+}
 
 // 🎯 **Start det valgte kamera**
 function startSelectedCamera() {
