@@ -54,6 +54,9 @@ let lapsCompleted = 0;
 let raceActive = false;
 let lastDetectionTime = 0;
 
+// 🎯 **Gem det valgte kamera til senere brug**
+let selectedCameraId = null;
+
 // 🎯 **Skift til farvevalg (hent kameraer kun, når brugeren trykker)**
 addPlayerButton.addEventListener("click", () => {
     startScreen.style.display = "none";
@@ -163,25 +166,41 @@ function getCameras() {
         });
 }
 
-// 🎯 **Start race-kamera**
+// 🎯 **Start race-kamera – bruger samme kamera som farvevalg**
 function startRaceCamera() {
-    navigator.mediaDevices.getUserMedia({ video: true })
-        .then(stream => {
-            raceVideo.srcObject = stream;
-            activeStream = stream;
-            raceVideo.play();
+    if (!selectedCameraId) {
+        alert("Intet kamera valgt. Gå tilbage og vælg et kamera.");
+        return;
+    }
+
+    navigator.mediaDevices.getUserMedia({
+        video: { deviceId: { exact: selectedCameraId } }
+    })
+    .then(stream => {
+        activeStream = stream;
+        raceVideo.srcObject = stream;
+        raceVideo.play();
+
+        // 🚀 **Vent på, at videoen er klar, før vi starter farvedetektion**
+        raceVideo.onloadedmetadata = () => {
+            console.log("Race-video klar!");
             detectColorInRace();
-        })
-        .catch(err => {
-            console.error("Fejl ved adgang til kamera", err);
-            alert("Kunne ikke starte kameraet.");
-        });
+        };
+    })
+    .catch(err => {
+        console.error("Fejl ved adgang til kamera", err);
+        alert("Kunne ikke starte kameraet.");
+    });
 }
 
 
-// 🎯 **Farvedetektion under racet**
+// 🎯 **Farvedetektion – Sikrer, at kameraet er klar**
 function detectColorInRace() {
-    if (!raceActive || !activeRacePlayer) return;
+    if (!raceActive || !activeRacePlayer || raceVideo.videoWidth === 0 || raceVideo.videoHeight === 0) {
+        console.warn("Video ikke klar, forsøger igen...");
+        setTimeout(detectColorInRace, 100);
+        return;
+    }
 
     const raceCanvas = document.createElement("canvas");
     raceCanvas.width = raceVideo.videoWidth;
@@ -248,10 +267,11 @@ function startSelectedCamera() {
     });
 }
 
-// 🎯 **Event listener til at vælge kamera**
-
-useSelectedCameraButton.addEventListener("click", startSelectedCamera);
-
+// 🎯 **Opdateret kameraopstart – gemmer valgte kamera**
+useSelectedCameraButton.addEventListener("click", () => {
+    selectedCameraId = cameraSelect.value; // 🔥 Gem kameraet til senere brug
+    startSelectedCamera();
+});
 
 
 // 🎯 **Vælg farve ved klik på video**
