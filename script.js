@@ -102,8 +102,6 @@ function getCameras() {
 
 let activeStream = null; // Holder styr på det aktive kamerastream
 
-let activeStream = null;
-
 function startSelectedCamera() {
     let selectedDeviceId = cameraSelect.value;
 
