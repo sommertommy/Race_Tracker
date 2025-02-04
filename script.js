@@ -99,7 +99,6 @@ function getCameras() {
         });
 }
 
-let activeStream = null; // Holder styr på det aktive kamerastream
 
 
 // 🎯 **Start det valgte kamera**
