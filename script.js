@@ -42,10 +42,12 @@ let players = [];
 let raceSettings = { rounds: 10 };
 let activeStream = null;
 
-// 🎯 **Skift til farvevalg**
+// 🎯 **Skift til farvevalg (og hent kameraer, når brugeren går ind)**
 addPlayerButton.addEventListener("click", () => {
     startScreen.style.display = "none";
     colorSetupScreen.style.display = "block";
+
+    // 🚀 Hent kameraer kun når brugeren går til farvevælgeren
     getCameras();
 });
 
