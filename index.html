@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Race Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Startskærm -->
+    <div id="startScreen">
+        <h1>Race Tracker</h1>
+        <button id="addPlayer">Tilføj spiller</button>
+        <div id="playerList"></div>
+        <button id="setupRace" style="display: none;">Opsæt race</button>
+    </div>
+    
+
+    <!-- Farvevælger + Justering -->
+    <div id="colorSetupScreen" style="display: none;">
+           <label for="cameraSelect">Vælg kamera:</label>
+            <select id="cameraSelect"></select>
+            <button id="useSelectedCamera">Brug kamera</button>
+
+        <h2>Vælg farve & Juster</h2>
+        <div class="video-container">
+            <video id="video" autoplay></video>
+            <canvas id="overlayCanvas"></canvas>
+        </div>
+        <p>Klik på en farve:</p>
+        <div id="selectedColor"></div>
+        <button id="adjustTolerance">Juster tolerance</button>
+        <button id="adjustColor" style="display: none;">Juster farve</button>
+
+        <div id="toleranceControls" style="display: none;">
+            <label for="tolerance">Tolerance:</label>
+            <input type="range" id="tolerance" min="0" max="100" value="50">
+            <p>Tolerance: <span id="toleranceValue">50</span></p>
+
+            <label for="threshold">Threshold:</label>
+            <input type="range" id="threshold" min="0" max="255" value="100">
+            <p>Threshold: <span id="thresholdValue">100</span></p>
+        </div>
+
+        <input type="text" id="playerName" placeholder="Indtast spillernavn">
+        <button id="savePlayer">Gem spiller</button>
+        <button id="backToStart">Tilbage</button>
+    </div>
+
+    <!-- Opsæt race skærm -->
+    <div id="raceSetupScreen" style="display: none;">
+        <h2>Opsæt Race</h2>
+        <label for="rounds">Antal runder:</label>
+        <input type="number" id="rounds" min="1" value="10">
+        <button id="saveRace">Gem race</button>
+        <button id="backToStartRace">Tilbage</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
