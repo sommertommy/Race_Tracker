@@ -69,6 +69,24 @@ backToStartRaceButton.addEventListener("click", () => {
     startScreen.style.display = "block";
 });
 
+// 🎯 **Gem race-indstillinger**
+saveRaceButton.addEventListener("click", () => {
+    const selectedRounds = parseInt(roundsInput.value);
+
+    if (isNaN(selectedRounds) || selectedRounds < 1) {
+        alert("Indtast et gyldigt antal runder!");
+        return;
+    }
+
+    raceSettings.rounds = selectedRounds; // ✅ Gemmer det valgte antal runder
+
+    console.log("Race gemt:", raceSettings); // Debugging for at se om det gemmes korrekt
+
+    // 🚀 Skift tilbage til startskærmen
+    raceSetupScreen.style.display = "none";
+    startScreen.style.display = "block";
+});
+
 // 🎯 **Hent kameraer og tilføj dem til dropdown**
 function getCameras() {
     console.log("getCameras() kaldt!");
