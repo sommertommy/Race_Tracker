@@ -57,6 +57,10 @@ let lastDetectionTime = 0;
 // 🎯 **Gem det valgte kamera til senere brug**
 let selectedCameraId = null;
 
+// 🎯 **Farvesporing – Sikrer, at kameraet er klar**
+let trackingInterval = null; // 🔥 Stopper flere samtidige tracking-løkker
+
+
 // 🎯 **Skift til farvevalg (hent kameraer kun, når brugeren trykker)**
 addPlayerButton.addEventListener("click", () => {
     startScreen.style.display = "none";
@@ -166,7 +170,7 @@ function getCameras() {
         });
 }
 
-// 🎯 **Start race-kamera – bruger samme kamera som farvevalg**
+// 🎯 **Start race-kamera – bruger det valgte kamera**
 function startRaceCamera() {
     if (!selectedCameraId) {
         alert("Intet kamera valgt. Gå tilbage og vælg et kamera.");
@@ -179,12 +183,23 @@ function startRaceCamera() {
     .then(stream => {
         activeStream = stream;
         raceVideo.srcObject = stream;
-        raceVideo.play();
 
-        // 🚀 **Vent på, at videoen er klar, før vi starter farvedetektion**
         raceVideo.onloadedmetadata = () => {
-            console.log("Race-video klar!");
-            detectColorInRace();
+            console.log("Race-video metadata indlæst!");
+        };
+
+        raceVideo.oncanplay = () => {
+            console.log("Race-video kan nu afspilles!");
+            raceVideo.play();
+            setTimeout(() => {
+                if (raceVideo.videoWidth > 0 && raceVideo.videoHeight > 0) {
+                    console.log("Race-video er fuldt indlæst, starter farvesporing!");
+                    detectColorInRace();
+                } else {
+                    console.error("Fejl: Race-video stadig ikke klar, prøver igen...");
+                    setTimeout(startRaceCamera, 500);
+                }
+            }, 500);
         };
     })
     .catch(err => {
@@ -196,47 +211,58 @@ function startRaceCamera() {
 
 // 🎯 **Farvedetektion – Sikrer, at kameraet er klar**
 function detectColorInRace() {
-    if (!raceActive || !activeRacePlayer || raceVideo.videoWidth === 0 || raceVideo.videoHeight === 0) {
-        console.warn("Video ikke klar, forsøger igen...");
-        setTimeout(detectColorInRace, 100);
+    if (trackingInterval !== null) {
+        console.warn("detectColorInRace kører allerede, undgår dobbelt-opstart.");
         return;
     }
 
-    const raceCanvas = document.createElement("canvas");
-    raceCanvas.width = raceVideo.videoWidth;
-    raceCanvas.height = raceVideo.videoHeight;
-    const raceCtx = raceCanvas.getContext("2d");
+    if (!raceActive || !activeRacePlayer) {
+        console.warn("Race er ikke aktiv eller spiller ikke valgt.");
+        return;
+    }
 
-    raceCtx.drawImage(raceVideo, 0, 0, raceCanvas.width, raceCanvas.height);
-    const imageData = raceCtx.getImageData(0, 0, raceCanvas.width, raceCanvas.height);
-    const data = imageData.data;
-
-    let detected = false;
-
-    for (let i = 0; i < data.length; i += 4) {
-        const r = data[i], g = data[i + 1], b = data[i + 2];
-
-        if (colorMatch(r, g, b, activeRacePlayer.color, activeRacePlayer.tolerance)) {
-            const now = Date.now();
-
-            if (now - lastDetectionTime > 1000) { // 1 sek pause før ny registrering
-                lapsCompleted++;
-                currentLapsDisplay.textContent = `Runder: ${lapsCompleted}/${raceSettings.rounds}`;
-                lastDetectionTime = now;
-            }
-
-            detected = true;
-            break;
+    trackingInterval = setInterval(() => {
+        if (raceVideo.videoWidth === 0 || raceVideo.videoHeight === 0) {
+            console.warn("Video stadig ikke klar, prøver igen...");
+            return;
         }
-    }
 
-    if (lapsCompleted < raceSettings.rounds) {
-        requestAnimationFrame(detectColorInRace);
-    } else {
-        alert(`${activeRacePlayer.name} har fuldført racet!`);
-        raceActive = false;
-        stopCamera();
-    }
+        const raceCanvas = document.createElement("canvas");
+        raceCanvas.width = raceVideo.videoWidth;
+        raceCanvas.height = raceVideo.videoHeight;
+        const raceCtx = raceCanvas.getContext("2d");
+
+        raceCtx.drawImage(raceVideo, 0, 0, raceCanvas.width, raceCanvas.height);
+        const imageData = raceCtx.getImageData(0, 0, raceCanvas.width, raceCanvas.height);
+        const data = imageData.data;
+
+        let detected = false;
+
+        for (let i = 0; i < data.length; i += 4) {
+            const r = data[i], g = data[i + 1], b = data[i + 2];
+
+            if (colorMatch(r, g, b, activeRacePlayer.color, activeRacePlayer.tolerance)) {
+                const now = Date.now();
+
+                if (now - lastDetectionTime > 1000) { // 1 sek pause før ny registrering
+                    lapsCompleted++;
+                    currentLapsDisplay.textContent = `Runder: ${lapsCompleted}/${raceSettings.rounds}`;
+                    lastDetectionTime = now;
+                }
+
+                detected = true;
+                break;
+            }
+        }
+
+        if (lapsCompleted >= raceSettings.rounds) {
+            alert(`${activeRacePlayer.name} har fuldført racet!`);
+            clearInterval(trackingInterval);
+            trackingInterval = null;
+            raceActive = false;
+            stopCamera();
+        }
+    }, 100); // Opdatering hver 100ms
 }
 
 // 🎯 **Start det valgte kamera**
@@ -402,21 +428,21 @@ savePlayerButton.addEventListener("click", () => {
     console.log("Spiller gemt:", player);
 });
 
-// 🎯 **Stop kameraet funktion (udenfor `savePlayerButton`!)**
+// 🎯 **Stop tracking når nødvendigt**
 function stopCamera() {
     if (activeStream) {
         activeStream.getTracks().forEach(track => track.stop());
-        video.srcObject = null;
+        raceVideo.srcObject = null;
         activeStream = null;
         console.log("Kamera stoppet.");
     }
 
-    // 🔴 **Stop tracking, hvis det stadig kører**
-    isTracking = false;
-    canvas.style.display = "none";
-    toleranceControls.style.display = "none";
+    if (trackingInterval !== null) {
+        clearInterval(trackingInterval);
+        trackingInterval = null;
+        console.log("Tracking stoppet.");
+    }
 }
-
 // 🎯 **Opdater spillerliste på forsiden**
 function updatePlayerList() {
     playerList.innerHTML = "";
