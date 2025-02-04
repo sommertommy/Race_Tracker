@@ -195,17 +195,24 @@ adjustColorButton.addEventListener("click", () => {
 function trackColor() {
     if (!selectedColor || !isTracking) return;
 
-    // Opsæt canvas dimensioner
+    // 🚀 **Tjek om video er klar**
+    if (video.videoWidth === 0 || video.videoHeight === 0) {
+        console.warn("Video er ikke klar, afventer...");
+        requestAnimationFrame(trackColor);
+        return;
+    }
+
+    // 📌 **Sæt canvas dimensioner korrekt**
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
+
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
 
     for (let i = 0; i < data.length; i += 4) {
         const r = data[i], g = data[i + 1], b = data[i + 2];
-        const brightness = (r + g + b) / 3; // Beregn lysstyrke
+        const brightness = (r + g + b) / 3; 
 
         if (colorMatch(r, g, b, selectedColor, tolerance) && brightness >= threshold) {
             data[i] = data[i + 1] = data[i + 2] = 255; // Hvid
@@ -215,7 +222,10 @@ function trackColor() {
     }
 
     ctx.putImageData(imageData, 0, 0);
-    requestAnimationFrame(trackColor); // Kør kontinuerligt
+
+    if (isTracking) {
+        requestAnimationFrame(trackColor);
+    }
 }
 
 // 🎯 **Matcher farver med tolerance**
@@ -261,6 +271,11 @@ function stopCamera() {
         activeStream = null;
         console.log("Kamera stoppet.");
     }
+
+    // 🔴 **Stop tracking, hvis det stadig kører**
+    isTracking = false;
+    canvas.style.display = "none";
+    toleranceControls.style.display = "none";
 }
 
 // 🎯 **Opdater spillerliste på forsiden**
