@@ -144,10 +144,19 @@ function startSelectedCamera() {
 }
 
 // 🎯 **Event listener til at vælge kamera**
-useSelectedCameraButton.addEventListener("click", startSelectedCamera);
 
-// 🎯 **Hent kameraer, når siden loader**
-document.addEventListener("DOMContentLoaded", getCameras);
+
+useSelectedCameraButton.addEventListener("click", () => {
+    let selectedDeviceId = cameraSelect.value;
+
+    if (!selectedDeviceId) {
+        alert("Vælg et kamera fra listen!");
+        return;
+    }
+
+    // 🚀 Start kameraet KUN hvis brugeren aktivt vælger det
+    startSelectedCamera(selectedDeviceId);
+});
 
 // 🎯 **Vælg farve ved klik på video (forhindrer frysen af kameraet)**
 video.addEventListener("click", (event) => {
