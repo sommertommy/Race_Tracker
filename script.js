@@ -172,15 +172,27 @@ function getCameras() {
 
 // 🎯 **Start race-kamera – bruger det valgte kamera**
 function startRaceCamera() {
-    if (!selectedCameraId) {
-        alert("Intet kamera valgt. Gå tilbage og vælg et kamera.");
-        return;
-    }
+    navigator.mediaDevices.enumerateDevices()
+    .then(devices => {
+        const videoDevices = devices.filter(device => device.kind === "videoinput");
 
-    navigator.mediaDevices.getUserMedia({
-        video: { deviceId: { exact: selectedCameraId } }
+        if (videoDevices.length === 0) {
+            console.error("Ingen kameraer fundet!");
+            alert("Ingen kameraer fundet. Tjek din enhed.");
+            return;
+        }
+
+        // Brug 'selectedCameraId', hvis det findes, ellers brug første kamera
+        const cameraId = selectedCameraId || videoDevices[0].deviceId;
+        console.log(`Bruger kamera: ${cameraId}`);
+
+        return navigator.mediaDevices.getUserMedia({
+            video: { deviceId: { exact: cameraId } }
+        });
     })
     .then(stream => {
+        if (!stream) return; // Hvis ingen stream returneres, stop her.
+
         activeStream = stream;
         raceVideo.srcObject = stream;
 
@@ -204,7 +216,7 @@ function startRaceCamera() {
     })
     .catch(err => {
         console.error("Fejl ved adgang til kamera", err);
-        alert("Kunne ikke starte kameraet.");
+        alert("Kunne ikke starte kameraet. Tjek kameraindstillinger.");
     });
 }
 
