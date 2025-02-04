@@ -16,7 +16,6 @@ const roundsInput = document.getElementById("rounds");
 const video = document.getElementById("video");
 const canvas = document.getElementById("overlayCanvas");
 
-// 🎯 **Optimeret canvas kontekst for hurtigere getImageData()**
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
 const toleranceSlider = document.getElementById("tolerance");
@@ -42,13 +41,13 @@ let players = [];
 let raceSettings = { rounds: 10 };
 let activeStream = null;
 
-// 🎯 **Skift til farvevalg (og hent kameraer, når brugeren går ind)**
+// 🎯 **Skift til farvevalg (hent kameraer kun, når brugeren trykker)**
 addPlayerButton.addEventListener("click", () => {
     startScreen.style.display = "none";
     colorSetupScreen.style.display = "block";
 
     console.log("Tilføj spiller trykket - henter kameraer...");
-    getCameras(); // 🚀 Nu hentes kameraer kun, når brugeren går ind i farvevælgeren.
+    getCameras();
 });
 
 // 🎯 **Skift til opsæt race**
@@ -62,7 +61,7 @@ setupRaceButton.addEventListener("click", () => {
 backToStartButton.addEventListener("click", () => {
     colorSetupScreen.style.display = "none";
     startScreen.style.display = "block";
-    stopTracking();
+    stopCamera();
 });
 
 backToStartRaceButton.addEventListener("click", () => {
@@ -83,7 +82,7 @@ function getCameras() {
                 return;
             }
 
-            cameraSelect.innerHTML = ""; // 🔥 Rydder dropdown, så den ikke duplicerer kameraer
+            cameraSelect.innerHTML = ""; 
 
             videoDevices.forEach((device, index) => {
                 let option = document.createElement("option");
@@ -102,6 +101,8 @@ function getCameras() {
 
 let activeStream = null; // Holder styr på det aktive kamerastream
 
+
+// 🎯 **Start det valgte kamera**
 function startSelectedCamera() {
     let selectedDeviceId = cameraSelect.value;
 
@@ -111,9 +112,7 @@ function startSelectedCamera() {
     }
 
     // 🔥 Stop eksisterende stream, hvis det allerede kører
-    if (activeStream) {
-        activeStream.getTracks().forEach(track => track.stop());
-    }
+    stopCamera();
 
     console.log("Starter kamera:", selectedDeviceId);
 
@@ -133,20 +132,11 @@ function startSelectedCamera() {
 
 // 🎯 **Event listener til at vælge kamera**
 
+useSelectedCameraButton.addEventListener("click", startSelectedCamera);
 
-useSelectedCameraButton.addEventListener("click", () => {
-    let selectedDeviceId = cameraSelect.value;
 
-    if (!selectedDeviceId) {
-        alert("Vælg et kamera fra listen!");
-        return;
-    }
 
-    // 🚀 Start kameraet KUN hvis brugeren aktivt vælger det
-    startSelectedCamera(selectedDeviceId);
-});
-
-// 🎯 **Vælg farve ved klik på video (forhindrer frysen af kameraet)**
+// 🎯 **Vælg farve ved klik på video**
 video.addEventListener("click", (event) => {
     if (!video.videoWidth || !video.videoHeight) {
         alert("Kameraet er ikke klar endnu. Prøv igen.");
@@ -166,7 +156,7 @@ video.addEventListener("click", (event) => {
     const pixel = tempCtx.getImageData(x, y, 1, 1).data;
     selectedColor = { r: pixel[0], g: pixel[1], b: pixel[2] };
 
-    colorDisplay.style.backgroundColor = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`; // ✅ Fixet syntax
+    colorDisplay.style.backgroundColor = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
 });
 
 // 🎯 **Opdater tolerance live**
@@ -254,15 +244,15 @@ savePlayerButton.addEventListener("click", () => {
     players.push(player);
     updatePlayerList();
 
-    // 🎯 **Stop kameraet, når spilleren gemmes**
-    stopCamera();
-
-    // Skift tilbage til startskærm
-    colorSetupScreen.style.display = "none";
-    startScreen.style.display = "block";
-
-    console.log("Spiller gemt:", player);
-});
+    // 🎯 **Stop kameraet**
+function stopCamera() {
+    if (activeStream) {
+        activeStream.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+        activeStream = null;
+        console.log("Kamera stoppet.");
+    }
+}
 
 // 🎯 **Stop kameraet, når spilleren gemmes**
 function stopCamera() {
