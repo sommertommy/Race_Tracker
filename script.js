@@ -109,7 +109,9 @@ function getCameras() {
         });
 }
 
-// 🎯 **Start det valgte kamera**
+let activeStream = null; // Holder styr på det aktive kamerastream
+
+// 🎯 **Start det valgte kamera (kun når brugeren vælger det)**
 function startSelectedCamera() {
     let selectedDeviceId = cameraSelect.value;
 
@@ -118,20 +120,20 @@ function startSelectedCamera() {
         return;
     }
 
-    // Stop eksisterende kamerastream, hvis det kører
+    // 🛠 Stop eksisterende kamerastream, hvis det kører
     if (activeStream) {
         activeStream.getTracks().forEach(track => track.stop());
     }
 
-    console.log("Valgt kamera:", selectedDeviceId);
+    console.log("Starter kamera:", selectedDeviceId);
 
     navigator.mediaDevices.getUserMedia({
-        video: { deviceId: { exact: selectedDeviceId } } // Tvinger brug af det valgte kamera
+        video: { deviceId: { exact: selectedDeviceId } }
     })
     .then(stream => {
-        activeStream = stream;
+        activeStream = stream; // Gem det aktive stream
         video.srcObject = stream;
-        video.play(); // Sikrer, at kameraet ikke fryser
+        video.play();
     })
     .catch(err => {
         console.error("Fejl ved adgang til kamera", err);
@@ -235,7 +237,7 @@ function colorMatch(r, g, b, color, tol) {
            Math.abs(b - color.b) < tol;
 }
 
-// 🎯 **Gem spiller**
+// 🎯 **Gem spiller og stop kameraet**
 savePlayerButton.addEventListener("click", () => {
     if (!selectedColor || !playerNameInput.value.trim()) {
         alert("Vælg en farve og indtast et navn!");
@@ -253,13 +255,30 @@ savePlayerButton.addEventListener("click", () => {
     players.push(player);
     updatePlayerList();
 
+    // Ryd felter
     playerNameInput.value = "";
     selectedColor = null;
     colorDisplay.style.backgroundColor = "transparent";
 
+    // 🎯 **Stop kameraet, når spilleren gemmes**
+    stopCamera();
+
+    // Skift tilbage til startskærm
     colorSetupScreen.style.display = "none";
     startScreen.style.display = "block";
+
+    console.log("Spiller gemt:", player);
 });
+
+// 🎯 **Stop kameraet, når spilleren gemmes**
+function stopCamera() {
+    if (activeStream) {
+        activeStream.getTracks().forEach(track => track.stop()); // Stop alle aktive kameratracks
+        video.srcObject = null; // Fjern stream fra video-elementet
+        activeStream = null; // Nulstil aktiv stream
+        console.log("Kamera stoppet.");
+    }
+}
 
 // 🎯 **Opdater spillerliste på forsiden**
 function updatePlayerList() {
