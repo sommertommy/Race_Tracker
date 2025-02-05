@@ -162,31 +162,30 @@ startRaceButton.addEventListener("click", () => {
 
     console.log("🔍 raceScreen vist!");
 
-    // Vælg første spiller
-    activeRacePlayer = players[0];
-    lapsCompleted = 0;
-    raceActive = true;
+    // **Slet og genskab `currentLapsDisplay` for at undgå fejl**
+    let lapsDisplay = document.getElementById("currentLapsDisplay");
 
+    if (!lapsDisplay) {
+        console.warn("⚠️ currentLapsDisplay ikke fundet! Opretter igen...");
+        lapsDisplay = document.createElement("p");
+        lapsDisplay.id = "currentLapsDisplay";
+        raceScreen.appendChild(lapsDisplay);
+    }
+
+    // **Vent 100ms og sæt textContent bagefter**
     setTimeout(() => {
-        let lapsDisplay = document.getElementById("currentLapsDisplay");
-        console.log("🔎 Før kontrol:", lapsDisplay);
+        console.log("🛠 Forsøger at opdatere currentLapsDisplay...");
 
-        if (!lapsDisplay) {
-            console.warn("⚠️ currentLapsDisplay blev ikke fundet! Opretter elementet...");
-            lapsDisplay = document.createElement("p");
-            lapsDisplay.id = "currentLapsDisplay";
+        if (lapsDisplay) {
             lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
-            raceScreen.appendChild(lapsDisplay);
+            console.log("✅ currentLapsDisplay opdateret!");
+        } else {
+            console.warn("⚠️ Fejl: currentLapsDisplay forsvandt igen!");
         }
-
-        console.log("✅ Efter kontrol:", lapsDisplay);
-
-        // Opdater spillerens navn i UI
-        currentPlayerDisplay.textContent = `Spiller: ${activeRacePlayer.name}`;
-
-        // Start kamera
-        startRaceCamera();
     }, 100);
+
+    // Start kamera
+    startRaceCamera();
 });
 
 const observer = new MutationObserver(() => {
