@@ -222,35 +222,49 @@ saveRaceButton.addEventListener("click", () => {
     startScreen.style.display = "block";
 });
 
-// 🎯 **Hent kameraer og tilføj dem til dropdown**
 function getCameras() {
     console.log("getCameras() kaldt!");
 
-    navigator.mediaDevices.enumerateDevices()
-        .then(devices => {
-            const videoDevices = devices.filter(device => device.kind === "videoinput");
+    navigator.mediaDevices.getUserMedia({ video: true }) // Anmoder om adgang for at få deviceId
+    .then(() => navigator.mediaDevices.enumerateDevices())
+    .then(devices => {
+        const videoDevices = devices.filter(device => device.kind === "videoinput");
 
-            if (videoDevices.length === 0) {
-                alert("Ingen kameraer fundet!");
-                return;
-            }
+        if (videoDevices.length === 0) {
+            console.error("❌ Ingen kameraer fundet!");
+            alert("Ingen kameraer fundet. Tjek din enhed.");
+            return;
+        }
 
-            cameraSelect.innerHTML = ""; 
+        cameraSelect.innerHTML = ""; 
 
-            videoDevices.forEach((device, index) => {
-                let option = document.createElement("option");
-                option.value = device.deviceId;
-                option.textContent = device.label || `Kamera ${index + 1}`;
-                cameraSelect.appendChild(option);
-            });
+        videoDevices.forEach((device, index) => {
+            let option = document.createElement("option");
 
-            console.log("Fundne kameraer:", videoDevices);
-        })
-        .catch(err => {
-            console.error("Fejl ved hentning af kameraer:", err);
-            alert("Kunne ikke hente kameraer. Tjek kameraindstillinger.");
+            // Brug fallback hvis deviceId mangler
+            let deviceId = device.deviceId || `fallback-${index}`;
+            option.value = deviceId;
+            option.textContent = device.label || `Kamera ${index + 1}`;
+            cameraSelect.appendChild(option);
+
+            console.log(`🎥 Kamera ${index + 1}: ${device.label || "Ukendt"} - ID: ${deviceId}`);
         });
+
+        // Vælg første kamera, hvis intet er valgt
+        if (!selectedCameraId && videoDevices[0]) {
+            selectedCameraId = videoDevices[0].deviceId || `fallback-0`;
+            console.log("📸 Første kamera valgt:", selectedCameraId);
+        }
+    })
+    .catch(err => {
+        console.error("⚠️ Fejl ved hentning af kameraer:", err);
+        alert("Kunne ikke hente kameraer. Tjek kameraindstillinger.");
+    });
 }
+
+
+
+
 
 // 🎯 **Start race-kamera – bruger det valgte kamera**
 function startRaceCamera() {
@@ -401,18 +415,18 @@ function detectColorInRace() {
     }, 100); // Opdatering hver 100ms
 }
 // 🎯 **Start det valgte kamera**
+
 function startSelectedCamera() {
     let selectedDeviceId = cameraSelect.value;
 
-    if (!selectedDeviceId) {
-        alert("Vælg et kamera fra listen!");
+    if (!selectedDeviceId || selectedDeviceId.startsWith("fallback")) {
+        alert("Ugyldigt kamera valgt! Prøv at vælge et andet.");
         return;
     }
 
-    // 🔥 Stop eksisterende stream, hvis det allerede kører
-    stopCamera();
+    stopCamera(); // Luk eksisterende stream, hvis der er en
 
-    console.log("Starter kamera:", selectedDeviceId);
+    console.log("🎬 Starter kamera:", selectedDeviceId);
 
     navigator.mediaDevices.getUserMedia({
         video: { deviceId: { exact: selectedDeviceId } }
@@ -423,14 +437,19 @@ function startSelectedCamera() {
         video.play();
     })
     .catch(err => {
-        console.error("Fejl ved adgang til kamera", err);
+        console.error("🚨 Fejl ved adgang til kamera:", err);
         alert("Kunne ikke starte kameraet. Prøv et andet kamera.");
     });
 }
 
+
 // 🎯 **Opdateret kameraopstart – gemmer valgte kamera**
 useSelectedCameraButton.addEventListener("click", () => {
-    selectedCameraId = cameraSelect.value; // 🔥 Gem kameraet til senere brug
+    if (!selectedCameraId) {
+        alert("Vælg et kamera fra listen!");
+        return;
+    }
+
     startSelectedCamera();
 });
 
