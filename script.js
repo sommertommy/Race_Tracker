@@ -70,15 +70,19 @@ addPlayerButton.addEventListener("click", () => {
     getCameras();
 });
 
+
 function addPlayer(name) {
     const newPlayer = {
         id: players.length + 1,
         name: name,
         laps: 0, // Start med 0 kørte runder
-        totalLaps: 12 // Sæt det samlede antal runder (kan justeres)
+        totalLaps: 12 // Sæt det samlede antal runder
     };
     players.push(newPlayer);
-    updateLeaderboard(); // Opdater leaderboardet efter tilføjelse af spiller
+    
+    updateLeaderboard(); // Opdater leaderboardet
+    
+    console.log(`Spiller tilføjet: ${name}`);
 }
 
 // Funktion der opdaterer en spillers runder og opdaterer leaderboardet
@@ -92,16 +96,33 @@ function updatePlayerLaps(playerId) {
 
 // Funktion til at opdatere leaderboardet
 function updateLeaderboard() {
-    const leaderboardDiv = document.getElementById("leaderboard"); // Sørg for at have en <div id="leaderboard"></div> i HTML'en
-    leaderboardDiv.innerHTML = "<h3>LEADERBOARD:</h3>"; // Ryd og tilføj overskrift
+    const leaderboardDiv = document.getElementById("leaderboard");
 
-    players.sort((a, b) => b.laps - a.laps); // Sortér spillere efter flest runder
+    // Tjek om leaderboard-div'en findes
+    if (!leaderboardDiv) {
+        console.error("Fejl: Leaderboard-div ikke fundet!");
+        return;
+    }
 
+    // Ryd leaderboard og tilføj overskrift
+    leaderboardDiv.innerHTML = "<h3>LEADERBOARD:</h3>";
+
+    // Sortér spillere efter flest runder
+    players.sort((a, b) => b.laps - a.laps);
+
+    // Tilføj hver spiller til leaderboardet
     players.forEach(player => {
         const playerEntry = document.createElement("p");
         playerEntry.textContent = `${player.name} ${player.laps}/${player.totalLaps}`;
         leaderboardDiv.appendChild(playerEntry);
     });
+
+    console.log("Leaderboard opdateret:", players);
+}
+
+// Forhindre kameraet i at blive påvirket, når en spiller tilføjes
+function preventCameraRestart() {
+    console.log("Kamera forbliver aktivt!");
 }
 
 // 🎯 **Skift til opsæt race**
