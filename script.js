@@ -54,6 +54,9 @@ let lapsCompleted = 0;
 let raceActive = false;
 let lastDetectionTime = 0;
 
+// Global liste til spillere og deres runder
+let players = [];
+
 // 🎯 **Gem det valgte kamera til senere brug**
 let selectedCameraId = null;
 
@@ -69,6 +72,40 @@ addPlayerButton.addEventListener("click", () => {
     console.log("Tilføj spiller trykket - henter kameraer...");
     getCameras();
 });
+
+function addPlayer(name) {
+    const newPlayer = {
+        id: players.length + 1,
+        name: name,
+        laps: 0, // Start med 0 kørte runder
+        totalLaps: 12 // Sæt det samlede antal runder (kan justeres)
+    };
+    players.push(newPlayer);
+    updateLeaderboard(); // Opdater leaderboardet efter tilføjelse af spiller
+}
+
+// Funktion der opdaterer en spillers runder og opdaterer leaderboardet
+function updatePlayerLaps(playerId) {
+    const player = players.find(p => p.id === playerId);
+    if (player) {
+        player.laps++;
+        updateLeaderboard();
+    }
+}
+
+// Funktion til at opdatere leaderboardet
+function updateLeaderboard() {
+    const leaderboardDiv = document.getElementById("leaderboard"); // Sørg for at have en <div id="leaderboard"></div> i HTML'en
+    leaderboardDiv.innerHTML = "<h3>LEADERBOARD:</h3>"; // Ryd og tilføj overskrift
+
+    players.sort((a, b) => b.laps - a.laps); // Sortér spillere efter flest runder
+
+    players.forEach(player => {
+        const playerEntry = document.createElement("p");
+        playerEntry.textContent = `${player.name} ${player.laps}/${player.totalLaps}`;
+        leaderboardDiv.appendChild(playerEntry);
+    });
+}
 
 // 🎯 **Skift til opsæt race**
 setupRaceButton.addEventListener("click", () => {
@@ -112,6 +149,8 @@ startRaceButton.addEventListener("click", () => {
     // Start kamera
     startRaceCamera();
 });
+
+
 
 // 🎯 **Tilbage til setup race**
 backToSetupRaceButton.addEventListener("click", () => {
