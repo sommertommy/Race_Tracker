@@ -295,24 +295,22 @@ function startRaceCamera() {
 
         hiddenVideo.oncanplay = () => {
             console.log("Race-video kan nu afspilles i baggrunden!");
-
             setTimeout(() => {
                 if (hiddenVideo.videoWidth > 0 && hiddenVideo.videoHeight > 0) {
                     console.log("Race-video er fuldt indlæst, starter farvesporing!");
                     
-                    // 🔥 **Sikrer, at detectColorInRace kun startes én gang**
-                    if (trackingInterval === null) {
+                    if (!trackingInterval) { // 🎯 Undgå at starte flere gange
                         detectColorInRace();
                     } else {
                         console.warn("⚠️ detectColorInRace kører allerede, undgår dobbelt-opstart.");
                     }
+        
                 } else {
                     console.error("Fejl: Race-video stadig ikke klar, prøver igen...");
                     setTimeout(startRaceCamera, 500);
                 }
             }, 500);
         };
-    })
     .catch(err => {
         console.error("Fejl ved adgang til kamera", err);
         alert("Kunne ikke starte kameraet. Tjek kameraindstillinger.");
