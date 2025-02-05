@@ -313,7 +313,14 @@ function detectColorInRace() {
 
                 if (now - lastDetectionTime > 1000) { // 1 sek pause før ny registrering
                     activeRacePlayer.laps++; // 🎯 **Opdater spillerens runder**
-                    currentLapsDisplay.textContent = `Runder: ${activeRacePlayer.laps}/${raceSettings.rounds}`;
+
+                    // 🔥 **Sikring mod null-fejl**
+                    if (currentLapsDisplay) {
+                        currentLapsDisplay.textContent = `Runder: ${activeRacePlayer.laps}/${raceSettings.rounds}`;
+                    } else {
+                        console.warn("Fejl: currentLapsDisplay findes ikke i DOM'en!");
+                    }
+
                     updateLeaderboard(); // 🎯 **Opdater leaderboard live**
                     lastDetectionTime = now;
                 }
