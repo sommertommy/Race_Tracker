@@ -167,12 +167,14 @@ startRaceButton.addEventListener("click", () => {
    // Opdater UI
    currentPlayerDisplay.textContent = `Spiller: ${activeRacePlayer.name}`;
    
-   const lapsDisplay = document.getElementById("currentLapsDisplay");
-   if (lapsDisplay) {
-       lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
-   } else {
-       console.warn("Fejl: Elementet currentLapsDisplay blev ikke fundet!");
-   }
+  const lapsDisplay = document.getElementById("currentLapsDisplay");
+
+    if (lapsDisplay) {
+        console.log("✅ Element fundet:", lapsDisplay);
+        lapsDisplay.textContent = `Runder: ${activeRacePlayer.laps || 0}/${raceSettings.rounds}`;
+    } else {
+        console.warn("⚠️ Fejl: Elementet currentLapsDisplay blev ikke fundet!");
+    }
 
     // Start kamera
     startRaceCamera();
