@@ -149,6 +149,8 @@ backToStartRaceButton.addEventListener("click", () => {
 
 // 🎯 **Start Race**
 startRaceButton.addEventListener("click", () => {
+    console.log("🚀 Start Race trykket!");
+
     if (players.length === 0) {
         alert("Tilføj mindst én spiller før du starter racet!");
         return;
@@ -158,30 +160,33 @@ startRaceButton.addEventListener("click", () => {
     raceSetupScreen.style.display = "none";
     raceScreen.style.display = "block";
 
+    console.log("🔍 raceScreen vist!");
+
     // Vælg første spiller
     activeRacePlayer = players[0];
     lapsCompleted = 0;
     raceActive = true;
 
-    // 🎯 **Opret `currentLapsDisplay` på ny for at sikre, at det eksisterer**
-    let lapsDisplay = document.getElementById("currentLapsDisplay");
+    setTimeout(() => {
+        let lapsDisplay = document.getElementById("currentLapsDisplay");
+        console.log("🔎 Før kontrol:", lapsDisplay);
 
-    if (lapsDisplay) {
-        lapsDisplay.remove(); // Fjern eksisterende version for at undgå fejl
-    }
+        if (!lapsDisplay) {
+            console.warn("⚠️ currentLapsDisplay blev ikke fundet! Opretter elementet...");
+            lapsDisplay = document.createElement("p");
+            lapsDisplay.id = "currentLapsDisplay";
+            lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
+            raceScreen.appendChild(lapsDisplay);
+        }
 
-    lapsDisplay = document.createElement("p");
-    lapsDisplay.id = "currentLapsDisplay";
-    lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
-    raceScreen.appendChild(lapsDisplay); // Tilføj elementet i DOM'en
+        console.log("✅ Efter kontrol:", lapsDisplay);
 
-    console.log("✅ currentLapsDisplay oprettet og tilføjet til DOM'en.");
+        // Opdater spillerens navn i UI
+        currentPlayerDisplay.textContent = `Spiller: ${activeRacePlayer.name}`;
 
-    // Opdater spillerens navn i UI
-    currentPlayerDisplay.textContent = `Spiller: ${activeRacePlayer.name}`;
-
-    // Start kamera
-    startRaceCamera();
+        // Start kamera
+        startRaceCamera();
+    }, 100);
 });
 
 const observer = new MutationObserver(() => {
