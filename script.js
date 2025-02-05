@@ -192,7 +192,11 @@ startRaceButton.addEventListener("click", () => {
     // **🔴 VIGTIGT! Start detectColorInRace efter 1 sekund**
     setTimeout(() => {
         console.log("🔥 Forsøger at starte detectColorInRace manuelt...");
-        detectColorInRace();
+        if (trackingInterval === null) {
+            detectColorInRace();
+        } else {
+    console.warn("⚠️ detectColorInRace kører allerede, starter ikke igen.");
+}
     }, 1000);
 });
 
