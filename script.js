@@ -46,6 +46,8 @@ const currentPlayerDisplay = document.getElementById("currentPlayer");
 const currentLapsDisplay = document.getElementById("currentLapsDisplay");
 const backToSetupRaceButton = document.getElementById("backToSetupRace");
 
+
+
 let selectedColor = null;
 let tolerance = 50;
 let threshold = 100;
@@ -65,12 +67,17 @@ let selectedCameraId = null;
 // 🎯 **Farvesporing – Sikrer, at kameraet er klar**
 let trackingInterval = null; // 🔥 Stopper flere samtidige tracking-løkker
 
+// 🎯 **Funktion til at styre skærmene**
+function showScreen(targetScreen) {
+    const screens = [startScreen, colorSetupScreen, raceSetupScreen, raceScreen];
+    screens.forEach(screen => screen.style.display = "none");
+    targetScreen.style.display = "block";
+}
+
 
 // 🎯 **Skift til farvevalg (hent kameraer kun, når brugeren trykker)**
 addPlayerButton.addEventListener("click", () => {
-    startScreen.style.display = "none";
-    colorSetupScreen.style.display = "block";
-
+    showScreen(colorSetupScreen);
     console.log("Tilføj spiller trykket - henter kameraer...");
     getCameras();
 });
@@ -130,24 +137,20 @@ function preventCameraRestart() {
 
 // 🎯 **Skift til opsæt race**
 setupRaceButton.addEventListener("click", () => {
-    startScreen.style.display = "none";
-    raceSetupScreen.style.display = "block";
+    showScreen(raceSetupScreen);
     roundsInput.value = raceSettings.rounds;
 });
 
 // 🎯 **Skift tilbage til startskærm**
 backToStartButton.addEventListener("click", () => {
-    colorSetupScreen.style.display = "none";
-    startScreen.style.display = "block";
+    showScreen(startScreen);
     stopCamera();
 });
 
 backToStartRaceButton.addEventListener("click", () => {
-    raceSetupScreen.style.display = "none";
-    startScreen.style.display = "block";
+    showScreen(startScreen);
 });
 
-// 🎯 **Start Race**
 startRaceButton.addEventListener("click", () => {
     console.log("🚀 Start Race trykket!");
 
@@ -156,19 +159,14 @@ startRaceButton.addEventListener("click", () => {
         return;
     }
 
-    // Skift til race-skærm
-    raceSetupScreen.style.display = "none";
-    raceScreen.style.display = "block";
-
+    showScreen(raceScreen);
     console.log("🔍 raceScreen vist!");
 
-    // Vælg første spiller som aktiv spiller
-    activeRacePlayer = players[0]; 
-    raceActive = true; // Sikre at race er aktiv
+    raceActive = true;
+    
+    console.log("🏁 Race er nu aktiv:", raceActive);
 
-    console.log("🏁 Race er nu aktiv:", raceActive, "Spiller valgt:", activeRacePlayer);
-
-    // Opdater UI
+    // Sikrer at `currentLapsDisplay` eksisterer
     let lapsDisplay = document.getElementById("currentLapsDisplay");
     if (!lapsDisplay) {
         console.warn("⚠️ currentLapsDisplay ikke fundet! Opretter igen...");
@@ -177,14 +175,9 @@ startRaceButton.addEventListener("click", () => {
         raceScreen.appendChild(lapsDisplay);
     }
 
-    setTimeout(() => {
-        if (lapsDisplay) {
-            lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
-            console.log("✅ currentLapsDisplay opdateret!");
-        } else {
-            console.warn("⚠️ Fejl: currentLapsDisplay forsvandt igen!");
-        }
-    }, 100);
+    // Opdater rundevisning
+    lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
+    console.log("✅ currentLapsDisplay opdateret!");
 
     // Start kameraet
     startRaceCamera();
@@ -192,11 +185,11 @@ startRaceButton.addEventListener("click", () => {
     // **🔴 VIGTIGT! Start detectColorInRace efter 1 sekund**
     setTimeout(() => {
         console.log("🔥 Forsøger at starte detectColorInRace manuelt...");
-        if (trackingInterval === null) {
+        if (!trackingInterval) {
             detectColorInRace();
         } else {
-    console.warn("⚠️ detectColorInRace kører allerede, starter ikke igen.");
-}
+            console.warn("⚠️ detectColorInRace kører allerede, starter ikke igen.");
+        }
     }, 1000);
 });
 
