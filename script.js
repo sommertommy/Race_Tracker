@@ -291,17 +291,27 @@ function startRaceCamera() {
         if (!stream) return; // Hvis ingen stream returneres, stop her.
 
         activeStream = stream;
-        raceVideo.srcObject = stream;
 
-        raceVideo.onloadedmetadata = () => {
+        // 🎯 **Skjult video-element til tracking**
+        let hiddenVideo = document.getElementById("hiddenRaceVideo");
+        if (!hiddenVideo) {
+            hiddenVideo = document.createElement("video");
+            hiddenVideo.id = "hiddenRaceVideo";
+            hiddenVideo.style.display = "none"; // Skjul video
+            document.body.appendChild(hiddenVideo);
+        }
+
+        hiddenVideo.srcObject = stream;
+        hiddenVideo.play();
+
+        hiddenVideo.onloadedmetadata = () => {
             console.log("Race-video metadata indlæst!");
         };
 
-        raceVideo.oncanplay = () => {
-            console.log("Race-video kan nu afspilles!");
-            raceVideo.play();
+        hiddenVideo.oncanplay = () => {
+            console.log("Race-video kan nu afspilles i baggrunden!");
             setTimeout(() => {
-                if (raceVideo.videoWidth > 0 && raceVideo.videoHeight > 0) {
+                if (hiddenVideo.videoWidth > 0 && hiddenVideo.videoHeight > 0) {
                     console.log("Race-video er fuldt indlæst, starter farvesporing!");
                     detectColorInRace();
                 } else {
