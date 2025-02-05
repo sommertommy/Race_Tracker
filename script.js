@@ -129,6 +129,15 @@ function updateLeaderboard() {
     });
 
     console.log("Leaderboard opdateret:", players);
+
+    // 🎯 **Sikrer at currentLapsDisplay kun oprettes én gang**
+    let lapsDisplay = document.getElementById("currentLapsDisplay");
+    if (!lapsDisplay) {
+        console.warn("⚠️ currentLapsDisplay ikke fundet! Opretter igen...");
+        lapsDisplay = document.createElement("p");
+        lapsDisplay.id = "currentLapsDisplay";
+        leaderboardDiv.appendChild(lapsDisplay);
+    }
 }
 // Forhindre kameraet i at blive påvirket, når en spiller tilføjes
 function preventCameraRestart() {
@@ -310,10 +319,17 @@ function startRaceCamera() {
 
         hiddenVideo.oncanplay = () => {
             console.log("Race-video kan nu afspilles i baggrunden!");
+
             setTimeout(() => {
                 if (hiddenVideo.videoWidth > 0 && hiddenVideo.videoHeight > 0) {
                     console.log("Race-video er fuldt indlæst, starter farvesporing!");
-                    detectColorInRace();
+                    
+                    // 🔥 **Sikrer, at detectColorInRace kun startes én gang**
+                    if (trackingInterval === null) {
+                        detectColorInRace();
+                    } else {
+                        console.warn("⚠️ detectColorInRace kører allerede, undgår dobbelt-opstart.");
+                    }
                 } else {
                     console.error("Fejl: Race-video stadig ikke klar, prøver igen...");
                     setTimeout(startRaceCamera, 500);
