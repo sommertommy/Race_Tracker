@@ -341,6 +341,12 @@ function detectColorInRace() {
         console.log("✅ detectColorInRace starter!");
     }
 
+    let hiddenVideo = document.getElementById("hiddenRaceVideo");
+    if (!hiddenVideo) {
+        console.error("❌ Fejl: Skjult kamera-video ikke fundet!");
+        return;
+    }
+
     trackingInterval = setInterval(() => {
         if (!raceActive) {
             console.warn("⏸ detectColorInRace stoppet, da raceActive er false.");
@@ -349,17 +355,17 @@ function detectColorInRace() {
             return;
         }
 
-        if (raceVideo.videoWidth === 0 || raceVideo.videoHeight === 0) {
+        if (hiddenVideo.videoWidth === 0 || hiddenVideo.videoHeight === 0) {
             console.warn("⏳ Video stadig ikke klar, prøver igen...");
             return;
         }
 
         const raceCanvas = document.createElement("canvas");
-        raceCanvas.width = raceVideo.videoWidth;
-        raceCanvas.height = raceVideo.videoHeight;
+        raceCanvas.width = hiddenVideo.videoWidth;
+        raceCanvas.height = hiddenVideo.videoHeight;
         const raceCtx = raceCanvas.getContext("2d");
 
-        raceCtx.drawImage(raceVideo, 0, 0, raceCanvas.width, raceCanvas.height);
+        raceCtx.drawImage(hiddenVideo, 0, 0, raceCanvas.width, raceCanvas.height);
         const imageData = raceCtx.getImageData(0, 0, raceCanvas.width, raceCanvas.height);
         const data = imageData.data;
 
@@ -563,12 +569,18 @@ savePlayerButton.addEventListener("click", () => {
 });
 
 
-// 🎯 **Stop kameraet korrekt for at undgå sort/hvid fejl**
 function stopCamera() {
     if (activeStream) {
         activeStream.getTracks().forEach(track => track.stop());
         video.srcObject = null; // Stopper preview-videoen
-        raceVideo.srcObject = null; // Stopper race-videoen
+
+        // 🎯 **Opdateret**: Brug hiddenRaceVideo i stedet for raceVideo
+        let hiddenVideo = document.getElementById("hiddenRaceVideo");
+        if (hiddenVideo) {
+            hiddenVideo.srcObject = null;
+            console.log("Skjult kamera-video stoppet.");
+        }
+
         activeStream = null;
         console.log("Kamera stoppet.");
     }
