@@ -163,10 +163,7 @@ startRaceButton.addEventListener("click", () => {
     lapsCompleted = 0;
     raceActive = true;
 
-    // Opdater spillerens navn i UI
-    currentPlayerDisplay.textContent = `Spiller: ${activeRacePlayer.name}`;
-
-    // 🚀 **Tjek og opret `currentLapsDisplay` hvis den mangler**
+    // 🎯 **Indlæs elementet EFTER race-skærmen er aktiveret**
     let lapsDisplay = document.getElementById("currentLapsDisplay");
 
     if (!lapsDisplay) {
@@ -179,6 +176,9 @@ startRaceButton.addEventListener("click", () => {
         console.log("✅ Element fundet:", lapsDisplay);
         lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
     }
+
+    // Opdater spillerens navn i UI
+    currentPlayerDisplay.textContent = `Spiller: ${activeRacePlayer.name}`;
 
     // Start kamera
     startRaceCamera();
