@@ -163,30 +163,41 @@ startRaceButton.addEventListener("click", () => {
     lapsCompleted = 0;
     raceActive = true;
 
-    // 🚀 **Vent 100ms for at sikre, at DOM er opdateret**
-    setTimeout(() => {
-        let lapsDisplay = document.getElementById("currentLapsDisplay");
+    // 🎯 **Opret `currentLapsDisplay` på ny for at sikre, at det eksisterer**
+    let lapsDisplay = document.getElementById("currentLapsDisplay");
 
-        if (!lapsDisplay) {
-            console.warn("⚠️ currentLapsDisplay blev ikke fundet! Opretter elementet...");
-            lapsDisplay = document.createElement("p");
-            lapsDisplay.id = "currentLapsDisplay";
-            lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
-            raceScreen.appendChild(lapsDisplay); // Tilføj elementet i DOM'en
-        } else {
-            console.log("✅ Element fundet:", lapsDisplay);
-            lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
-        }
+    if (lapsDisplay) {
+        lapsDisplay.remove(); // Fjern eksisterende version for at undgå fejl
+    }
 
-        // Opdater spillerens navn i UI
-        currentPlayerDisplay.textContent = `Spiller: ${activeRacePlayer.name}`;
+    lapsDisplay = document.createElement("p");
+    lapsDisplay.id = "currentLapsDisplay";
+    lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
+    raceScreen.appendChild(lapsDisplay); // Tilføj elementet i DOM'en
 
-        // Start kamera
-        startRaceCamera();
-    }, 100); // ⏳ Vent 100ms
+    console.log("✅ currentLapsDisplay oprettet og tilføjet til DOM'en.");
+
+    // Opdater spillerens navn i UI
+    currentPlayerDisplay.textContent = `Spiller: ${activeRacePlayer.name}`;
+
+    // Start kamera
+    startRaceCamera();
 });
 
+const observer = new MutationObserver(() => {
+    let lapsDisplay = document.getElementById("currentLapsDisplay");
 
+    if (!lapsDisplay) {
+        console.warn("⚠️ currentLapsDisplay forsvandt! Opretter igen...");
+        lapsDisplay = document.createElement("p");
+        lapsDisplay.id = "currentLapsDisplay";
+        lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
+        raceScreen.appendChild(lapsDisplay);
+    }
+});
+
+// Overvåg raceScreen for ændringer i børneelementer
+observer.observe(raceScreen, { childList: true, subtree: true });
 
 // 🎯 **Tilbage til setup race**
 backToSetupRaceButton.addEventListener("click", () => {
