@@ -6,7 +6,7 @@ const addPlayerButton = document.getElementById("addPlayer");
 const setupRaceButton = document.getElementById("setupRace");
 const saveRaceButton = document.getElementById("saveRace");
 const backToStartRaceButton = document.getElementById("backToStartRace");
-
+ 
 const savePlayerButton = document.getElementById("savePlayer");
 const backToStartButton = document.getElementById("backToStart");
 
