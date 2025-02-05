@@ -264,7 +264,6 @@ function startRaceCamera() {
             return;
         }
 
-        // Brug 'selectedCameraId', hvis det findes, ellers brug første kamera
         const cameraId = selectedCameraId || videoDevices[0].deviceId;
         console.log(`Bruger kamera: ${cameraId}`);
 
@@ -273,16 +272,15 @@ function startRaceCamera() {
         });
     })
     .then(stream => {
-        if (!stream) return; // Hvis ingen stream returneres, stop her.
+        if (!stream) return; 
 
         activeStream = stream;
 
-        // 🎯 **Skjult video-element til tracking**
         let hiddenVideo = document.getElementById("hiddenRaceVideo");
         if (!hiddenVideo) {
             hiddenVideo = document.createElement("video");
             hiddenVideo.id = "hiddenRaceVideo";
-            hiddenVideo.style.display = "none"; // Skjul video
+            hiddenVideo.style.display = "none"; 
             document.body.appendChild(hiddenVideo);
         }
 
@@ -299,19 +297,19 @@ function startRaceCamera() {
                 if (hiddenVideo.videoWidth > 0 && hiddenVideo.videoHeight > 0) {
                     console.log("Race-video er fuldt indlæst, starter farvesporing!");
                     
-                    if (!trackingInterval) { // 🎯 Undgå at starte flere gange
+                    if (!trackingInterval) { 
                         detectColorInRace();
                     } else {
                         console.warn("⚠️ detectColorInRace kører allerede, undgår dobbelt-opstart.");
                     }
-        
                 } else {
                     console.error("Fejl: Race-video stadig ikke klar, prøver igen...");
                     setTimeout(startRaceCamera, 500);
                 }
             }, 500);
         };
-    catch(err => {
+    })
+    .catch(err => { // 🔴 Flyttet `catch()` udenfor `.then()`
         console.error("Fejl ved adgang til kamera", err);
         alert("Kunne ikke starte kameraet. Tjek kameraindstillinger.");
     });
