@@ -94,26 +94,25 @@ function updatePlayerLaps(playerId) {
     }
 }
 
-// Funktion til at opdatere leaderboardet
+// 🎯 **Opdater leaderboard ved at vise alle spillere korrekt**
 function updateLeaderboard() {
     const leaderboardDiv = document.getElementById("leaderboard");
 
-    // Tjek om leaderboard-div'en findes
+    // Hvis leaderboard ikke findes i DOM, afslut funktionen
     if (!leaderboardDiv) {
         console.error("Fejl: Leaderboard-div ikke fundet!");
         return;
     }
 
-    // Ryd leaderboard og tilføj overskrift
-    leaderboardDiv.innerHTML = "<h3>LEADERBOARD:</h3>";
+    leaderboardDiv.innerHTML = "<h3>LEADERBOARD:</h3>"; // Tilføj overskrift
 
-    // Sortér spillere efter flest runder
+    // Sortér spillerne efter antal runder kørt (højest først)
     players.sort((a, b) => b.laps - a.laps);
 
-    // Tilføj hver spiller til leaderboardet
+    // Gennemgå hver spiller og vis dem i leaderboardet
     players.forEach(player => {
-        const playerEntry = document.createElement("p");
-        playerEntry.textContent = `${player.name} ${player.laps}/${player.totalLaps}`;
+        let playerEntry = document.createElement("p");
+        playerEntry.textContent = `${player.name} ${player.laps}/${raceSettings.rounds}`;
         leaderboardDiv.appendChild(playerEntry);
     });
 
@@ -470,6 +469,7 @@ function colorMatch(r, g, b, color, tol) {
 }
 
 // 🎯 **Gem spiller og stop kameraet**
+// 🎯 **Tilføj spiller og sørg for, at leaderboard bliver opdateret**
 savePlayerButton.addEventListener("click", () => {
     if (!selectedColor || !playerNameInput.value.trim()) {
         alert("Vælg en farve og indtast et navn!");
@@ -481,34 +481,40 @@ savePlayerButton.addEventListener("click", () => {
         name: playerNameInput.value.trim(),
         color: selectedColor,
         tolerance: tolerance,
-        threshold: threshold
+        threshold: threshold,
+        laps: 0 // Start med 0 kørte runder
     };
-    
+
     players.push(player);
     updatePlayerList();
+    updateLeaderboard(); // 🎯 Opdater leaderboard når en spiller tilføjes
 
-    // 🎯 **Stop kameraet, når spilleren gemmes**
+    // 🎯 **Stop kameraet korrekt, så sort/hvid mode ikke starter igen**
     stopCamera();
 
-    // Skift tilbage til startskærm
+    // 🎯 **Skift tilbage til startskærm**
     colorSetupScreen.style.display = "none";
     startScreen.style.display = "block";
 
     console.log("Spiller gemt:", player);
 });
 
-// 🎯 **Stop tracking når nødvendigt**
+
+// 🎯 **Stop kameraet korrekt for at undgå sort/hvid fejl**
 function stopCamera() {
     if (activeStream) {
         activeStream.getTracks().forEach(track => track.stop());
-        raceVideo.srcObject = null;
+        video.srcObject = null; // Stopper preview-videoen
+        raceVideo.srcObject = null; // Stopper race-videoen
         activeStream = null;
         console.log("Kamera stoppet.");
     }
 
-    if (trackingInterval !== null) {
-        clearInterval(trackingInterval);
-        trackingInterval = null;
+    // 🎯 **Stop sort/hvid-tracking, så det ikke fortsætter efter en spiller tilføjes**
+    if (isTracking) {
+        isTracking = false;
+        canvas.style.display = "none";
+        toleranceControls.style.display = "none";
         console.log("Tracking stoppet.");
     }
 }
