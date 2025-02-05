@@ -95,10 +95,10 @@ function updatePlayerLaps(playerId) {
 }
 
 // 🎯 **Opdater leaderboard ved at vise alle spillere korrekt**
+// 🎯 **Opdater leaderboard ved at vise alle spillere korrekt**
 function updateLeaderboard() {
     const leaderboardDiv = document.getElementById("leaderboard");
 
-    // Hvis leaderboard ikke findes i DOM, afslut funktionen
     if (!leaderboardDiv) {
         console.error("Fejl: Leaderboard-div ikke fundet!");
         return;
@@ -106,10 +106,10 @@ function updateLeaderboard() {
 
     leaderboardDiv.innerHTML = "<h3>LEADERBOARD:</h3>"; // Tilføj overskrift
 
-    // Sortér spillerne efter antal runder kørt (højest først)
+    // 🎯 **Sortér spillere efter antal runder kørt (højest først)**
     players.sort((a, b) => b.laps - a.laps);
 
-    // Gennemgå hver spiller og vis dem i leaderboardet
+    // 🎯 **Vis opdaterede spillerrunder i leaderboardet**
     players.forEach(player => {
         let playerEntry = document.createElement("p");
         playerEntry.textContent = `${player.name} ${player.laps}/${raceSettings.rounds}`;
@@ -118,7 +118,6 @@ function updateLeaderboard() {
 
     console.log("Leaderboard opdateret:", players);
 }
-
 // Forhindre kameraet i at blive påvirket, når en spiller tilføjes
 function preventCameraRestart() {
     console.log("Kamera forbliver aktivt!");
@@ -277,7 +276,7 @@ function startRaceCamera() {
 }
 
 
-// 🎯 **Farvedetektion – Sikrer, at kameraet er klar**
+// 🎯 **Farvedetektion – Registrer runder for aktive spillere**
 function detectColorInRace() {
     if (trackingInterval !== null) {
         console.warn("detectColorInRace kører allerede, undgår dobbelt-opstart.");
@@ -313,8 +312,9 @@ function detectColorInRace() {
                 const now = Date.now();
 
                 if (now - lastDetectionTime > 1000) { // 1 sek pause før ny registrering
-                    lapsCompleted++;
-                    currentLapsDisplay.textContent = `Runder: ${lapsCompleted}/${raceSettings.rounds}`;
+                    activeRacePlayer.laps++; // 🎯 **Opdater spillerens runder**
+                    currentLapsDisplay.textContent = `Runder: ${activeRacePlayer.laps}/${raceSettings.rounds}`;
+                    updateLeaderboard(); // 🎯 **Opdater leaderboard live**
                     lastDetectionTime = now;
                 }
 
@@ -323,7 +323,7 @@ function detectColorInRace() {
             }
         }
 
-        if (lapsCompleted >= raceSettings.rounds) {
+        if (activeRacePlayer.laps >= raceSettings.rounds) {
             alert(`${activeRacePlayer.name} har fuldført racet!`);
             clearInterval(trackingInterval);
             trackingInterval = null;
