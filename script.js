@@ -311,7 +311,7 @@ function startRaceCamera() {
                 }
             }, 500);
         };
-    .catch(err => {
+    catch(err => {
         console.error("Fejl ved adgang til kamera", err);
         alert("Kunne ikke starte kameraet. Tjek kameraindstillinger.");
     });
