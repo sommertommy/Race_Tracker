@@ -166,17 +166,19 @@ startRaceButton.addEventListener("click", () => {
     // Opdater spillerens navn i UI
     currentPlayerDisplay.textContent = `Spiller: ${activeRacePlayer.name}`;
 
-    // 🚀 **Vent 100ms for at sikre, at DOM er opdateret**
-    setTimeout(() => {
-        const lapsDisplay = document.getElementById("currentLapsDisplay");
+    // 🚀 **Tjek og opret `currentLapsDisplay` hvis den mangler**
+    let lapsDisplay = document.getElementById("currentLapsDisplay");
 
-        if (lapsDisplay) {
-            console.log("✅ Element fundet:", lapsDisplay);
-            lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
-        } else {
-            console.warn("⚠️ Fejl: Elementet currentLapsDisplay blev ikke fundet!");
-        }
-    }, 100);  // ⏳ Vent 100ms
+    if (!lapsDisplay) {
+        console.warn("⚠️ currentLapsDisplay blev ikke fundet! Opretter elementet...");
+        lapsDisplay = document.createElement("p");
+        lapsDisplay.id = "currentLapsDisplay";
+        lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
+        raceScreen.appendChild(lapsDisplay); // Tilføj elementet i DOM'en
+    } else {
+        console.log("✅ Element fundet:", lapsDisplay);
+        lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
+    }
 
     // Start kamera
     startRaceCamera();
