@@ -43,7 +43,7 @@ const startRaceButton = document.getElementById("startRace");
 const raceScreen = document.getElementById("raceScreen");
 const raceVideo = document.getElementById("raceVideo");
 const currentPlayerDisplay = document.getElementById("currentPlayer");
-const currentLapsDisplay = document.getElementById("currentLaps");
+const currentLapsDisplay = document.getElementById("currentLapsDisplay");
 const backToSetupRaceButton = document.getElementById("backToSetupRace");
 
 let selectedColor = null;
