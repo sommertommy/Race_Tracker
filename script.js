@@ -1,3 +1,8 @@
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("DOM er nu indlæst!");
+    console.log("Tjekker element:", document.getElementById("currentLapsDisplay"));
+});
+
 const startScreen = document.getElementById("startScreen");
 const colorSetupScreen = document.getElementById("colorSetupScreen");
 const raceSetupScreen = document.getElementById("raceSetupScreen");
@@ -159,8 +164,15 @@ startRaceButton.addEventListener("click", () => {
     raceActive = true;
 
     // Opdater UI
-    currentPlayerDisplay.textContent = `Spiller: ${activeRacePlayer.name}`;
-    currentLapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
+   // Opdater UI
+   currentPlayerDisplay.textContent = `Spiller: ${activeRacePlayer.name}`;
+   
+   const lapsDisplay = document.getElementById("currentLapsDisplay");
+   if (lapsDisplay) {
+       lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
+   } else {
+       console.warn("Fejl: Elementet currentLapsDisplay blev ikke fundet!");
+   }
 
     // Start kamera
     startRaceCamera();
