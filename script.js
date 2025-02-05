@@ -347,6 +347,9 @@ function detectColorInRace() {
         return;
     }
 
+    let maxAttempts = 50; // Undgå uendelig gentagelse
+    let attempts = 0;
+
     trackingInterval = setInterval(() => {
         if (!raceActive) {
             console.warn("⏸ detectColorInRace stoppet, da raceActive er false.");
@@ -355,8 +358,15 @@ function detectColorInRace() {
             return;
         }
 
-        if (hiddenVideo.videoWidth === 0 || hiddenVideo.videoHeight === 0) {
-            console.warn("⏳ Video stadig ikke klar, prøver igen...");
+        if (!hiddenVideo || hiddenVideo.videoWidth === 0 || hiddenVideo.videoHeight === 0) {
+            attempts++;
+            if (attempts >= maxAttempts) {
+                console.error("⛔ Video kunne ikke startes efter flere forsøg. Stopper detectColorInRace.");
+                clearInterval(trackingInterval);
+                trackingInterval = null;
+            } else {
+                console.warn("⏳ Video stadig ikke klar, prøver igen...");
+            }
             return;
         }
 
@@ -572,20 +582,22 @@ savePlayerButton.addEventListener("click", () => {
 function stopCamera() {
     if (activeStream) {
         activeStream.getTracks().forEach(track => track.stop());
-        video.srcObject = null; // Stopper preview-videoen
-
-        // 🎯 **Opdateret**: Brug hiddenRaceVideo i stedet for raceVideo
-        let hiddenVideo = document.getElementById("hiddenRaceVideo");
-        if (hiddenVideo) {
-            hiddenVideo.srcObject = null;
-            console.log("Skjult kamera-video stoppet.");
-        }
-
         activeStream = null;
         console.log("Kamera stoppet.");
     }
 
-    // 🎯 **Stop sort/hvid-tracking, så det ikke fortsætter efter en spiller tilføjes**
+    let hiddenVideo = document.getElementById("hiddenRaceVideo");
+    
+    // 🎯 Sikrer at vi ikke forsøger at ændre et null-objekt
+    if (hiddenVideo) {
+        hiddenVideo.srcObject = null;
+    }
+
+    if (raceVideo) {
+        raceVideo.srcObject = null;
+    }
+
+    // 🎯 Stop sort/hvid-tracking, så det ikke fortsætter efter en spiller tilføjes
     if (isTracking) {
         isTracking = false;
         canvas.style.display = "none";
@@ -593,6 +605,7 @@ function stopCamera() {
         console.log("Tracking stoppet.");
     }
 }
+
 // 🎯 **Opdater spillerliste på forsiden**
 function updatePlayerList() {
     playerList.innerHTML = "";
