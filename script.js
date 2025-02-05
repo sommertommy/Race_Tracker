@@ -163,25 +163,27 @@ startRaceButton.addEventListener("click", () => {
     lapsCompleted = 0;
     raceActive = true;
 
-    // 🎯 **Indlæs elementet EFTER race-skærmen er aktiveret**
-    let lapsDisplay = document.getElementById("currentLapsDisplay");
+    // 🚀 **Vent 100ms for at sikre, at DOM er opdateret**
+    setTimeout(() => {
+        let lapsDisplay = document.getElementById("currentLapsDisplay");
 
-    if (!lapsDisplay) {
-        console.warn("⚠️ currentLapsDisplay blev ikke fundet! Opretter elementet...");
-        lapsDisplay = document.createElement("p");
-        lapsDisplay.id = "currentLapsDisplay";
-        lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
-        raceScreen.appendChild(lapsDisplay); // Tilføj elementet i DOM'en
-    } else {
-        console.log("✅ Element fundet:", lapsDisplay);
-        lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
-    }
+        if (!lapsDisplay) {
+            console.warn("⚠️ currentLapsDisplay blev ikke fundet! Opretter elementet...");
+            lapsDisplay = document.createElement("p");
+            lapsDisplay.id = "currentLapsDisplay";
+            lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
+            raceScreen.appendChild(lapsDisplay); // Tilføj elementet i DOM'en
+        } else {
+            console.log("✅ Element fundet:", lapsDisplay);
+            lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
+        }
 
-    // Opdater spillerens navn i UI
-    currentPlayerDisplay.textContent = `Spiller: ${activeRacePlayer.name}`;
+        // Opdater spillerens navn i UI
+        currentPlayerDisplay.textContent = `Spiller: ${activeRacePlayer.name}`;
 
-    // Start kamera
-    startRaceCamera();
+        // Start kamera
+        startRaceCamera();
+    }, 100); // ⏳ Vent 100ms
 });
 
 
