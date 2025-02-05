@@ -210,10 +210,12 @@ observer.observe(raceScreen, { childList: true, subtree: true });
 
 // 🎯 **Tilbage til setup race**
 backToSetupRaceButton.addEventListener("click", () => {
-    raceScreen.style.display = "none";
-    raceSetupScreen.style.display = "block";
+    console.log("🔙 Tilbage til startskærm trykket!");
+
     raceActive = false;
     stopCamera();
+
+    showScreen(startScreen); // Gå direkte til startskærmen
 });
 
 
