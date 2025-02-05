@@ -54,9 +54,6 @@ let lapsCompleted = 0;
 let raceActive = false;
 let lastDetectionTime = 0;
 
-// Global liste til spillere og deres runder
-let players = [];
-
 // 🎯 **Gem det valgte kamera til senere brug**
 let selectedCameraId = null;
 
