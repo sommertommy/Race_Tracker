@@ -6,14 +6,20 @@ document.addEventListener("DOMContentLoaded", () => {
 const startScreen = document.getElementById("startScreen");
 const colorSetupScreen = document.getElementById("colorSetupScreen");
 const raceSetupScreen = document.getElementById("raceSetupScreen");
+const raceScreen = document.getElementById("raceScreen");
+const roundSetupOverlay = document.getElementById("roundSetupOverlay"); // Overlay til rundevalg
 
 const addPlayerButton = document.getElementById("addPlayer");
 const setupRaceButton = document.getElementById("setupRace");
 const saveRaceButton = document.getElementById("saveRace");
 const backToStartRaceButton = document.getElementById("backToStartRace");
- 
+
+const setupRoundsButton = document.getElementById("setupRounds");
+const saveRoundsButton = document.getElementById("saveRounds");
+
 const savePlayerButton = document.getElementById("savePlayer");
 const backToStartButton = document.getElementById("backToStart");
+const backToRaceButton = document.getElementById("backToRace");
 
 const playerList = document.getElementById("playerList");
 const roundsInput = document.getElementById("rounds");
@@ -40,7 +46,6 @@ const useSelectedCameraButton = document.getElementById("useSelectedCamera");
 
 // 🎯 **Hent referencer til race UI-elementer**
 const startRaceButton = document.getElementById("startRace");
-const raceScreen = document.getElementById("raceScreen");
 const raceVideo = document.getElementById("raceVideo");
 const currentPlayerDisplay = document.getElementById("currentPlayer");
 const currentLapsDisplay = document.getElementById("currentLapsDisplay");
@@ -68,13 +73,26 @@ let trackingInterval = null; // 🔥 Stopper flere samtidige tracking-løkker
 
 // 🎯 **Skift til farvevalg (hent kameraer kun, når brugeren trykker)**
 addPlayerButton.addEventListener("click", () => {
-    startScreen.style.display = "none";
-    colorSetupScreen.style.display = "block";
-
-    console.log("Tilføj spiller trykket - henter kameraer...");
-    getCameras();
+    showScreen(colorSetupScreen);
 });
 
+// 🎯 **Vis rundeopsætningsoverlay**
+setupRoundsButton.addEventListener("click", () => {
+    roundSetupOverlay.style.display = "block";
+    roundsInput.value = raceSettings.rounds; // Vis nuværende værdi
+});
+
+// 🎯 **Gem rundeindstilling og skjul overlay**
+saveRoundsButton.addEventListener("click", () => {
+    const selectedRounds = parseInt(roundsInput.value);
+    if (isNaN(selectedRounds) || selectedRounds < 1) {
+        alert("Indtast et gyldigt antal runder!");
+        return;
+    }
+    raceSettings.rounds = selectedRounds;
+    console.log("Runder gemt:", raceSettings.rounds);
+    roundSetupOverlay.style.display = "none";
+});
 
 function addPlayer(name) {
     const newPlayer = {
@@ -135,17 +153,30 @@ setupRaceButton.addEventListener("click", () => {
     roundsInput.value = raceSettings.rounds;
 });
 
-// 🎯 **Skift tilbage til startskærm**
+// 🎯 **Tilbage fra opsætning til startskærm**
 backToStartButton.addEventListener("click", () => {
-    colorSetupScreen.style.display = "none";
-    startScreen.style.display = "block";
-    stopCamera();
+    showScreen(startScreen);
 });
 
 backToStartRaceButton.addEventListener("click", () => {
     raceSetupScreen.style.display = "none";
     startScreen.style.display = "block";
 });
+
+// 🎯 **Tilbage fra race til startskærm**
+backToRaceButton.addEventListener("click", () => {
+    raceActive = false;
+    showScreen(startScreen);
+});
+
+// 🎯 **Funktion til at skifte skærm korrekt**
+function showScreen(screen) {
+    startScreen.style.display = "none";
+    colorSetupScreen.style.display = "none";
+    raceScreen.style.display = "none";
+
+    screen.style.display = "block";
+}
 
 // 🎯 **Start Race**
 startRaceButton.addEventListener("click", () => {
@@ -157,47 +188,19 @@ startRaceButton.addEventListener("click", () => {
     }
 
     // Skift til race-skærm
-    raceSetupScreen.style.display = "none";
-    raceScreen.style.display = "block";
-
+    showScreen(raceScreen);
     console.log("🔍 raceScreen vist!");
 
-    // Vælg første spiller som aktiv spiller
-    activeRacePlayer = players[0]; 
-    raceActive = true; // Sikre at race er aktiv
+    // Start race
+    raceActive = true;
+    console.log("🏁 Race er nu aktiv:", raceActive);
 
-    console.log("🏁 Race er nu aktiv:", raceActive, "Spiller valgt:", activeRacePlayer);
+    // Opdater rundevisning
+    currentLapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
 
-    // Opdater UI
-    let lapsDisplay = document.getElementById("currentLapsDisplay");
-    if (!lapsDisplay) {
-        console.warn("⚠️ currentLapsDisplay ikke fundet! Opretter igen...");
-        lapsDisplay = document.createElement("p");
-        lapsDisplay.id = "currentLapsDisplay";
-        raceScreen.appendChild(lapsDisplay);
-    }
-
-    setTimeout(() => {
-        if (lapsDisplay) {
-            lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
-            console.log("✅ currentLapsDisplay opdateret!");
-        } else {
-            console.warn("⚠️ Fejl: currentLapsDisplay forsvandt igen!");
-        }
-    }, 100);
-
-    // Start kameraet
+    // Start kamera og farvesporing
     startRaceCamera();
-
-    // **🔴 VIGTIGT! Start detectColorInRace efter 1 sekund**
-    setTimeout(() => {
-        console.log("🔥 Forsøger at starte detectColorInRace manuelt...");
-        if (trackingInterval === null) {
-            detectColorInRace();
-        } else {
-    console.warn("⚠️ detectColorInRace kører allerede, starter ikke igen.");
-}
-    }, 1000);
+    detectColorInRace();
 });
 
 const observer = new MutationObserver(() => {
@@ -576,9 +579,10 @@ function stopCamera() {
         console.log("Tracking stoppet.");
     }
 }
-// 🎯 **Opdater spillerliste på forsiden**
+// 🎯 **Opdater spillerlisten på startskærmen**
 function updatePlayerList() {
     playerList.innerHTML = "";
+
     players.forEach(player => {
         let div = document.createElement("div");
         div.classList.add("player");
@@ -589,7 +593,5 @@ function updatePlayerList() {
         playerList.appendChild(div);
     });
 
-    if (players.length > 0) {
-        setupRaceButton.style.display = "block";
-    }
+    startRaceButton.style.display = players.length > 0 ? "block" : "none";
 }
