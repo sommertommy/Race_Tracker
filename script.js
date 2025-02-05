@@ -107,7 +107,6 @@ function updatePlayerLaps(playerId) {
 }
 
 // 🎯 **Opdater leaderboard ved at vise alle spillere korrekt**
-// 🎯 **Opdater leaderboard ved at vise alle spillere korrekt**
 function updateLeaderboard() {
     const leaderboardDiv = document.getElementById("leaderboard");
 
@@ -124,20 +123,11 @@ function updateLeaderboard() {
     // 🎯 **Vis opdaterede spillerrunder i leaderboardet**
     players.forEach(player => {
         let playerEntry = document.createElement("p");
-        playerEntry.textContent = `${player.name} ${player.laps}/${raceSettings.rounds}`;
+        playerEntry.textContent = `${player.name} - ${player.laps}/${raceSettings.rounds} runder`;
         leaderboardDiv.appendChild(playerEntry);
     });
 
     console.log("Leaderboard opdateret:", players);
-
-    // 🎯 **Sikrer at currentLapsDisplay kun oprettes én gang**
-    let lapsDisplay = document.getElementById("currentLapsDisplay");
-    if (!lapsDisplay) {
-        console.warn("⚠️ currentLapsDisplay ikke fundet! Opretter igen...");
-        lapsDisplay = document.createElement("p");
-        lapsDisplay.id = "currentLapsDisplay";
-        leaderboardDiv.appendChild(lapsDisplay);
-    }
 }
 // Forhindre kameraet i at blive påvirket, når en spiller tilføjes
 function preventCameraRestart() {
@@ -172,26 +162,12 @@ startRaceButton.addEventListener("click", () => {
     console.log("🔍 raceScreen vist!");
 
     raceActive = true;
-    
     console.log("🏁 Race er nu aktiv:", raceActive);
 
-    // Sikrer at `currentLapsDisplay` eksisterer
-    let lapsDisplay = document.getElementById("currentLapsDisplay");
-    if (!lapsDisplay) {
-        console.warn("⚠️ currentLapsDisplay ikke fundet! Opretter igen...");
-        lapsDisplay = document.createElement("p");
-        lapsDisplay.id = "currentLapsDisplay";
-        raceScreen.appendChild(lapsDisplay);
-    }
-
-    // Opdater rundevisning
-    lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
-    console.log("✅ currentLapsDisplay opdateret!");
-
-    // Start kameraet
+    // 🎯 **Start kameraet (uden synlig visning af video)**
     startRaceCamera();
 
-    // **🔴 VIGTIGT! Start detectColorInRace efter 1 sekund**
+    // 🎯 **Start detectColorInRace hvis det ikke allerede kører**
     setTimeout(() => {
         console.log("🔥 Forsøger at starte detectColorInRace manuelt...");
         if (!trackingInterval) {
