@@ -162,9 +162,14 @@ startRaceButton.addEventListener("click", () => {
 
     console.log("🔍 raceScreen vist!");
 
-    // **Slet og genskab `currentLapsDisplay` for at undgå fejl**
-    let lapsDisplay = document.getElementById("currentLapsDisplay");
+    // Vælg første spiller som aktiv spiller
+    activeRacePlayer = players[0]; 
+    raceActive = true; // Sikre at race er aktiv
 
+    console.log("🏁 Race er nu aktiv:", raceActive, "Spiller valgt:", activeRacePlayer);
+
+    // Opdater UI
+    let lapsDisplay = document.getElementById("currentLapsDisplay");
     if (!lapsDisplay) {
         console.warn("⚠️ currentLapsDisplay ikke fundet! Opretter igen...");
         lapsDisplay = document.createElement("p");
@@ -172,10 +177,7 @@ startRaceButton.addEventListener("click", () => {
         raceScreen.appendChild(lapsDisplay);
     }
 
-    // **Vent 100ms og sæt textContent bagefter**
     setTimeout(() => {
-        console.log("🛠 Forsøger at opdatere currentLapsDisplay...");
-
         if (lapsDisplay) {
             lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
             console.log("✅ currentLapsDisplay opdateret!");
@@ -184,8 +186,14 @@ startRaceButton.addEventListener("click", () => {
         }
     }, 100);
 
-    // Start kamera
+    // Start kameraet
     startRaceCamera();
+
+    // **🔴 VIGTIGT! Start detectColorInRace efter 1 sekund**
+    setTimeout(() => {
+        console.log("🔥 Forsøger at starte detectColorInRace manuelt...");
+        detectColorInRace();
+    }, 1000);
 });
 
 const observer = new MutationObserver(() => {
@@ -311,21 +319,31 @@ function startRaceCamera() {
 }
 
 
-// 🎯 **Farvedetektion – Registrer runder for aktive spillere**
 function detectColorInRace() {
     if (trackingInterval !== null) {
-        console.warn("detectColorInRace kører allerede, undgår dobbelt-opstart.");
+        console.warn("⚠️ detectColorInRace kører allerede, undgår dobbelt-opstart.");
         return;
     }
 
     if (!raceActive || !activeRacePlayer) {
-        console.warn("Race er ikke aktiv eller spiller ikke valgt.");
+        console.error("❌ Fejl: detectColorInRace starter ikke!", {
+            raceActive, activeRacePlayer
+        });
         return;
+    } else {
+        console.log("✅ detectColorInRace starter for:", activeRacePlayer.name);
     }
 
     trackingInterval = setInterval(() => {
+        if (!raceActive) {
+            console.warn("⏸ detectColorInRace stoppet, da raceActive er false.");
+            clearInterval(trackingInterval);
+            trackingInterval = null;
+            return;
+        }
+
         if (raceVideo.videoWidth === 0 || raceVideo.videoHeight === 0) {
-            console.warn("Video stadig ikke klar, prøver igen...");
+            console.warn("⏳ Video stadig ikke klar, prøver igen...");
             return;
         }
 
@@ -347,16 +365,19 @@ function detectColorInRace() {
                 const now = Date.now();
 
                 if (now - lastDetectionTime > 1000) { // 1 sek pause før ny registrering
-                    activeRacePlayer.laps++; // 🎯 **Opdater spillerens runder**
+                    activeRacePlayer.laps++;
 
-                    // 🔥 **Sikring mod null-fejl**
-                    if (currentLapsDisplay) {
-                        currentLapsDisplay.textContent = `Runder: ${activeRacePlayer.laps}/${raceSettings.rounds}`;
-                    } else {
-                        console.warn("Fejl: currentLapsDisplay findes ikke i DOM'en!");
+                    console.log(`🏎 ${activeRacePlayer.name} har nu ${activeRacePlayer.laps} runder!`);
+
+                    // Opdater leaderboard
+                    updateLeaderboard();
+
+                    // Opdater UI
+                    let lapsDisplay = document.getElementById("currentLapsDisplay");
+                    if (lapsDisplay) {
+                        lapsDisplay.textContent = `Runder: ${activeRacePlayer.laps}/${raceSettings.rounds}`;
                     }
 
-                    updateLeaderboard(); // 🎯 **Opdater leaderboard live**
                     lastDetectionTime = now;
                 }
 
@@ -365,6 +386,7 @@ function detectColorInRace() {
             }
         }
 
+        // Stop race hvis spiller har fuldført alle runder
         if (activeRacePlayer.laps >= raceSettings.rounds) {
             alert(`${activeRacePlayer.name} har fuldført racet!`);
             clearInterval(trackingInterval);
@@ -372,9 +394,8 @@ function detectColorInRace() {
             raceActive = false;
             stopCamera();
         }
-    }, 100); // Opdatering hver 100ms
+    }, 100);
 }
-
 // 🎯 **Start det valgte kamera**
 function startSelectedCamera() {
     let selectedDeviceId = cameraSelect.value;
