@@ -592,30 +592,31 @@ savePlayerButton.onclick = function() {
         addNewPlayer(); // ➕ Tilføj en ny spiller
     }
 
-    // ✅ Nulstil redigeringstilstand, så næste oprettelse fungerer normalt
+    // ✅ Nulstil redigeringstilstand efter gem
     editingPlayerIndex = null;
 };
 
 function addNewPlayer() {
-    if (!selectedColor || !playerNameInput.value.trim()) {
-        alert("Vælg en farve og indtast et navn!");
+    if (editingPlayerIndex !== null) {
+        console.warn("⚠️ Forsøger at tilføje ny spiller, men er i redigeringstilstand. Stopper!");
         return;
     }
 
-    let player = {
+    let newPlayer = {
         id: players.length + 1,
         name: playerNameInput.value.trim(),
         color: selectedColor,
         tolerance: tolerance,
         threshold: threshold,
-        laps: 0
+        laps: 0 // Start med 0 kørte runder
     };
 
-    players.push(player);
+    players.push(newPlayer);
+    console.log("➕ Ny spiller tilføjet:", newPlayer);
+
+    // 🎯 Opdater UI
     updatePlayerList();
     showScreen(startScreen);
-
-    console.log(`➕ Ny spiller tilføjet: ${player.name}`);
 }
 
 function stopCamera() {
@@ -653,17 +654,20 @@ function updatePlayer(index) {
 
     let player = players[index];
 
-    // 🎯 Opdater spillerens data
+    // 🎯 Opdater kun spillerens eksisterende data
     player.name = playerNameInput.value.trim();
     player.color = selectedColor;
     player.tolerance = tolerance;
     player.threshold = threshold;
 
-    // 🎯 Opdater UI og vend tilbage til startskærmen
+    console.log(`✅ Spiller "${player.name}" opdateret!`);
+
+    // 🎯 Opdater UI og gå tilbage til startskærmen
     updatePlayerList();
     showScreen(startScreen);
 
-    console.log(`✅ Spiller "${player.name}" opdateret!`);
+    // ✅ Nulstil `editingPlayerIndex`
+    editingPlayerIndex = null;
 }
 
 function editPlayer(index) {
