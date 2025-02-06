@@ -653,7 +653,7 @@ function stopCamera() {
 
 function updatePlayer(index) {
     if (index === null || index >= players.length) {
-        console.error("Fejl: Ugyldigt spiller-index ved opdatering!");
+        console.error("❌ Fejl: Ugyldigt spiller-index ved opdatering!");
         return;
     }
 
@@ -670,30 +670,18 @@ function updatePlayer(index) {
     updatePlayerList();
     showScreen(startScreen);
 
-    editingPlayerIndex = null;
+    editingPlayerIndex = null; // Nulstil redigeringstilstand
 }
 
 function editPlayer(index) {
     let player = players[index];
-    editingPlayerIndex = index; // 🔥 Husk hvilket indeks vi redigerer
 
-    // 🎯 Indsæt spillerens data i inputfelter
     playerNameInput.value = player.name;
     selectedColor = player.color;
     tolerance = player.tolerance;
     threshold = player.threshold;
 
-    // 🎨 Opdater UI
-    colorDisplay.style.backgroundColor = `rgb(${player.color.r}, ${player.color.g}, ${player.color.b})`;
-    toleranceSlider.value = tolerance;
-    thresholdSlider.value = threshold;
-    toleranceValue.textContent = tolerance;
-    thresholdValue.textContent = threshold;
-
-    // 🎥 Start kameraet, så man kan justere farvevalg
-    startSelectedCamera();
-
-    // 🔄 Skift til oprettelsesskærmen
+    editingPlayerIndex = index; // Sæt index for den spiller, vi redigerer
     showScreen(colorSetupScreen);
 
     console.log(`✏️ Redigerer spiller: ${player.name}`);
