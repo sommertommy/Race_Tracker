@@ -587,13 +587,13 @@ savePlayerButton.addEventListener("click", () => {
 
 savePlayerButton.onclick = function() {
     if (editingPlayerIndex !== null) {
-        // 🔥 Hvis vi er i redigeringsmode, opdater spilleren
-        updatePlayer(editingPlayerIndex);
-        editingPlayerIndex = null; // Nulstil efter opdatering
+        updatePlayer(editingPlayerIndex); // 🔥 Opdater eksisterende spiller
     } else {
-        // ➕ Opret ny spiller hvis vi ikke redigerer en eksisterende
-        addNewPlayer();
+        addNewPlayer(); // ➕ Tilføj en ny spiller
     }
+
+    // ✅ Nulstil redigeringstilstand, så næste oprettelse fungerer normalt
+    editingPlayerIndex = null;
 };
 
 function addNewPlayer() {
@@ -646,6 +646,11 @@ function stopCamera() {
 }
 
 function updatePlayer(index) {
+    if (index === null || index >= players.length) {
+        console.error("Fejl: Ugyldigt spiller-index ved opdatering!");
+        return;
+    }
+
     let player = players[index];
 
     // 🎯 Opdater spillerens data
@@ -654,7 +659,7 @@ function updatePlayer(index) {
     player.tolerance = tolerance;
     player.threshold = threshold;
 
-    // 📌 Opdater UI og vend tilbage til startskærmen
+    // 🎯 Opdater UI og vend tilbage til startskærmen
     updatePlayerList();
     showScreen(startScreen);
 
@@ -663,7 +668,7 @@ function updatePlayer(index) {
 
 function editPlayer(index) {
     let player = players[index];
-    editingPlayerIndex = index; // 🔥 Gem hvilket indeks vi redigerer
+    editingPlayerIndex = index; // 🔥 Husk hvilket indeks vi redigerer
 
     // 🎯 Indsæt spillerens data i inputfelter
     playerNameInput.value = player.name;
