@@ -587,18 +587,23 @@ savePlayerButton.addEventListener("click", () => {
 
 savePlayerButton.onclick = function() {
     if (editingPlayerIndex !== null) {
-        updatePlayer(editingPlayerIndex); // 🔥 Opdater eksisterende spiller
+        updatePlayer(editingPlayerIndex);
     } else {
-        addNewPlayer(); // ➕ Tilføj en ny spiller
+        addNewPlayer();
     }
 
-    // ✅ Nulstil redigeringstilstand efter gem
-    editingPlayerIndex = null;
+    editingPlayerIndex = null; // Nulstil redigeringstilstand
 };
 
 function addNewPlayer() {
     if (editingPlayerIndex !== null) {
         console.warn("⚠️ Forsøger at tilføje ny spiller, men er i redigeringstilstand. Stopper!");
+        return;
+    }
+
+    // 🚨 Stopper, hvis spilleren allerede eksisterer
+    if (players.some(player => player.name === playerNameInput.value.trim())) {
+        console.warn("⚠️ Spilleren eksisterer allerede! Undgår duplikat.");
         return;
     }
 
@@ -608,13 +613,13 @@ function addNewPlayer() {
         color: selectedColor,
         tolerance: tolerance,
         threshold: threshold,
-        laps: 0 // Start med 0 kørte runder
+        laps: 0
     };
 
     players.push(newPlayer);
     console.log("➕ Ny spiller tilføjet:", newPlayer);
 
-    // 🎯 Opdater UI
+    // ✅ Kun én UI-opdatering
     updatePlayerList();
     showScreen(startScreen);
 }
@@ -654,7 +659,6 @@ function updatePlayer(index) {
 
     let player = players[index];
 
-    // 🎯 Opdater kun spillerens eksisterende data
     player.name = playerNameInput.value.trim();
     player.color = selectedColor;
     player.tolerance = tolerance;
@@ -662,11 +666,10 @@ function updatePlayer(index) {
 
     console.log(`✅ Spiller "${player.name}" opdateret!`);
 
-    // 🎯 Opdater UI og gå tilbage til startskærmen
+    // 🎯 Opdater UI én gang
     updatePlayerList();
     showScreen(startScreen);
 
-    // ✅ Nulstil `editingPlayerIndex`
     editingPlayerIndex = null;
 }
 
