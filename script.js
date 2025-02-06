@@ -47,7 +47,7 @@ const currentLapsDisplay = document.getElementById("currentLapsDisplay");
 const backToSetupRaceButton = document.getElementById("backToSetupRace");
 
 
-
+let editingPlayerIndex = null; // 🔥 Sporer om en spiller redigeres
 let selectedColor = null;
 let tolerance = 50;
 let threshold = 100;
@@ -585,6 +585,38 @@ savePlayerButton.addEventListener("click", () => {
     console.log("Spiller gemt:", player);
 });
 
+savePlayerButton.onclick = function() {
+    if (editingPlayerIndex !== null) {
+        // 🔥 Hvis vi er i redigeringsmode, opdater spilleren
+        updatePlayer(editingPlayerIndex);
+        editingPlayerIndex = null; // Nulstil efter opdatering
+    } else {
+        // ➕ Opret ny spiller hvis vi ikke redigerer en eksisterende
+        addNewPlayer();
+    }
+};
+
+function addNewPlayer() {
+    if (!selectedColor || !playerNameInput.value.trim()) {
+        alert("Vælg en farve og indtast et navn!");
+        return;
+    }
+
+    let player = {
+        id: players.length + 1,
+        name: playerNameInput.value.trim(),
+        color: selectedColor,
+        tolerance: tolerance,
+        threshold: threshold,
+        laps: 0
+    };
+
+    players.push(player);
+    updatePlayerList();
+    showScreen(startScreen);
+
+    console.log(`➕ Ny spiller tilføjet: ${player.name}`);
+}
 
 function stopCamera() {
     if (activeStream) {
@@ -622,39 +654,35 @@ function updatePlayer(index) {
     player.tolerance = tolerance;
     player.threshold = threshold;
 
-    // 📌 Opdater UI og vend tilbage til start
+    // 📌 Opdater UI og vend tilbage til startskærmen
     updatePlayerList();
     showScreen(startScreen);
 
-    console.log("✅ Spiller opdateret:", player);
+    console.log(`✅ Spiller "${player.name}" opdateret!`);
 }
 
 function editPlayer(index) {
     let player = players[index];
+    editingPlayerIndex = index; // 🔥 Gem hvilket indeks vi redigerer
 
-    // 🎯 Indsæt spillerens data i oprettelsesskærmen
+    // 🎯 Indsæt spillerens data i inputfelter
     playerNameInput.value = player.name;
     selectedColor = player.color;
     tolerance = player.tolerance;
     threshold = player.threshold;
 
-    // 🎨 Opdater UI med spillerens farvevalg
+    // 🎨 Opdater UI
     colorDisplay.style.backgroundColor = `rgb(${player.color.r}, ${player.color.g}, ${player.color.b})`;
     toleranceSlider.value = tolerance;
     thresholdSlider.value = threshold;
     toleranceValue.textContent = tolerance;
     thresholdValue.textContent = threshold;
 
-    // 🎥 Genstart kameraet så spilleren kan justere sin farve
+    // 🎥 Start kameraet, så man kan justere farvevalg
     startSelectedCamera();
 
     // 🔄 Skift til oprettelsesskærmen
     showScreen(colorSetupScreen);
-
-    // 🔥 Opdater "Gem spiller"-knappen, så den opdaterer spilleren i stedet for at tilføje en ny
-    savePlayerButton.onclick = function() {
-        updatePlayer(index);
-    };
 
     console.log(`✏️ Redigerer spiller: ${player.name}`);
 }
