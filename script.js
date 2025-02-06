@@ -613,20 +613,99 @@ function stopCamera() {
     }
 }
 
-// 🎯 **Opdater spillerliste på forsiden**
+function updatePlayer(index) {
+    let player = players[index];
+
+    // 🎯 Opdater spillerens data
+    player.name = playerNameInput.value.trim();
+    player.color = selectedColor;
+    player.tolerance = tolerance;
+    player.threshold = threshold;
+
+    // 📌 Opdater UI og vend tilbage til start
+    updatePlayerList();
+    showScreen(startScreen);
+
+    console.log("✅ Spiller opdateret:", player);
+}
+
+function editPlayer(index) {
+    let player = players[index];
+
+    // 🎯 Indsæt spillerens data i oprettelsesskærmen
+    playerNameInput.value = player.name;
+    selectedColor = player.color;
+    tolerance = player.tolerance;
+    threshold = player.threshold;
+
+    // 🎨 Opdater UI med spillerens farvevalg
+    colorDisplay.style.backgroundColor = `rgb(${player.color.r}, ${player.color.g}, ${player.color.b})`;
+    toleranceSlider.value = tolerance;
+    thresholdSlider.value = threshold;
+    toleranceValue.textContent = tolerance;
+    thresholdValue.textContent = threshold;
+
+    // 🎥 Genstart kameraet så spilleren kan justere sin farve
+    startSelectedCamera();
+
+    // 🔄 Skift til oprettelsesskærmen
+    showScreen(colorSetupScreen);
+
+    // 🔥 Opdater "Gem spiller"-knappen, så den opdaterer spilleren i stedet for at tilføje en ny
+    savePlayerButton.onclick = function() {
+        updatePlayer(index);
+    };
+
+    console.log(`✏️ Redigerer spiller: ${player.name}`);
+}
+
+function deletePlayer(index) {
+    if (confirm(`Er du sikker på, at du vil fjerne ${players[index].name}?`)) {
+        players.splice(index, 1); // Fjern spilleren
+        updatePlayerList(); // Opdater UI
+        console.log("❌ Spiller fjernet!");
+    }
+}
+
+// 🎯 **Opdater spillerliste på forsiden med redigeringsmuligheder**
 function updatePlayerList() {
-    playerList.innerHTML = "";
-    players.forEach(player => {
+    playerList.innerHTML = ""; // Ryd liste før ny opdatering
+
+    players.forEach((player, index) => {
         let div = document.createElement("div");
         div.classList.add("player");
-        div.innerHTML = `
-            <div class="playerColor" style="background-color: rgb(${player.color.r}, ${player.color.g}, ${player.color.b});"></div>
-            ${player.name}
-        `;
+
+        // 🎨 Farveboks
+        let colorBox = document.createElement("div");
+        colorBox.classList.add("playerColor");
+        colorBox.style.backgroundColor = `rgb(${player.color.r}, ${player.color.g}, ${player.color.b})`;
+
+        // 📝 Spillernavn
+        let nameSpan = document.createElement("span");
+        nameSpan.textContent = ` ${player.name} `;
+
+        // ✏️ "Ret" knap
+        let editButton = document.createElement("button");
+        editButton.textContent = "Ret";
+        editButton.onclick = () => editPlayer(index);
+
+        // ❌ "Fjern" knap
+        let deleteButton = document.createElement("button");
+        deleteButton.textContent = "Fjern";
+        deleteButton.onclick = () => deletePlayer(index);
+
+        // 📌 Tilføj elementer til spiller-div
+        div.appendChild(colorBox);
+        div.appendChild(nameSpan);
+        div.appendChild(editButton);
+        div.appendChild(deleteButton);
+
         playerList.appendChild(div);
     });
 
     if (players.length > 0) {
-        setupRaceButton.style.display = "block";
+        setupRaceButton.style.display = "block"; // Vis "Opsæt Race"-knap hvis spillere findes
+    } else {
+        setupRaceButton.style.display = "none"; // Skjul knappen hvis ingen spillere er tilbage
     }
 }
