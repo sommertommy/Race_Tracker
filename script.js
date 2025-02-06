@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("DOM er nu indlæst!");
     console.log("Tjekker element:", document.getElementById("currentLapsDisplay"));
 });
-
+ 
 const startScreen = document.getElementById("startScreen");
 const colorSetupScreen = document.getElementById("colorSetupScreen");
 const raceSetupScreen = document.getElementById("raceSetupScreen");
