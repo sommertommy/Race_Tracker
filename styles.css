@@ -31,14 +31,16 @@ body {
 
 .leaderboard-player {
     display: flex;
-    justify-content: space-between; /* Sørger for at navn og runder står i hver sin side */
     align-items: center;
-    width: 100%;
-    padding: 10px 15px;
-    background: #f8f9fa;
+    justify-content: space-between;
+    background: white;
+    padding: 10px;
+    margin: 5px auto;
+    width: 80%;
+    max-width: 400px;
     border-radius: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    position: relative;
 }
 
 .leaderboard-player:last-child {
@@ -50,7 +52,12 @@ body {
     height: 20px;
     border-radius: 50%;
     margin-right: 10px;
-    border: 1px solid #333;
+    border: 1px solid black;
+}
+
+.player-name {
+    flex-grow: 1;
+    text-align: left;
 }
 
 .player-info {
@@ -58,12 +65,25 @@ body {
     align-items: center;
     font-weight: bold;
 }
-
+.player-laps {
+    font-weight: bold;
+    text-align: right;
+    width: 50px;
+}
 .laps {
     font-size: 1.2em;
     font-weight: bold;
     color: #007BFF;
 }
+
+.medal {
+    position: absolute;
+    right: -25px;
+    font-size: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
 .video-container {
     position: relative;
     display: inline-block;
