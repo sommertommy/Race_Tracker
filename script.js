@@ -558,37 +558,10 @@ function colorMatch(r, g, b, color, tol) {
 
 // 🎯 **Gem spiller og stop kameraet**
 // 🎯 **Tilføj spiller og sørg for, at leaderboard bliver opdateret**
-savePlayerButton.addEventListener("click", () => {
-    if (!selectedColor || !playerNameInput.value.trim()) {
-        alert("Vælg en farve og indtast et navn!");
-        return;
-    }
 
-    let player = {
-        id: players.length + 1,
-        name: playerNameInput.value.trim(),
-        color: selectedColor,
-        tolerance: tolerance,
-        threshold: threshold,
-        laps: 0 // Start med 0 kørte runder
-    };
 
-    players.push(player);
-    updatePlayerList();
-    updateLeaderboard(); // 🎯 Opdater leaderboard når en spiller tilføjes
-
-    // 🎯 **Stop kameraet korrekt, så sort/hvid mode ikke starter igen**
-    stopCamera();
-
-    // 🎯 **Skift tilbage til startskærm**
-    colorSetupScreen.style.display = "none";
-    startScreen.style.display = "block";
-
-    console.log("Spiller gemt:", player);
-});
-
-// 🎯 **Gem spiller og stop kameraet**
-savePlayerButton.onclick = function() {
+// 🎯 **Gem spiller – Undgå duplikater!**
+savePlayerButton.onclick = function () {
     let playerName = playerNameInput.value.trim();
     if (!selectedColor || !playerName) {
         alert("Vælg en farve og indtast et navn!");
@@ -604,10 +577,11 @@ savePlayerButton.onclick = function() {
     editingPlayerId = null; // ✅ Nulstil redigeringstilstand
 };
 
-// 🎯 **Tilføj ny spiller med unikt ID**
+
+// 🎯 **Tilføj ny spiller – Nu kun én gang!**
 function addNewPlayer() {
     let playerName = playerNameInput.value.trim();
-    
+
     // ✅ Sørg for, at der ikke findes en spiller med samme navn
     let existingPlayer = players.find(p => p.name.toLowerCase() === playerName.toLowerCase());
     if (existingPlayer) {
@@ -615,7 +589,7 @@ function addNewPlayer() {
         return;
     }
 
-    // 🔥 Generér et unikt ID
+    // 🔥 Generér et unikt ID baseret på tidsstempel
     let newId = Date.now();
 
     let newPlayer = {
@@ -697,6 +671,7 @@ function editPlayer(playerId) {
     console.log(`✏️ Redigerer spiller: ${player.name} (ID: ${playerId})`);
 }
 
+
 function deletePlayer(index) {
     if (confirm(`Er du sikker på, at du vil fjerne ${players[index].name}?`)) {
         players.splice(index, 1); // Fjern spilleren
@@ -705,7 +680,7 @@ function deletePlayer(index) {
     }
 }
 
-// 🎯 **Opdater spillerliste på forsiden med redigeringsmuligheder**
+// 🎯 **Opdater spillerliste med rediger/slet-knapper**
 function updatePlayerList() {
     playerList.innerHTML = "";
     players.forEach(player => {
