@@ -47,6 +47,7 @@ const currentLapsDisplay = document.getElementById("currentLapsDisplay");
 const backToSetupRaceButton = document.getElementById("backToSetupRace");
 
 
+let colorCounts = {}; // Holder styr på hvor mange gange hver farve er fundet
 let editingPlayerIndex = null; // 🔥 Sporer om en spiller redigeres
 let selectedColor = null;
 let tolerance = 50;
@@ -435,40 +436,62 @@ function detectColorInRace() {
         const data = imageData.data;
 
         let playerDetected = {}; 
+        let colorCounts = {}; // 🔹 Holder styr på hvor mange pixels hver farve har
 
+        // 🎯 **Gennemgå alle pixels**
         for (let i = 0; i < data.length; i += 4) {
             const r = data[i], g = data[i + 1], b = data[i + 2];
 
             players.forEach(player => {
-                if (!playerDetected[player.id] && colorMatch(r, g, b, player.color, player.tolerance, player.excludedColors)) {
-
-                    // 🚫 Hvis farven matcher en ekskluderet farve, spring over
-                    if (player.excludedColors.some(excluded => colorMatch(r, g, b, excluded, player.tolerance))) {
-                        console.warn(`🚫 ${player.name} ignorerede en forbudt farve!`);
-                        return; // Spring denne iteration over
-                    }
-            
-                    const now = Date.now();
-            
-                    if (!player.lastDetectionTime || now - player.lastDetectionTime > 1000) {
-                        if (player.laps < raceSettings.rounds) {
-                            player.laps++;
-                            player.lastDetectionTime = now;
-                            playerDetected[player.id] = true; 
-            
-                            console.log(`🏎 ${player.name} har nu ${player.laps} runder!`);
-            
-                            if (player.laps >= raceSettings.rounds && !player.finishTime) {
-                                player.finishTime = now;
-                                console.log(`🏁 ${player.name} er færdig med racet!`);
-                            }
-            
-                            updateLeaderboard();
-                        }
-                    }
+                if (colorMatch(r, g, b, player.color, player.tolerance)) {
+                    let key = `${player.color.r},${player.color.g},${player.color.b}`;
+                    colorCounts[key] = (colorCounts[key] || 0) + 1;
                 }
             });
         }
+
+        // 🎯 **Filtrér små farveområder væk**
+        Object.entries(colorCounts).forEach(([color, count]) => {
+            let totalPixels = raceCanvas.width * raceCanvas.height;
+            let percentage = (count / totalPixels) * 100;
+
+            if (percentage < 3) { // 🔥 Justér denne værdi for mere/mindre streng filtrering
+                console.warn(`🚫 Ignorerede farve ${color} (kun ${percentage.toFixed(2)}% af billedet)`);
+                delete colorCounts[color]; // Fjern farven fra registreringen
+            }
+        });
+
+        // 🎯 **Tjek hvilke spillere der stadig har en registreret farve**
+        players.forEach(player => {
+            let key = `${player.color.r},${player.color.g},${player.color.b}`;
+            if (!colorCounts[key]) return; // Hvis farven er filtreret fra, gør ingenting
+
+            // 🚫 **Tjek ekskluderede farver (EFTER areal-filtrering)**
+            if (player.excludedColors.some(excluded => colorMatch(player.color.r, player.color.g, player.color.b, excluded, player.tolerance))) {
+                console.warn(`🚫 ${player.name} ignorerede en forbudt farve!`);
+                return; // Spring over hvis en ekskluderet farve matches
+            }
+
+            const now = Date.now();
+
+            if (!player.lastDetectionTime || now - player.lastDetectionTime > 1000) {
+                if (player.laps < raceSettings.rounds) {
+                    player.laps++;
+                    player.lastDetectionTime = now;
+                    playerDetected[player.id] = true; 
+
+                    console.log(`🏎 ${player.name} har nu ${player.laps} runder!`);
+
+                    if (player.laps >= raceSettings.rounds && !player.finishTime) {
+                        player.finishTime = now;
+                        console.log(`🏁 ${player.name} er færdig med racet!`);
+                    }
+
+                    updateLeaderboard();
+                }
+            }
+        });
+
     }, 100); // 🎯 **Opdatering hver 100ms**
 }
 // 🎯 **Start det valgte kamera**
