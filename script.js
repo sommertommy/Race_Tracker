@@ -586,29 +586,23 @@ savePlayerButton.addEventListener("click", () => {
 });
 
 savePlayerButton.onclick = function() {
-    if (editingPlayerIndex !== null) {
-        updatePlayer(editingPlayerIndex);
+    if (editingPlayerId !== null) {
+        updatePlayer(editingPlayerId); // 🔄 Opdater eksisterende spiller
     } else {
-        addNewPlayer();
+        addNewPlayer(); // ➕ Opret ny spiller
     }
 
-    editingPlayerIndex = null; // Nulstil redigeringstilstand
+    editingPlayerId = null; // ✅ Nulstil redigeringstilstand
 };
 
 function addNewPlayer() {
-    if (editingPlayerIndex !== null) {
+    if (editingPlayerId !== null) {
         console.warn("⚠️ Forsøger at tilføje ny spiller, men er i redigeringstilstand. Stopper!");
         return;
     }
 
-    // 🚨 Stopper, hvis spilleren allerede eksisterer
-    if (players.some(player => player.name === playerNameInput.value.trim())) {
-        console.warn("⚠️ Spilleren eksisterer allerede! Undgår duplikat.");
-        return;
-    }
-
     let newPlayer = {
-        id: players.length + 1,
+        id: Date.now(), // 🔥 Generer unikt ID baseret på timestamp
         name: playerNameInput.value.trim(),
         color: selectedColor,
         tolerance: tolerance,
@@ -619,7 +613,6 @@ function addNewPlayer() {
     players.push(newPlayer);
     console.log("➕ Ny spiller tilføjet:", newPlayer);
 
-    // ✅ Kun én UI-opdatering
     updatePlayerList();
     showScreen(startScreen);
 }
@@ -651,40 +644,42 @@ function stopCamera() {
     }
 }
 
-function updatePlayer(index) {
-    if (index === null || index >= players.length) {
-        console.error("❌ Fejl: Ugyldigt spiller-index ved opdatering!");
+function updatePlayer(playerId) {
+    let player = players.find(p => p.id === playerId); // 🔍 Find den rigtige spiller
+    if (!player) {
+        console.error(`❌ Fejl: Ingen spiller med ID ${playerId} fundet!`);
         return;
     }
-
-    let player = players[index];
 
     player.name = playerNameInput.value.trim();
     player.color = selectedColor;
     player.tolerance = tolerance;
     player.threshold = threshold;
 
-    console.log(`✅ Spiller "${player.name}" opdateret!`);
+    console.log(`✅ Spiller "${player.name}" opdateret! (ID: ${playerId})`);
 
-    // 🎯 Opdater UI én gang
     updatePlayerList();
     showScreen(startScreen);
 
-    editingPlayerIndex = null; // Nulstil redigeringstilstand
+    editingPlayerId = null; // Nulstil redigeringstilstand
 }
 
-function editPlayer(index) {
-    let player = players[index];
+function editPlayer(playerId) {
+    let player = players.find(p => p.id === playerId); // 🔍 Find spilleren baseret på ID
+    if (!player) {
+        console.error(`❌ Kunne ikke finde spiller med ID ${playerId}`);
+        return;
+    }
 
     playerNameInput.value = player.name;
     selectedColor = player.color;
     tolerance = player.tolerance;
     threshold = player.threshold;
 
-    editingPlayerIndex = index; // Sæt index for den spiller, vi redigerer
+    editingPlayerId = playerId; // 🔥 Gem ID'et for den spiller, der redigeres
     showScreen(colorSetupScreen);
 
-    console.log(`✏️ Redigerer spiller: ${player.name}`);
+    console.log(`✏️ Redigerer spiller: ${player.name} (ID: ${playerId})`);
 }
 
 function deletePlayer(index) {
@@ -697,43 +692,26 @@ function deletePlayer(index) {
 
 // 🎯 **Opdater spillerliste på forsiden med redigeringsmuligheder**
 function updatePlayerList() {
-    playerList.innerHTML = ""; // Ryd liste før ny opdatering
-
-    players.forEach((player, index) => {
+    playerList.innerHTML = "";
+    players.forEach(player => {
         let div = document.createElement("div");
         div.classList.add("player");
-
-        // 🎨 Farveboks
-        let colorBox = document.createElement("div");
-        colorBox.classList.add("playerColor");
-        colorBox.style.backgroundColor = `rgb(${player.color.r}, ${player.color.g}, ${player.color.b})`;
-
-        // 📝 Spillernavn
-        let nameSpan = document.createElement("span");
-        nameSpan.textContent = ` ${player.name} `;
-
-        // ✏️ "Ret" knap
-        let editButton = document.createElement("button");
-        editButton.textContent = "Ret";
-        editButton.onclick = () => editPlayer(index);
-
-        // ❌ "Fjern" knap
-        let deleteButton = document.createElement("button");
-        deleteButton.textContent = "Fjern";
-        deleteButton.onclick = () => deletePlayer(index);
-
-        // 📌 Tilføj elementer til spiller-div
-        div.appendChild(colorBox);
-        div.appendChild(nameSpan);
-        div.appendChild(editButton);
-        div.appendChild(deleteButton);
-
+        div.innerHTML = `
+            <div class="playerColor" style="background-color: rgb(${player.color.r}, ${player.color.g}, ${player.color.b});"></div>
+            ${player.name} 
+            <button onclick="editPlayer(${player.id})">Ret</button>
+            <button onclick="removePlayer(${player.id})">Fjern</button>
+        `;
         playerList.appendChild(div);
     });
 
     if (players.length > 0) {
-        setupRaceButton.style.display = "block"; // Vis "Opsæt Race"-knap hvis spillere findes
-    } else {
-        setupRaceButton.style.display = "none"; // Skjul knappen hvis ingen spillere er tilbage
+        setupRaceButton.style.display = "block";
     }
+}
+
+function removePlayer(playerId) {
+    players = players.filter(p => p.id !== playerId);
+    console.log(`❌ Spiller fjernet! (ID: ${playerId})`);
+    updatePlayerList();
 }
