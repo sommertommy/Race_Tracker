@@ -61,6 +61,8 @@ let lapsCompleted = 0;
 let raceActive = false;
 let lastDetectionTime = 0;
 
+let editingPlayerId = null; // 🔥 Holder styr på den spiller, der redigeres
+
 // 🎯 **Gem det valgte kamera til senere brug**
 let selectedCameraId = null;
 
@@ -587,9 +589,9 @@ savePlayerButton.addEventListener("click", () => {
 
 savePlayerButton.onclick = function() {
     if (editingPlayerId !== null) {
-        updatePlayer(editingPlayerId); // 🔄 Opdater eksisterende spiller
+        updatePlayer(editingPlayerId); // 🔄 Opdater den eksisterende spiller
     } else {
-        addNewPlayer(); // ➕ Opret ny spiller
+        addNewPlayer(); // ➕ Tilføj ny spiller
     }
 
     editingPlayerId = null; // ✅ Nulstil redigeringstilstand
@@ -645,7 +647,7 @@ function stopCamera() {
 }
 
 function updatePlayer(playerId) {
-    let player = players.find(p => p.id === playerId); // 🔍 Find den rigtige spiller
+    let player = players.find(p => p.id === playerId); // 🔍 Find spilleren baseret på ID
     if (!player) {
         console.error(`❌ Fejl: Ingen spiller med ID ${playerId} fundet!`);
         return;
