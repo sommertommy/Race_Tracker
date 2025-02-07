@@ -587,7 +587,14 @@ savePlayerButton.addEventListener("click", () => {
     console.log("Spiller gemt:", player);
 });
 
+// 🎯 **Gem spiller og stop kameraet**
 savePlayerButton.onclick = function() {
+    let playerName = playerNameInput.value.trim();
+    if (!selectedColor || !playerName) {
+        alert("Vælg en farve og indtast et navn!");
+        return;
+    }
+
     if (editingPlayerId !== null) {
         updatePlayer(editingPlayerId); // 🔄 Opdater den eksisterende spiller
     } else {
@@ -597,22 +604,10 @@ savePlayerButton.onclick = function() {
     editingPlayerId = null; // ✅ Nulstil redigeringstilstand
 };
 
+// 🎯 **Tilføj ny spiller med unikt ID**
 function addNewPlayer() {
     let playerName = playerNameInput.value.trim();
-    if (!playerName) {
-        alert("Spillernavn kan ikke være tomt!");
-        return;
-    }
-
-    // ✅ Tjek om spilleren allerede findes
-    let existingPlayer = players.find(p => p.name === playerName);
-    if (existingPlayer) {
-        console.warn(`⚠️ Spilleren ${playerName} findes allerede!`);
-        return;
-    }
-
-    // ✅ Generér unikt ID
-    let newId = Date.now();
+    let newId = Date.now(); // 🔥 Unikt ID baseret på tid
 
     let newPlayer = {
         id: newId,
@@ -658,27 +653,25 @@ function stopCamera() {
 }
 
 function updatePlayer(playerId) {
-    let player = players.find(p => p.id === playerId); // 🔍 Find spilleren baseret på ID
-    if (!player) {
+    let playerIndex = players.findIndex(p => p.id === playerId);
+    if (playerIndex === -1) {
         console.error(`❌ Fejl: Ingen spiller med ID ${playerId} fundet!`);
         return;
     }
 
-    player.name = playerNameInput.value.trim();
-    player.color = selectedColor;
-    player.tolerance = tolerance;
-    player.threshold = threshold;
+    players[playerIndex].name = playerNameInput.value.trim();
+    players[playerIndex].color = selectedColor;
+    players[playerIndex].tolerance = tolerance;
+    players[playerIndex].threshold = threshold;
 
-    console.log(`✅ Spiller "${player.name}" opdateret! (ID: ${playerId})`);
+    console.log(`✅ Spiller "${players[playerIndex].name}" opdateret! (ID: ${playerId})`);
 
     updatePlayerList();
     showScreen(startScreen);
-
-    editingPlayerId = null; // Nulstil redigeringstilstand
 }
 
 function editPlayer(playerId) {
-    let player = players.find(p => p.id === playerId); // 🔍 Find spilleren baseret på ID
+    let player = players.find(p => p.id === playerId);
     if (!player) {
         console.error(`❌ Kunne ikke finde spiller med ID ${playerId}`);
         return;
@@ -722,7 +715,7 @@ function updatePlayerList() {
         setupRaceButton.style.display = "block";
     }
 }
-
+// 🎯 **Slet spiller baseret på ID**
 function removePlayer(playerId) {
     players = players.filter(p => p.id !== playerId);
     console.log(`❌ Spiller fjernet! (ID: ${playerId})`);
