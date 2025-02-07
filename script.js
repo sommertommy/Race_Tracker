@@ -102,20 +102,39 @@ function addPlayer(name) {
 // Funktion der opdaterer en spillers runder og opdaterer leaderboardet, Her sikrer vi, at en spillers runder aldrig overstiger det valgte antal runder:
 function updatePlayerLaps(playerId) {
     let player = players.find(p => p.id === playerId);
-    if (player) {
-        if (player.laps < raceSettings.rounds) {
-            player.laps++;
+    if (!player) return;
 
-            if (player.laps === raceSettings.rounds) {
-                player.finishTime = Date.now(); // 🎯 Registrerer tidspunktet spilleren afslutter
-                console.log(`🏁 ${player.name} har FULDFØRT racet!`);
-            }
-            
-            console.log(`🏎 ${player.name} har nu ${player.laps}/${raceSettings.rounds} runder!`);
+    if (player.laps < raceSettings.rounds) { 
+        player.laps++;
+
+        if (player.laps === raceSettings.rounds) {
+            player.finishTime = player.finishTime || Date.now(); // 🎯 Registrerer tid, kun første gang
+            console.log(`🏁 ${player.name} har FULDFØRT racet!`);
         }
 
+        console.log(`🏎 ${player.name} har nu ${player.laps}/${raceSettings.rounds} runder!`);
         updateLeaderboard();
+    } else {
+        console.log(`⛔ ${player.name} har allerede fuldført racet.`);
     }
+
+    // 🎯 **Stop tracking når alle spillere er færdige**
+    if (players.every(p => p.laps >= raceSettings.rounds)) {
+        console.log("🏁 ALLE spillere har fuldført racet! Stoppes tracking.");
+        stopRace();
+    }
+}
+
+function stopRace() {
+    raceActive = false;
+    console.log("🏁 Race afsluttet!");
+
+    if (trackingInterval) {
+        clearInterval(trackingInterval);
+        trackingInterval = null;
+    }
+
+    stopCamera();
 }
 
 function updateLeaderboard() {
@@ -381,9 +400,6 @@ function detectColorInRace() {
         return;
     }
 
-    let maxAttempts = 50; // Undgå uendelig gentagelse
-    let attempts = 0;
-
     trackingInterval = setInterval(() => {
         if (!raceActive) {
             console.warn("⏸ detectColorInRace stoppet, da raceActive er false.");
@@ -392,15 +408,10 @@ function detectColorInRace() {
             return;
         }
 
-        if (!hiddenVideo || hiddenVideo.videoWidth === 0 || hiddenVideo.videoHeight === 0) {
-            attempts++;
-            if (attempts >= maxAttempts) {
-                console.error("⛔ Video kunne ikke startes efter flere forsøg. Stopper detectColorInRace.");
-                clearInterval(trackingInterval);
-                trackingInterval = null;
-            } else {
-                console.warn("⏳ Video stadig ikke klar, prøver igen...");
-            }
+        // 🎯 **Stop tracking hvis alle er færdige**
+        if (players.every(p => p.laps >= raceSettings.rounds)) {
+            console.log("🏁 Alle spillere er færdige! Stopper tracking.");
+            stopRace();
             return;
         }
 
@@ -413,38 +424,26 @@ function detectColorInRace() {
         const imageData = raceCtx.getImageData(0, 0, raceCanvas.width, raceCanvas.height);
         const data = imageData.data;
 
-        let playerDetected = {}; // Holder styr på, hvilke spillere der er registreret
+        let playerDetected = {}; 
 
         for (let i = 0; i < data.length; i += 4) {
             const r = data[i], g = data[i + 1], b = data[i + 2];
 
             players.forEach(player => {
-                if (!playerDetected[player.id] && colorMatch(r, g, b, player.color, player.tolerance)) {
-                    const now = Date.now();
+                if (!playerDetected[player.id] && player.laps < raceSettings.rounds) { // 🎯 **Stop hvis allerede færdig**
+                    if (colorMatch(r, g, b, player.color, player.tolerance)) {
+                        const now = Date.now();
 
-                    if (!player.lastDetectionTime || now - player.lastDetectionTime > 1000) {
-                        player.laps++; // 🎯 Opdater spillerens runder
-                        player.lastDetectionTime = now;
-                        playerDetected[player.id] = true; // Markér spilleren som registreret denne frame
-
-                        console.log(`🏎 ${player.name} har nu ${player.laps} runder!`);
-
-                        // Opdater UI for den specifikke spiller
-                        updateLeaderboard();
+                        if (!player.lastDetectionTime || now - player.lastDetectionTime > 1000) {
+                            updatePlayerLaps(player.id);
+                            player.lastDetectionTime = now;
+                            playerDetected[player.id] = true;
+                        }
                     }
                 }
             });
         }
-
-        // Tjek om alle spillere er færdige
-        if (players.every(player => player.laps >= raceSettings.rounds)) {
-            alert("🏁 Alle spillere har fuldført racet!");
-            clearInterval(trackingInterval);
-            trackingInterval = null;
-            raceActive = false;
-            stopCamera();
-        }
-    }, 100); // Opdatering hver 100ms
+    }, 100); // 🎯 **Opdatering hver 100ms**
 }
 // 🎯 **Start det valgte kamera**
 
