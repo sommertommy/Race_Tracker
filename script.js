@@ -596,7 +596,7 @@ savePlayerButton.onclick = function() {
     }
 
     if (editingPlayerId !== null) {
-        updatePlayer(editingPlayerId); // 🔄 Opdater den eksisterende spiller
+        updatePlayer(editingPlayerId); // 🔄 Opdater eksisterende spiller
     } else {
         addNewPlayer(); // ➕ Tilføj ny spiller
     }
@@ -605,11 +605,17 @@ savePlayerButton.onclick = function() {
 };
 
 // 🎯 **Tilføj ny spiller med unikt ID**
-// 🎯 **Tilføj ny spiller med unikt ID**
 function addNewPlayer() {
     let playerName = playerNameInput.value.trim();
     
-    // 🔥 Generér et unikt ID baseret på tid
+    // ✅ Sørg for, at der ikke findes en spiller med samme navn
+    let existingPlayer = players.find(p => p.name.toLowerCase() === playerName.toLowerCase());
+    if (existingPlayer) {
+        console.warn(`⚠️ Spilleren "${playerName}" findes allerede!`);
+        return;
+    }
+
+    // 🔥 Generér et unikt ID
     let newId = Date.now();
 
     let newPlayer = {
@@ -718,7 +724,6 @@ function updatePlayerList() {
         setupRaceButton.style.display = "block";
     }
 }
-// 🎯 **Slet spiller baseret på ID**
 // 🎯 **Slet spiller baseret på ID**
 function removePlayer(playerId) {
     players = players.filter(p => p.id !== playerId);
