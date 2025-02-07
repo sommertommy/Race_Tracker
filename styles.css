@@ -82,6 +82,11 @@ body {
     font-size: 24px;
     top: 50%;
     transform: translateY(-50%);
+    display: none; /* 🔥 Skjult indtil spilleren når målstregen */
+}
+
+.leaderboard-player .medal:not(:empty) {
+    display: block; /* 🎖 Vises kun når der er en medalje */
 }
 
 .video-container {
