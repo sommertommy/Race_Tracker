@@ -440,7 +440,8 @@ function detectColorInRace() {
             const r = data[i], g = data[i + 1], b = data[i + 2];
 
             players.forEach(player => {
-                if (!playerDetected[player.id] && colorMatch(r, g, b, player.color, player.tolerance)) {
+                if (!playerDetected[player.id] && colorMatch(r, g, b, player.color, player.tolerance, player.excludedColors)) {
+
                     // 🚫 Hvis farven matcher en ekskluderet farve, spring over
                     if (player.excludedColors.some(excluded => colorMatch(r, g, b, excluded, player.tolerance))) {
                         console.warn(`🚫 ${player.name} ignorerede en forbudt farve!`);
@@ -604,7 +605,18 @@ function trackColor() {
 }
 
 // 🎯 **Matcher farver med tolerance**
-function colorMatch(r, g, b, color, tol) {
+function colorMatch(r, g, b, color, tol, excludedColors = []) {
+    // 🚫 Tjek om farven er en ekskluderet farve
+    for (let excluded of excludedColors) {
+        if (Math.abs(r - excluded.r) < tol &&
+            Math.abs(g - excluded.g) < tol &&
+            Math.abs(b - excluded.b) < tol) {
+            console.warn(`🚫 Ignoreret forbudt farve: rgb(${r}, ${g}, ${b})`);
+            return false; // Farven må ikke registreres
+        }
+    }
+
+    // ✅ Match på spillerens farve
     return Math.abs(r - color.r) < tol &&
            Math.abs(g - color.g) < tol &&
            Math.abs(b - color.b) < tol;
