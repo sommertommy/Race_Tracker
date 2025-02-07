@@ -108,7 +108,6 @@ function updatePlayerLaps(playerId) {
     }
 }
 
-// 🎯 **Opdater leaderboard ved at vise alle spillere korrekt**
 function updateLeaderboard() {
     const leaderboardDiv = document.getElementById("leaderboard");
 
@@ -117,19 +116,23 @@ function updateLeaderboard() {
         return;
     }
 
-    leaderboardDiv.innerHTML = "<h3>LEADERBOARD:</h3>"; // Tilføj overskrift
+    leaderboardDiv.innerHTML = "<h3>LEADERBOARD:</h3>"; // ✅ Bevarer overskrift
 
     // 🎯 **Sortér spillere efter antal runder kørt (højest først)**
     players.sort((a, b) => b.laps - a.laps);
 
-    // 🎯 **Vis opdaterede spillerrunder i leaderboardet**
+    // 🎯 **Vis opdaterede spillerrunder i en flottere visning**
     players.forEach(player => {
-        let playerEntry = document.createElement("p");
-        playerEntry.textContent = `${player.name} - ${player.laps}/${raceSettings.rounds} runder`;
+        let playerEntry = document.createElement("div");
+        playerEntry.classList.add("leaderboard-player"); // 🎯 Ny klasse for bedre UI
+        playerEntry.innerHTML = `
+            <div class="playerColor" style="background-color: rgb(${player.color.r}, ${player.color.g}, ${player.color.b});"></div>
+            <span>${player.name} - ${player.laps}/${raceSettings.rounds} runder</span>
+        `;
         leaderboardDiv.appendChild(playerEntry);
     });
 
-    console.log("Leaderboard opdateret:", players);
+    console.log("✅ Leaderboard opdateret:", players);
 }
 // Forhindre kameraet i at blive påvirket, når en spiller tilføjes
 function preventCameraRestart() {
@@ -165,6 +168,9 @@ startRaceButton.addEventListener("click", () => {
 
     raceActive = true;
     console.log("🏁 Race er nu aktiv:", raceActive);
+
+    // 🎯 **Opdater leaderboard, så det vises fra start**
+    updateLeaderboard();  // 🔥 Tilføj denne linje her!
 
     // 🎯 **Start kameraet (uden synlig visning af video)**
     startRaceCamera();
