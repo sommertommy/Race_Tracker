@@ -147,22 +147,25 @@ function updateLeaderboard() {
 
     leaderboardDiv.innerHTML = "<h3>LEADERBOARD:</h3>"; // ✅ Bevarer overskrift
 
-    // 🎯 **Sortér spillere efter afsluttet rækkefølge (og derefter antal runder)**
-    players.sort((a, b) => {
-        if (a.laps >= raceSettings.rounds && b.laps >= raceSettings.rounds) {
-            return a.finishTime - b.finishTime; // 🎯 Behold oprindelig rækkefølge, hvis begge er færdige
-        }
-        return b.laps - a.laps; // 🎯 Ellers sorter efter flest runder
-    });
+    // 🎖 Medaljer til de første tre spillere, der færdiggør løbet
+    const medals = ["🥇", "🥈", "🥉"];
+    let finishedPlayers = players.filter(p => p.laps >= raceSettings.rounds);
+    
+    // 🎯 Sortér færdige spillere efter afslutningstidspunkt
+    finishedPlayers.sort((a, b) => a.finishTime - b.finishTime);
 
-    const medals = ["🥇", "🥈", "🥉"]; // 🎖 Medaljer til top 3
+    // 🎯 Sortér ikke-færdige spillere efter antal runder
+    let ongoingPlayers = players.filter(p => p.laps < raceSettings.rounds);
+    ongoingPlayers.sort((a, b) => b.laps - a.laps);
 
-    players.forEach((player, index) => {
+    let sortedPlayers = [...finishedPlayers, ...ongoingPlayers];
+
+    sortedPlayers.forEach((player, index) => {
         let playerEntry = document.createElement("div");
         playerEntry.classList.add("leaderboard-player");
 
-        // 🎖 Tildel medalje, hvis spilleren er i top 3
-        let medal = index < 3 ? medals[index] : "";
+        // 🎖 Tildel medalje KUN hvis spilleren har gennemført racet
+        let medal = (index < medals.length && player.laps >= raceSettings.rounds) ? medals[index] : "";
 
         playerEntry.innerHTML = `
             <div class="playerColor" style="background-color: rgb(${player.color.r}, ${player.color.g}, ${player.color.b});"></div>
@@ -174,8 +177,9 @@ function updateLeaderboard() {
         leaderboardDiv.appendChild(playerEntry);
     });
 
-    console.log("✅ Leaderboard opdateret:", players);
+    console.log("✅ Leaderboard opdateret:", sortedPlayers);
 }
+
 // Forhindre kameraet i at blive påvirket, når en spiller tilføjes
 function preventCameraRestart() {
     console.log("Kamera forbliver aktivt!");
