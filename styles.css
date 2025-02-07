@@ -17,54 +17,53 @@ body {
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* 🎯 Leaderboard som pæn boks */
 #leaderboard {
-    width: 80%;
-    max-width: 600px;
-    background: #fff;
-    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centrerer boksene */
+    width: 50%; /* Gør leaderboardet smallere */
+    margin: 20px auto; /* Centrer det på siden */
+    background: white;
+    padding: 20px;
     border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .leaderboard-player {
     display: flex;
+    justify-content: space-between; /* Sørger for at navn og runder står i hver sin side */
     align-items: center;
-    justify-content: space-between;
-    background: #f9f9f9;
-    padding: 10px;
-    margin: 5px 0;
+    width: 100%;
+    padding: 10px 15px;
+    background: #f8f9fa;
     border-radius: 8px;
+    margin-bottom: 10px;
     border: 1px solid #ddd;
 }
 
-/* 🎯 Farveboks ved spiller */
-.leaderboard-player .playerColor {
-    width: 30px;
-    height: 30px;
+.leaderboard-player:last-child {
+    margin-bottom: 0;
+}
+
+.playerColor {
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
-    border: 2px solid black;
+    margin-right: 10px;
+    border: 1px solid #333;
 }
 
-/* 🎯 Opdater spillernavn og rundeantal */
-.leaderboard-player span {
-    flex-grow: 1;
+.player-info {
+    display: flex;
+    align-items: center;
     font-weight: bold;
-    text-align: left;
-    margin-left: 10px;
 }
 
-.leaderboard-player button {
-    background: #ff4d4d;
-    padding: 5px 10px;
-    font-size: 14px;
+.laps {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #007BFF;
 }
-
-.leaderboard-player button:hover {
-    background: #cc0000;
-}
-
 .video-container {
     position: relative;
     display: inline-block;
