@@ -605,9 +605,12 @@ savePlayerButton.onclick = function() {
 };
 
 // 🎯 **Tilføj ny spiller med unikt ID**
+// 🎯 **Tilføj ny spiller med unikt ID**
 function addNewPlayer() {
     let playerName = playerNameInput.value.trim();
-    let newId = Date.now(); // 🔥 Unikt ID baseret på tid
+    
+    // 🔥 Generér et unikt ID baseret på tid
+    let newId = Date.now();
 
     let newPlayer = {
         id: newId,
@@ -715,6 +718,7 @@ function updatePlayerList() {
         setupRaceButton.style.display = "block";
     }
 }
+// 🎯 **Slet spiller baseret på ID**
 // 🎯 **Slet spiller baseret på ID**
 function removePlayer(playerId) {
     players = players.filter(p => p.id !== playerId);
