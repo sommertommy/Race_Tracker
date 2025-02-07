@@ -99,11 +99,21 @@ function addPlayer(name) {
     console.log(`Spiller tilføjet: ${name}`);
 }
 
-// Funktion der opdaterer en spillers runder og opdaterer leaderboardet
+// Funktion der opdaterer en spillers runder og opdaterer leaderboardet, Her sikrer vi, at en spillers runder aldrig overstiger det valgte antal runder:
 function updatePlayerLaps(playerId) {
-    const player = players.find(p => p.id === playerId);
+    let player = players.find(p => p.id === playerId);
     if (player) {
-        player.laps++;
+        if (player.laps < raceSettings.rounds) {
+            player.laps++;
+
+            if (player.laps === raceSettings.rounds) {
+                player.finishTime = Date.now(); // 🎯 Registrerer tidspunktet spilleren afslutter
+                console.log(`🏁 ${player.name} har FULDFØRT racet!`);
+            }
+            
+            console.log(`🏎 ${player.name} har nu ${player.laps}/${raceSettings.rounds} runder!`);
+        }
+
         updateLeaderboard();
     }
 }
@@ -116,13 +126,22 @@ function updateLeaderboard() {
         return;
     }
 
-    leaderboardDiv.innerHTML = "<h3>LEADERBOARD:</h3>"; // ✅ Bevarer overskrift
+    leaderboardDiv.innerHTML = "<h3>LEADERBOARD:</h3>";
 
-    // 🎯 **Sortér spillere efter antal runder kørt (højest først)**
-    players.sort((a, b) => b.laps - a.laps);
+    // 🎯 **Opdel spillere i to grupper:**
+    let finishedPlayers = players.filter(p => p.laps >= raceSettings.rounds);
+    let ongoingPlayers = players.filter(p => p.laps < raceSettings.rounds);
 
-    // 🎯 **Vis opdaterede spillerrunder i flottere UI**
-    players.forEach(player => {
+    // 🎯 **Bevar placeringen for færdige spillere og sorter dem i målrækkefølge**
+    finishedPlayers.sort((a, b) => a.finishTime - b.finishTime);
+
+    // 🎯 **Sortér de igangværende spillere efter flest runder kørt**
+    ongoingPlayers.sort((a, b) => b.laps - a.laps);
+
+    // 🎯 **Sammensæt leaderboard med færdige spillere øverst**
+    let sortedPlayers = [...finishedPlayers, ...ongoingPlayers];
+
+    sortedPlayers.forEach(player => {
         let playerEntry = document.createElement("div");
         playerEntry.classList.add("leaderboard-player");
 
@@ -137,7 +156,7 @@ function updateLeaderboard() {
         leaderboardDiv.appendChild(playerEntry);
     });
 
-    console.log("✅ Leaderboard opdateret:", players);
+    console.log("✅ Leaderboard opdateret:", sortedPlayers);
 }
 // Forhindre kameraet i at blive påvirket, når en spiller tilføjes
 function preventCameraRestart() {
