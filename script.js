@@ -436,9 +436,13 @@ function detectColorInRace() {
         const data = imageData.data;
 
         let colorCounts = {}; // 🎯 Holder styr på farveantal
-        let totalPixels = (raceCanvas.width * raceCanvas.height);
+        let excludedCounts = {}; // 🚫 Holder styr på ekskluderede farver
+        let totalPixels = raceCanvas.width * raceCanvas.height;
 
-        players.forEach(player => colorCounts[player.id] = 0);
+        players.forEach(player => {
+            colorCounts[player.id] = 0;
+            excludedCounts[player.id] = 0;
+        });
 
         // 🎯 **Gå igennem hvert pixel i billedet**
         for (let i = 0; i < data.length; i += 4) {
@@ -448,6 +452,11 @@ function detectColorInRace() {
                 if (colorMatch(r, g, b, player.color, player.tolerance)) {
                     colorCounts[player.id]++; // 🎯 Tæl farven for denne spiller
                 }
+
+                // 🚫 Tæl også ekskluderede farver
+                if (player.excludedColors.some(excluded => colorMatch(r, g, b, excluded, player.tolerance))) {
+                    excludedCounts[player.id]++;
+                }
             });
         }
 
@@ -455,10 +464,11 @@ function detectColorInRace() {
         Object.keys(colorCounts).forEach(playerId => {
             let player = players.find(p => p.id == playerId);
             let percentage = (colorCounts[playerId] / totalPixels) * 100;
+            let excludedPercentage = (excludedCounts[playerId] / totalPixels) * 100;
 
-            // 🚫 Ignorer hvis farven fylder for lidt af billedet
-            if (percentage < 2.5) { // **Sæt en tærskel, f.eks. 2.5%**
-                console.warn(`🚫 ${player.name} ignoreret – kun ${percentage.toFixed(2)}% af billedet`);
+            // 🚫 Ignorer hvis spillerens farve ikke er mindst dobbelt så stor som den største ekskluderede farve
+            if (excludedPercentage > 0 && percentage < (excludedPercentage * 2)) {
+                console.warn(`🚫 ${player.name} ignoreret – kun ${percentage.toFixed(2)}% vs. ekskluderede ${excludedPercentage.toFixed(2)}%`);
                 return;
             }
 
@@ -470,7 +480,7 @@ function detectColorInRace() {
                     player.laps++;
                     player.lastDetectionTime = now;
 
-                    console.log(`🏎 ${player.name} har nu ${player.laps} runder (${percentage.toFixed(2)}% af billedet)!`);
+                    console.log(`🏎 ${player.name} har nu ${player.laps} runder! (${percentage.toFixed(2)}% af billedet, ekskluderet: ${excludedPercentage.toFixed(2)}%)`);
 
                     if (player.laps >= raceSettings.rounds && !player.finishTime) {
                         player.finishTime = now;
