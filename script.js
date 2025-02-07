@@ -598,14 +598,25 @@ savePlayerButton.onclick = function() {
 };
 
 function addNewPlayer() {
-    if (editingPlayerId !== null) {
-        console.warn("⚠️ Forsøger at tilføje ny spiller, men er i redigeringstilstand. Stopper!");
+    let playerName = playerNameInput.value.trim();
+    if (!playerName) {
+        alert("Spillernavn kan ikke være tomt!");
         return;
     }
 
+    // ✅ Tjek om spilleren allerede findes
+    let existingPlayer = players.find(p => p.name === playerName);
+    if (existingPlayer) {
+        console.warn(`⚠️ Spilleren ${playerName} findes allerede!`);
+        return;
+    }
+
+    // ✅ Generér unikt ID
+    let newId = Date.now();
+
     let newPlayer = {
-        id: Date.now(), // 🔥 Generer unikt ID baseret på timestamp
-        name: playerNameInput.value.trim(),
+        id: newId,
+        name: playerName,
         color: selectedColor,
         tolerance: tolerance,
         threshold: threshold,
