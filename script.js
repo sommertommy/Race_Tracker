@@ -121,14 +121,19 @@ function updateLeaderboard() {
     // 🎯 **Sortér spillere efter antal runder kørt (højest først)**
     players.sort((a, b) => b.laps - a.laps);
 
-    // 🎯 **Vis opdaterede spillerrunder i en flottere visning**
+    // 🎯 **Vis opdaterede spillerrunder i flottere UI**
     players.forEach(player => {
         let playerEntry = document.createElement("div");
-        playerEntry.classList.add("leaderboard-player"); // 🎯 Ny klasse for bedre UI
+        playerEntry.classList.add("leaderboard-player");
+
         playerEntry.innerHTML = `
-            <div class="playerColor" style="background-color: rgb(${player.color.r}, ${player.color.g}, ${player.color.b});"></div>
-            <span>${player.name} - ${player.laps}/${raceSettings.rounds} runder</span>
+            <div class="player-info">
+                <div class="playerColor" style="background-color: rgb(${player.color.r}, ${player.color.g}, ${player.color.b});"></div>
+                <span>${player.name}</span>
+            </div>
+            <div class="laps">${player.laps}/${raceSettings.rounds}</div>
         `;
+
         leaderboardDiv.appendChild(playerEntry);
     });
 
