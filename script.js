@@ -180,6 +180,15 @@ function updateLeaderboard() {
     console.log("✅ Leaderboard opdateret:", sortedPlayers);
 }
 
+function updateExcludedColors() {
+    players.forEach(player => {
+        player.excludedColors = players
+            .filter(other => other.id !== player.id) // Ekskluder sig selv
+            .map(other => other.color); // Gem de andre spilleres farver
+    });
+    console.log("🚫 Opdateret eksklusionsfarver for hver spiller:", players);
+}
+
 // Forhindre kameraet i at blive påvirket, når en spiller tilføjes
 function preventCameraRestart() {
     console.log("Kamera forbliver aktivt!");
@@ -209,19 +218,17 @@ startRaceButton.addEventListener("click", () => {
         return;
     }
 
+    updateExcludedColors(); // 🚫 Opdater eksklusionsfarver inden start
     showScreen(raceScreen);
     console.log("🔍 raceScreen vist!");
 
     raceActive = true;
     console.log("🏁 Race er nu aktiv:", raceActive);
 
-    // 🎯 **Opdater leaderboard, så det vises fra start**
-    updateLeaderboard();  // 🔥 Tilføj denne linje her!
+    updateLeaderboard(); // 🔥 Vis leaderboard fra start
 
-    // 🎯 **Start kameraet (uden synlig visning af video)**
     startRaceCamera();
 
-    // 🎯 **Start detectColorInRace hvis det ikke allerede kører**
     setTimeout(() => {
         console.log("🔥 Forsøger at starte detectColorInRace manuelt...");
         if (!trackingInterval) {
@@ -433,14 +440,29 @@ function detectColorInRace() {
             const r = data[i], g = data[i + 1], b = data[i + 2];
 
             players.forEach(player => {
-                if (!playerDetected[player.id] && player.laps < raceSettings.rounds) { // 🎯 **Stop hvis allerede færdig**
-                    if (colorMatch(r, g, b, player.color, player.tolerance)) {
-                        const now = Date.now();
-
-                        if (!player.lastDetectionTime || now - player.lastDetectionTime > 1000) {
-                            updatePlayerLaps(player.id);
+                if (!playerDetected[player.id] && colorMatch(r, g, b, player.color, player.tolerance)) {
+                    // 🚫 Hvis farven matcher en ekskluderet farve, spring over
+                    if (player.excludedColors.some(excluded => colorMatch(r, g, b, excluded, player.tolerance))) {
+                        console.warn(`🚫 ${player.name} ignorerede en forbudt farve!`);
+                        return; // Spring denne iteration over
+                    }
+            
+                    const now = Date.now();
+            
+                    if (!player.lastDetectionTime || now - player.lastDetectionTime > 1000) {
+                        if (player.laps < raceSettings.rounds) {
+                            player.laps++;
                             player.lastDetectionTime = now;
-                            playerDetected[player.id] = true;
+                            playerDetected[player.id] = true; 
+            
+                            console.log(`🏎 ${player.name} har nu ${player.laps} runder!`);
+            
+                            if (player.laps >= raceSettings.rounds && !player.finishTime) {
+                                player.finishTime = now;
+                                console.log(`🏁 ${player.name} er færdig med racet!`);
+                            }
+            
+                            updateLeaderboard();
                         }
                     }
                 }
