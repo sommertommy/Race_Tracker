@@ -435,52 +435,42 @@ function detectColorInRace() {
         const imageData = raceCtx.getImageData(0, 0, raceCanvas.width, raceCanvas.height);
         const data = imageData.data;
 
-        let playerDetected = {}; 
-        let colorCounts = {}; // 🔹 Holder styr på hvor mange pixels hver farve har
+        let colorCounts = {}; // 🎯 Holder styr på farveantal
+        let totalPixels = (raceCanvas.width * raceCanvas.height);
 
-        // 🎯 **Gennemgå alle pixels**
+        players.forEach(player => colorCounts[player.id] = 0);
+
+        // 🎯 **Gå igennem hvert pixel i billedet**
         for (let i = 0; i < data.length; i += 4) {
             const r = data[i], g = data[i + 1], b = data[i + 2];
 
             players.forEach(player => {
                 if (colorMatch(r, g, b, player.color, player.tolerance)) {
-                    let key = `${player.color.r},${player.color.g},${player.color.b}`;
-                    colorCounts[key] = (colorCounts[key] || 0) + 1;
+                    colorCounts[player.id]++; // 🎯 Tæl farven for denne spiller
                 }
             });
         }
 
-        // 🎯 **Filtrér små farveområder væk**
-        Object.entries(colorCounts).forEach(([color, count]) => {
-            let totalPixels = raceCanvas.width * raceCanvas.height;
-            let percentage = (count / totalPixels) * 100;
+        // 🎯 **Beregn procentdel for hver farve**
+        Object.keys(colorCounts).forEach(playerId => {
+            let player = players.find(p => p.id == playerId);
+            let percentage = (colorCounts[playerId] / totalPixels) * 100;
 
-            if (percentage < 3) { // 🔥 Justér denne værdi for mere/mindre streng filtrering
-                console.warn(`🚫 Ignorerede farve ${color} (kun ${percentage.toFixed(2)}% af billedet)`);
-                delete colorCounts[color]; // Fjern farven fra registreringen
-            }
-        });
-
-        // 🎯 **Tjek hvilke spillere der stadig har en registreret farve**
-        players.forEach(player => {
-            let key = `${player.color.r},${player.color.g},${player.color.b}`;
-            if (!colorCounts[key]) return; // Hvis farven er filtreret fra, gør ingenting
-
-            // 🚫 **Tjek ekskluderede farver (EFTER areal-filtrering)**
-            if (player.excludedColors.some(excluded => colorMatch(player.color.r, player.color.g, player.color.b, excluded, player.tolerance))) {
-                console.warn(`🚫 ${player.name} ignorerede en forbudt farve!`);
-                return; // Spring over hvis en ekskluderet farve matches
+            // 🚫 Ignorer hvis farven fylder for lidt af billedet
+            if (percentage < 2.5) { // **Sæt en tærskel, f.eks. 2.5%**
+                console.warn(`🚫 ${player.name} ignoreret – kun ${percentage.toFixed(2)}% af billedet`);
+                return;
             }
 
             const now = Date.now();
 
+            // 🎯 **Registrer kun spiller, hvis de ikke er færdige**
             if (!player.lastDetectionTime || now - player.lastDetectionTime > 1000) {
                 if (player.laps < raceSettings.rounds) {
                     player.laps++;
                     player.lastDetectionTime = now;
-                    playerDetected[player.id] = true; 
 
-                    console.log(`🏎 ${player.name} har nu ${player.laps} runder!`);
+                    console.log(`🏎 ${player.name} har nu ${player.laps} runder (${percentage.toFixed(2)}% af billedet)!`);
 
                     if (player.laps >= raceSettings.rounds && !player.finishTime) {
                         player.finishTime = now;
@@ -494,6 +484,9 @@ function detectColorInRace() {
 
     }, 100); // 🎯 **Opdatering hver 100ms**
 }
+
+
+
 // 🎯 **Start det valgte kamera**
 
 function startSelectedCamera() {
