@@ -111,36 +111,32 @@ function updatePlayerLaps(playerId) {
 
     const now = Date.now();
 
-    if (player.laps < raceSettings.rounds) { 
-        if (!player.lapTimes) player.lapTimes = []; // 🔥 Sikrer at lapTimes eksisterer
-
-        let lapTime = player.lapTimes.length === 0 
-            ? now - raceStartTime  // Første omgang er fra race start
-            : now - player.lastDetectionTime; // Tid siden sidste omgang
-
-        player.lapTimes.push(lapTime); // 📌 Tilføj rundetiden til spilleren
-        player.lastDetectionTime = now; // 🔥 Opdater seneste detektering
-
-        console.log(`⏱ ${player.name} rundetid: ${lapTime}ms`);
-        console.log("🔎 Spilleren nu:", JSON.stringify(player, null, 2)); // 🎯 Debug log
-
-        player.laps++;
-
-        if (player.laps === raceSettings.rounds) {
-            player.finishTime = now;
-            console.log(`🏁 ${player.name} har FULDFØRT racet!`);
-        }
-
-        updateLeaderboard();
-        updateLapTimesTable(); // 📌 Opdater tabellen, når der kommer en ny tid
+    // 💡 Sørg for, at `lapTimes` altid eksisterer
+    if (!player.lapTimes) {
+        player.lapTimes = [];
+        console.warn(`🔧 Oprettede lapTimes for ${player.name}`);
     }
 
-    if (players.every(p => p.laps >= raceSettings.rounds)) {
-        console.log("🏁 ALLE spillere har fuldført racet! Stopper tracking.");
-        stopRace();
+    let lapTime = player.lapTimes.length === 0 
+        ? now - raceStartTime  // Første omgang = tid siden race start
+        : now - player.lastDetectionTime; // Tid siden sidste omgang
+
+    player.lapTimes.push(lapTime); // 🎯 GEM rundetiden!
+    player.lastDetectionTime = now; // Opdater seneste omgang
+
+    console.log(`⏱ ${player.name} rundetid: ${lapTime}ms`);
+    console.log("📊 Opdateret spiller:", JSON.stringify(player, null, 2)); // 🎯 Debug log
+
+    player.laps++;
+
+    if (player.laps === raceSettings.rounds) {
+        player.finishTime = now;
+        console.log(`🏁 ${player.name} har FULDFØRT racet!`);
     }
+
+    updateLeaderboard();
+    updateLapTimesTable(); // 📌 Opdater tabellen, når der kommer en ny tid
 }
-
 
 
 function toggleLapTimes() {
