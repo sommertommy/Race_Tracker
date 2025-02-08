@@ -105,18 +105,26 @@ function updatePlayerLaps(playerId) {
     let player = players.find(p => p.id === playerId);
     if (!player) return;
 
+    const now = Date.now();
+    
     if (player.laps < raceSettings.rounds) { 
+        if (!player.lapTimes) player.lapTimes = [];
+        
+        let lapTime = player.lapTimes.length === 0 
+            ? now - raceStartTime 
+            : now - player.lapTimes[player.lapTimes.length - 1];
+
+        player.lapTimes.push(lapTime);
+
         player.laps++;
 
         if (player.laps === raceSettings.rounds) {
-            player.finishTime = player.finishTime || Date.now(); // 🎯 Registrerer tid, kun første gang
+            player.finishTime = now;
             console.log(`🏁 ${player.name} har FULDFØRT racet!`);
         }
 
         console.log(`🏎 ${player.name} har nu ${player.laps}/${raceSettings.rounds} runder!`);
         updateLeaderboard();
-    } else {
-        console.log(`⛔ ${player.name} har allerede fuldført racet.`);
     }
 
     // 🎯 **Stop tracking når alle spillere er færdige**
@@ -125,6 +133,51 @@ function updatePlayerLaps(playerId) {
         stopRace();
     }
 }
+
+function toggleLapTimes() {
+    const overlay = document.getElementById("lapTimesOverlay");
+    overlay.style.display = overlay.style.display === "flex" ? "none" : "flex";
+
+    if (overlay.style.display === "flex") {
+        updateLapTimesTable();
+    }
+}
+
+function updateLapTimesTable() {
+    const headerRow = document.getElementById("lapTableHeader");
+    const body = document.getElementById("lapTableBody");
+
+    headerRow.innerHTML = "<th>Runde</th>"; 
+    body.innerHTML = "";
+
+    let maxLaps = Math.max(...players.map(p => p.lapTimes.length));
+
+    players.forEach(player => {
+        let th = document.createElement("th");
+        th.textContent = player.name;
+        headerRow.appendChild(th);
+    });
+
+    for (let i = 0; i < maxLaps; i++) {
+        let row = document.createElement("tr");
+        let roundCell = document.createElement("td");
+        roundCell.textContent = i + 1;
+        row.appendChild(roundCell);
+
+        players.forEach(player => {
+            let cell = document.createElement("td");
+            if (player.lapTimes[i]) {
+                cell.textContent = (player.lapTimes[i] / 1000).toFixed(2) + "s"; // Konverter ms til sekunder
+            } else {
+                cell.textContent = "-";
+            }
+            row.appendChild(cell);
+        });
+
+        body.appendChild(row);
+    }
+}
+
 
 function resetRaceData() {
     console.log("♻️ Nulstiller race-data...");
