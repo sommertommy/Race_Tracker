@@ -466,6 +466,12 @@ function detectColorInRace() {
             let percentage = (colorCounts[playerId] / totalPixels) * 100;
             let excludedPercentage = (excludedCounts[playerId] / totalPixels) * 100;
 
+            // 🚨 **Debugging: Hvis der ikke er farver i billedet, lad os logge en fejl**
+            if (percentage === 0 && excludedPercentage === 0) {
+                console.warn(`⚠️ ${player.name} har ingen synlige farver i billedet.`);
+                return;
+            }
+
             // 🚫 Ignorer hvis spillerens farve ikke er mindst dobbelt så stor som den største ekskluderede farve
             if (excludedPercentage > 0 && percentage < (excludedPercentage * 2)) {
                 console.warn(`🚫 ${player.name} ignoreret – kun ${percentage.toFixed(2)}% vs. ekskluderede ${excludedPercentage.toFixed(2)}%`);
