@@ -201,11 +201,7 @@ setupRaceButton.addEventListener("click", () => {
     roundsInput.value = raceSettings.rounds;
 });
 
-// 🎯 **Skift tilbage til startskærm**
-backToStartButton.addEventListener("click", () => {
-    showScreen(startScreen);
-    stopCamera();
-});
+
 
 backToStartRaceButton.addEventListener("click", () => {
     console.log("🔙 Tilbage til startskærm trykket!");
