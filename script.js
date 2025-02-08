@@ -656,39 +656,40 @@ function detectColorInRace() {
             let percentage = (colorCounts[playerId] / totalPixels) * 100;
             let excludedPercentage = (excludedCounts[playerId] / totalPixels) * 100;
 
-            // 🚨 **Debugging: Hvis der ikke er farver i billedet, lad os logge en fejl**
             if (percentage === 0 && excludedPercentage === 0) {
                 return; // Ingen synlig farve
             }
 
-            // 🚫 Ignorer hvis spillerens farve ikke er mindst dobbelt så stor som den største ekskluderede farve
             if (excludedPercentage > 0 && percentage < (excludedPercentage * 2)) {
                 return;
             }
 
             const now = Date.now();
 
-            // 🎯 **Ignorer første registrering for hver spiller, og sæt 2 sekunders delay før ny registrering er mulig**
+            // 🎯 **Ignorer første registrering for hver spiller**
             if (!player.firstDetectionSkipped) {
                 player.firstDetectionSkipped = true;
                 player.lastDetectionTime = now; // **Sæt 2 sekunders pause efter første registrering**
                 console.log(`✅ Første registrering ignoreret for ${player.name}`);
-                return; // 🚫 Stop her, så første detektion ikke tæller som en omgang
+                return;
             }
 
             // 🎯 **Opdater spillerens omgang via `updatePlayerLaps()`**
             if (!player.lastDetectionTime || now - player.lastDetectionTime > 2000) { // 2 sekunders delay
                 if (player.laps < raceSettings.rounds) {
-                    updatePlayerLaps(player.id); // 🎯 KALD FUNKTIONEN HER
+                    updatePlayerLaps(player.id);
                     player.lastDetectionTime = now; // Opdater sidste registreringstid
 
                     // 🎉 **Check om spilleren har fuldført racet**
                     if (player.laps >= raceSettings.rounds && !player.finishTime) {
                         player.finishTime = now;
-                        console.log(`🏁 ${player.name} har fuldført racet! 🎉`);
-                        
+                        console.log(`🏁 ${player.name} har FULDFØRT racet! 🎉`);
+
                         // 🚀 **Start confetti og lyd**
+                        console.log("🎉 Udløser konfetti!");
                         launchConfetti();
+
+                        console.log("🔊 Afspiller applaus!");
                         playApplauseSound();
                     }
                 }
