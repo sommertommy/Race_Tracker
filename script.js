@@ -707,7 +707,7 @@ Object.keys(colorCounts).forEach(playerId => {
     let percentage = (colorCounts[playerId] / totalPixels) * 100;
     let excludedPercentage = (excludedCounts[playerId] / totalPixels) * 100;
 
-    const minPercentageRequired = 2.0; // 🚀 Kræver mindst 2% dækning af billedet
+    const minPercentageRequired = 0.5; // 🚀 Kræver mindst 2% dækning af billedet
     
     if (percentage === 0 && excludedPercentage === 0) {
         return; // Ingen synlig farve
