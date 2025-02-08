@@ -57,6 +57,8 @@ let players = [];
 let raceSettings = { rounds: 10 };
 let activeStream = null;
 
+let raceStartTime = 0; // 🔥 Tilføj denne linje globalt
+
 let activeRacePlayer = null;
 let lapsCompleted = 0;
 let raceActive = false;
@@ -110,14 +112,16 @@ function updatePlayerLaps(playerId) {
     const now = Date.now();
     
     if (player.laps < raceSettings.rounds) { 
-        if (!player.lapTimes) player.lapTimes = [];
+        if (!player.lapTimes) player.lapTimes = []; // 🔥 Sikrer at lapTimes eksisterer
 
-        // ⏱️ Beregn rundetid baseret på tidligere tidspunkter
         let lapTime = player.lapTimes.length === 0 
-            ? now - raceStartTime  // Første omgang er fra race start
-            : now - player.lapTimes.reduce((a, b) => Math.max(a, b), raceStartTime);
+            ? now - raceStartTime 
+            : now - player.lapTimes[player.lapTimes.length - 1]; // Tiden mellem sidste omgang og nu
 
-        player.lapTimes.push(lapTime); // 📌 Tilføj rundetiden til spilleren
+        player.lapTimes.push(lapTime);
+
+        console.log(`⏱ ${player.name} rundetid: ${lapTime}ms`); // 🔥 Debugging af rundetid
+        console.log("🔎 Spilleren nu:", player);
 
         player.laps++;
 
@@ -126,15 +130,12 @@ function updatePlayerLaps(playerId) {
             console.log(`🏁 ${player.name} har FULDFØRT racet!`);
         }
 
-        console.log(`🏎 ${player.name} har nu ${player.laps}/${raceSettings.rounds} runder! Rundetid: ${lapTime}ms`);
-
         updateLeaderboard();
-        updateLapTimesTable(); // 📌 Opdater tabellen, når der kommer en ny tid
+        updateLapTimesTable(); // 📌 Opdater tabellen
     }
 
-    // 🎯 **Stop tracking når alle spillere er færdige**
     if (players.every(p => p.laps >= raceSettings.rounds)) {
-        console.log("🏁 ALLE spillere har fuldført racet! Stoppes tracking.");
+        console.log("🏁 ALLE spillere har fuldført racet! Stopper tracking.");
         stopRace();
     }
 }
@@ -172,18 +173,17 @@ function updateLapTimesTable() {
         return;
     }
 
-    // Ryd tidligere data
+    console.log("📊 Opdaterer lap times tabel:", players); // 🔥 Se om `lapTimes` findes
+
     tableBody.innerHTML = "";
     tableHeader.innerHTML = "<th>Runde</th>"; // Beholder "Runde" som første kolonne
 
-    // 📌 Tilføj spillernavne til headeren
     players.forEach(player => {
         let th = document.createElement("th");
         th.textContent = player.name;
         tableHeader.appendChild(th);
     });
 
-    // Find maksimalt antal runder, så vi sikrer nok rækker
     let maxRounds = Math.max(...players.map(p => (p.lapTimes ? p.lapTimes.length : 0)), 0);
 
     for (let i = 0; i < maxRounds; i++) {
@@ -196,9 +196,9 @@ function updateLapTimesTable() {
             let cell = document.createElement("td");
 
             if (player.lapTimes && player.lapTimes[i] !== undefined) {
-                cell.textContent = formatTime(player.lapTimes[i]); // 🎯 Formatér tid korrekt
+                cell.textContent = formatTime(player.lapTimes[i]);
             } else {
-                cell.textContent = "--"; // Placeholder hvis ingen tid endnu
+                cell.textContent = "--";
             }
 
             row.appendChild(cell);
@@ -206,9 +206,8 @@ function updateLapTimesTable() {
 
         tableBody.appendChild(row);
     }
-
-    console.log("✅ Rundetider opdateret:", players);
 }
+
 
 
 function resetRaceData() {
