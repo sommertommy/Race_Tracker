@@ -674,12 +674,23 @@ function detectColorInRace() {
                 if (player.laps < raceSettings.rounds) {
                     updatePlayerLaps(player.id); // 🎯 KALD FUNKTIONEN HER
                     player.lastDetectionTime = now; // Opdater sidste registreringstid
+
+                    // 🎉 **Check om spilleren har fuldført racet**
+                    if (player.laps >= raceSettings.rounds && !player.finishTime) {
+                        player.finishTime = now;
+                        console.log(`🏁 ${player.name} har fuldført racet! 🎉`);
+                        
+                        // 🚀 **Start confetti og lyd**
+                        launchConfetti();
+                        playApplauseSound();
+                    }
                 }
             }
         });
 
     }, 100); // 🎯 **Opdatering hver 100ms**
 }
+
 
 
 
