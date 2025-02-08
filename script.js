@@ -124,10 +124,10 @@ function updatePlayerLaps(playerId) {
     player.lapTimes.push(lapTime); // 🎯 GEM rundetiden!
     player.lastDetectionTime = now; // Opdater seneste omgang
 
-    console.log(`⏱ ${player.name} rundetid: ${lapTime}ms`);
-    console.log("📊 Opdateret spiller:", JSON.stringify(player, null, 2)); // 🎯 Debug log
-
     player.laps++;
+
+    console.log(`⏱ ${player.name} rundetid: ${lapTime}ms`);
+    console.log("📊 Opdateret spiller:", JSON.stringify(player, null, 2));
 
     if (player.laps === raceSettings.rounds) {
         player.finishTime = now;
@@ -137,6 +137,7 @@ function updatePlayerLaps(playerId) {
     updateLeaderboard();
     updateLapTimesTable(); // 📌 Opdater tabellen, når der kommer en ny tid
 }
+
 
 
 function toggleLapTimes() {
@@ -592,32 +593,21 @@ function detectColorInRace() {
 
             // 🚨 **Debugging: Hvis der ikke er farver i billedet, lad os logge en fejl**
             if (percentage === 0 && excludedPercentage === 0) {
-               //console.warn(`⚠️ ${player.name} har ingen synlige farver i billedet.`);
-                return;
+                return; // Ingen synlig farve
             }
 
             // 🚫 Ignorer hvis spillerens farve ikke er mindst dobbelt så stor som den største ekskluderede farve
             if (excludedPercentage > 0 && percentage < (excludedPercentage * 2)) {
-                //console.warn(`🚫 ${player.name} ignoreret – kun ${percentage.toFixed(2)}% vs. ekskluderede ${excludedPercentage.toFixed(2)}%`);
                 return;
             }
 
             const now = Date.now();
 
-            // 🎯 **Registrer kun spiller, hvis de ikke er færdige**
+            // 🎯 **Opdater spillerens omgang via `updatePlayerLaps()`**
             if (!player.lastDetectionTime || now - player.lastDetectionTime > 1000) {
                 if (player.laps < raceSettings.rounds) {
-                    player.laps++;
-                    player.lastDetectionTime = now;
-
-                    console.log(`🏎 ${player.name} har nu ${player.laps} runder! (${percentage.toFixed(2)}% af billedet, ekskluderet: ${excludedPercentage.toFixed(2)}%)`);
-
-                    if (player.laps >= raceSettings.rounds && !player.finishTime) {
-                        player.finishTime = now;
-                        console.log(`🏁 ${player.name} er færdig med racet!`);
-                    }
-
-                    updateLeaderboard();
+                    updatePlayerLaps(player.id); // 🎯 KALD FUNKTIONEN HER
+                    player.lastDetectionTime = now; // Opdater sidste registreringstid
                 }
             }
         });
