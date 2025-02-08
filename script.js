@@ -111,14 +111,14 @@ function updatePlayerLaps(playerId) {
 
     const now = Date.now();
 
-    // 💡 Sørg for, at `lapTimes` altid eksisterer
+    // ✅ Sørg for, at `lapTimes` eksisterer
     if (!player.lapTimes) {
         player.lapTimes = [];
         console.warn(`🔧 Oprettede lapTimes for ${player.name}`);
     }
 
     let lapTime = player.lapTimes.length === 0 
-        ? now - raceStartTime  // Første omgang = tid siden race start
+        ? now - raceStartTime  // Første omgang starter fra race start
         : now - player.lastDetectionTime; // Tid siden sidste omgang
 
     player.lapTimes.push(lapTime); // 🎯 GEM rundetiden!
