@@ -64,6 +64,8 @@ let lapsCompleted = 0;
 let raceActive = false;
 let lastDetectionTime = 0;
 
+let selectedProfilePicture = "Reddriver.png"; // Standardbillede
+
 let editingPlayerId = null; // 🔥 Holder styr på den spiller, der redigeres
 
 // 🎯 **Gem det valgte kamera til senere brug**
@@ -119,6 +121,16 @@ function playApplauseSound() {
     applause.play().catch(error => {
         console.warn("⚠️ Kunne ikke afspille lyd:", error);
     });
+}
+
+function selectProfilePicture(imagePath) {
+    selectedProfilePicture = imagePath;
+
+    // Fjern tidligere markering
+    document.querySelectorAll(".profile-pic-option").forEach(img => img.classList.remove("selected-profile"));
+
+    // Marker det valgte billede
+    document.querySelector(`img[src='${imagePath}']`).classList.add("selected-profile");
 }
 
 
@@ -329,33 +341,28 @@ function updateLeaderboard() {
         return;
     }
 
-    leaderboardDiv.innerHTML = "<h3>LEADERBOARD:</h3>"; // ✅ Bevarer overskrift
+    leaderboardDiv.innerHTML = "<h3>LEADERBOARD:</h3>";
 
-    // 🎖 Medaljer til de første tre spillere, der færdiggør løbet
     const medals = ["🥇", "🥈", "🥉"];
     let finishedPlayers = players.filter(p => p.laps >= raceSettings.rounds);
-    
-    // 🎯 Sortér færdige spillere efter afslutningstidspunkt
     finishedPlayers.sort((a, b) => a.finishTime - b.finishTime);
-
-    // 🎯 Sortér ikke-færdige spillere efter antal runder
     let ongoingPlayers = players.filter(p => p.laps < raceSettings.rounds);
     ongoingPlayers.sort((a, b) => b.laps - a.laps);
-
     let sortedPlayers = [...finishedPlayers, ...ongoingPlayers];
 
     sortedPlayers.forEach((player, index) => {
         let playerEntry = document.createElement("div");
         playerEntry.classList.add("leaderboard-player");
 
-        // 🎖 Tildel medalje KUN hvis spilleren har gennemført racet
         let medal = (index < medals.length && player.laps >= raceSettings.rounds) ? medals[index] : "";
 
         playerEntry.innerHTML = `
-            <div class="playerColor" style="background-color: rgb(${player.color.r}, ${player.color.g}, ${player.color.b});"></div>
-            <span class="player-name">${player.name}</span>
-            <span class="player-laps">${player.laps}/${raceSettings.rounds}</span>
-            <span class="medal">${medal}</span>
+            <div class="player-profile">
+                <img src="${player.profilePicture}" class="leaderboard-profile-pic">
+                <span class="player-name">${player.name}</span>
+                <span class="player-laps">${player.laps}/${raceSettings.rounds}</span>
+                <span class="medal">${medal}</span>
+            </div>
         `;
 
         leaderboardDiv.appendChild(playerEntry);
@@ -363,6 +370,7 @@ function updateLeaderboard() {
 
     console.log("✅ Leaderboard opdateret:", sortedPlayers);
 }
+
 
 function updateExcludedColors() {
     players.forEach(player => {
@@ -958,6 +966,7 @@ function addNewPlayer() {
         color: selectedColor,
         tolerance: tolerance,
         threshold: threshold,
+        profilePicture: selectedProfilePicture // 🔥 Gem billedevalg
         laps: 0
     };
 
