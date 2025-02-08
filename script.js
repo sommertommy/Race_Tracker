@@ -173,16 +173,17 @@ function updateLapTimesTable() {
     const tableBody = document.getElementById("lapTableBody");
     const tableHeader = document.getElementById("lapTableHeader");
 
-    if (!players || players.length === 0) {
-        console.warn("❌ Ingen spillere fundet til rundetider!");
+    // 🚀 **Nulstil tabellen, hvis ingen spillere har tider endnu**
+    if (!players || players.length === 0 || players.every(p => !p.lapTimes || p.lapTimes.length === 0)) {
+        console.warn("❌ Ingen spillere fundet eller ingen tider registreret – rydder tabellen!");
+        tableBody.innerHTML = "";
+        tableHeader.innerHTML = "<th>Runde</th>";
         return;
     }
 
     console.log("📊 Opdaterer lap times tabel:", players);
-    console.log("📊 Spillere efter race:", JSON.stringify(players, null, 2));
-
     tableBody.innerHTML = "";
-    tableHeader.innerHTML = "<th>Runde</th>"; // Beholder "Runde" som første kolonne
+    tableHeader.innerHTML = "<th>Runde</th>";
 
     players.forEach(player => {
         let th = document.createElement("th");
@@ -191,9 +192,8 @@ function updateLapTimesTable() {
     });
 
     let maxRounds = Math.max(...players.map(p => (p.lapTimes ? p.lapTimes.length : 0)), 0);
-
-    // 🎯 **Find hurtigste runde for hver spiller**
     let fastestLaps = {};
+
     players.forEach(player => {
         if (player.lapTimes && player.lapTimes.length > 0) {
             fastestLaps[player.id] = Math.min(...player.lapTimes);
@@ -203,7 +203,7 @@ function updateLapTimesTable() {
     for (let i = 0; i < maxRounds; i++) {
         let row = document.createElement("tr");
         let roundCell = document.createElement("td");
-        roundCell.textContent = i + 1; // Runde nummer starter fra 1
+        roundCell.textContent = i + 1;
         row.appendChild(roundCell);
 
         players.forEach(player => {
@@ -213,7 +213,6 @@ function updateLapTimesTable() {
                 let lapTime = player.lapTimes[i];
                 cell.textContent = formatTime(lapTime);
 
-                // 🎯 **Markér hurtigste runde med grøn baggrund**
                 if (lapTime === fastestLaps[player.id]) {
                     cell.style.backgroundColor = "lightgreen";
                     cell.style.fontWeight = "bold";
@@ -232,18 +231,22 @@ function updateLapTimesTable() {
 
 
 
+
 function resetRaceData() {
     console.log("♻️ Nulstiller race-data...");
     raceActive = false;
-    
+
     players.forEach(player => {
         player.laps = 0;
         player.finishTime = null;
         player.lastDetectionTime = null;
+        player.lapTimes = []; // 🔥 Nulstil runde-tider
     });
 
     updateLeaderboard();
+    updateLapTimesTable(); // 📌 Nulstil også tidstabellen!
 }
+
 
 function stopRace() {
     raceActive = false;
