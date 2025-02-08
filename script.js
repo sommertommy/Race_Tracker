@@ -111,12 +111,13 @@ function updatePlayerLaps(playerId) {
     
     if (player.laps < raceSettings.rounds) { 
         if (!player.lapTimes) player.lapTimes = [];
-        
-        let lapTime = player.lapTimes.length === 0 
-            ? now - raceStartTime 
-            : now - player.lapTimes[player.lapTimes.length - 1];
 
-        player.lapTimes.push(lapTime);
+        // ⏱️ Beregn rundetid baseret på tidligere tidspunkter
+        let lapTime = player.lapTimes.length === 0 
+            ? now - raceStartTime  // Første omgang er fra race start
+            : now - player.lapTimes.reduce((a, b) => Math.max(a, b), raceStartTime);
+
+        player.lapTimes.push(lapTime); // 📌 Tilføj rundetiden til spilleren
 
         player.laps++;
 
@@ -125,8 +126,10 @@ function updatePlayerLaps(playerId) {
             console.log(`🏁 ${player.name} har FULDFØRT racet!`);
         }
 
-        console.log(`🏎 ${player.name} har nu ${player.laps}/${raceSettings.rounds} runder!`);
+        console.log(`🏎 ${player.name} har nu ${player.laps}/${raceSettings.rounds} runder! Rundetid: ${lapTime}ms`);
+
         updateLeaderboard();
+        updateLapTimesTable(); // 📌 Opdater tabellen, når der kommer en ny tid
     }
 
     // 🎯 **Stop tracking når alle spillere er færdige**
@@ -135,6 +138,7 @@ function updatePlayerLaps(playerId) {
         stopRace();
     }
 }
+
 
 function toggleLapTimes() {
     const overlay = document.getElementById("lapTimesOverlay");
@@ -157,6 +161,7 @@ function formatTime(ms) {
     let milliseconds = ms % 1000;
     return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}:${String(milliseconds).padStart(3, '0')}`;
 }
+
 
 function updateLapTimesTable() {
     const tableBody = document.getElementById("lapTableBody");
@@ -332,6 +337,7 @@ backToStartRaceButton.addEventListener("click", () => {
 
 startRaceButton.addEventListener("click", () => {
     resetRaceData(); // 🚀 Sørger for, at racet starter fra 0
+    raceStartTime = Date.now(); // 🔥 Gem starttidspunktet for løbet
     console.log("🚀 Start Race trykket!");
 
     if (players.length === 0) {
