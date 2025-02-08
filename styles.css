@@ -213,3 +213,37 @@ th, td {
     }
 }
 
+.profile-options {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.profile-pic-option {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.profile-pic-option:hover {
+    transform: scale(1.1);
+}
+
+.selected-profile {
+    border: 3px solid #FFD700; /* Gul kant til markeret profil */
+}
+
+.player-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.leaderboard-profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid white;
+}
