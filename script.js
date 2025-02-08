@@ -399,19 +399,19 @@ backToStartRaceButton.addEventListener("click", () => {
 
 
 startRaceButton.addEventListener("click", () => {
-    resetRaceData(); // 🚀 Sørger for, at racet starter fra 0
-    raceStartTime = Date.now(); // 🔥 Gem starttidspunktet for løbet
-    console.log("🚀 Start Race trykket!");
-
     if (players.length === 0) {
         alert("Tilføj mindst én spiller før du starter racet!");
         return;
     }
 
-    // 🚨 Sørg for at firstDetectionSkipped nulstilles for alle spillere
-    players.forEach(player => {
-        player.firstDetectionSkipped = false;
-    });
+    // 🎥 Start countdown video
+    playCountdownVideo();
+});
+
+function startRace() {
+    resetRaceData(); // 🚀 Sørger for, at racet starter fra 0
+    raceStartTime = Date.now(); // 🔥 Gem starttidspunktet for løbet
+    console.log("🚀 Start Race!");
 
     updateExcludedColors(); // 🚫 Opdater eksklusionsfarver inden start
     showScreen(raceScreen);
@@ -432,7 +432,53 @@ startRaceButton.addEventListener("click", () => {
             console.warn("⚠️ detectColorInRace kører allerede, starter ikke igen.");
         }
     }, 1000);
-});
+}
+
+function playCountdownVideo() {
+    console.log("⏳ Starter 10 sekunders nedtælling...");
+
+    // Opret en video-container
+    let countdownOverlay = document.createElement("div");
+    countdownOverlay.id = "countdownOverlay";
+    countdownOverlay.style.position = "fixed";
+    countdownOverlay.style.top = "0";
+    countdownOverlay.style.left = "0";
+    countdownOverlay.style.width = "100vw";
+    countdownOverlay.style.height = "100vh";
+    countdownOverlay.style.background = "black";
+    countdownOverlay.style.display = "flex";
+    countdownOverlay.style.alignItems = "center";
+    countdownOverlay.style.justifyContent = "center";
+    countdownOverlay.style.zIndex = "1000"; // Sørg for, at den er øverst
+
+    let countdownVideo = document.createElement("video");
+    countdownVideo.id = "countdownVideo";
+    countdownVideo.src = "countdownlight.mp4";
+    countdownVideo.style.width = "100%";
+    countdownVideo.style.height = "100%";
+    countdownVideo.style.objectFit = "cover";
+    countdownVideo.autoplay = true;
+    countdownVideo.muted = false;
+    countdownVideo.playsInline = true;
+
+    countdownOverlay.appendChild(countdownVideo);
+    document.body.appendChild(countdownOverlay);
+
+    // 🚀 Start video og vent til den er færdig
+    countdownVideo.play().then(() => {
+        console.log("🎬 Countdown video startet!");
+    }).catch(error => {
+        console.error("⚠️ Kunne ikke afspille video:", error);
+    });
+
+    // Når videoen slutter, start racet
+    countdownVideo.onended = () => {
+        console.log("🏁 Countdown færdig – starter racet!");
+        document.body.removeChild(countdownOverlay); // Fjern videooverlay
+        startRace(); // Kald funktionen, der starter racet
+    };
+}
+
 
 const observer = new MutationObserver(() => {
     let lapsDisplay = document.getElementById("currentLapsDisplay");
