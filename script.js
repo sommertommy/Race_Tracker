@@ -114,6 +114,12 @@ function launchConfetti() {
     }, 5000);
 }
 
+function playApplauseSound() {
+    const applause = new Audio("applaus.mp3"); // Sørg for at filen findes i din mappe!
+    applause.play().catch(error => {
+        console.warn("⚠️ Kunne ikke afspille lyd:", error);
+    });
+}
 
 
 
@@ -662,9 +668,10 @@ function detectColorInRace() {
 
             const now = Date.now();
 
-            // 🎯 **Ignorer første registrering for hver spiller**
+            // 🎯 **Ignorer første registrering for hver spiller, og sæt 2 sekunders delay før ny registrering er mulig**
             if (!player.firstDetectionSkipped) {
                 player.firstDetectionSkipped = true;
+                player.lastDetectionTime = now; // **Sæt 2 sekunders pause efter første registrering**
                 console.log(`✅ Første registrering ignoreret for ${player.name}`);
                 return; // 🚫 Stop her, så første detektion ikke tæller som en omgang
             }
