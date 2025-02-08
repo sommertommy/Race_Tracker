@@ -662,33 +662,18 @@ function detectColorInRace() {
 
             const now = Date.now();
 
-            // 🎯 **Ignorer første registrering og vent 2 sekunder før ny registrering er mulig**
+            // 🎯 **Ignorer første registrering for hver spiller**
             if (!player.firstDetectionSkipped) {
-                if (!player.firstDetectionTime) {
-                    player.firstDetectionTime = now; // Gem tidspunkt for første registrering
-                }
-
-                if (now - player.firstDetectionTime > 2000) { // Vent 2 sekunder
-                    player.firstDetectionSkipped = true; // ✅ Nu ignoreres første passage
-                    console.log(`✅ Første registrering ignoreret for ${player.name}`);
-                } else {
-                    console.log(`🚦 Ignorerer første registrering for ${player.name}, venter...`);
-                    return; // Spring over denne registrering
-                }
+                player.firstDetectionSkipped = true;
+                console.log(`✅ Første registrering ignoreret for ${player.name}`);
+                return; // 🚫 Stop her, så første detektion ikke tæller som en omgang
             }
 
-            // 🎯 **Tilføj 2 sekunders forsinkelse mellem registreringer**
-            if (!player.lastDetectionTime || now - player.lastDetectionTime > 2000) {
+            // 🎯 **Opdater spillerens omgang via `updatePlayerLaps()`**
+            if (!player.lastDetectionTime || now - player.lastDetectionTime > 2000) { // 2 sekunders delay
                 if (player.laps < raceSettings.rounds) {
                     updatePlayerLaps(player.id); // 🎯 KALD FUNKTIONEN HER
                     player.lastDetectionTime = now; // Opdater sidste registreringstid
-                    console.log(`🏎 ${player.name} har nu ${player.laps} runder!`);
-
-                    // 🎉 **Udløs konfetti, hvis spilleren fuldfører racet**
-                    if (player.laps === raceSettings.rounds) {
-                        console.log(`🏁 ${player.name} har fuldført racet! 🎉`);
-                        launchConfetti();
-                    }
                 }
             }
         });
