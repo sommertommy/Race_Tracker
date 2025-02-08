@@ -468,7 +468,7 @@ function detectColorInRace() {
 
             // 🚨 **Debugging: Hvis der ikke er farver i billedet, lad os logge en fejl**
             if (percentage === 0 && excludedPercentage === 0) {
-                console.warn(`⚠️ ${player.name} har ingen synlige farver i billedet.`);
+               //console.warn(`⚠️ ${player.name} har ingen synlige farver i billedet.`);
                 return;
             }
 
