@@ -701,50 +701,58 @@ function detectColorInRace() {
         }
 
         // 🎯 **Beregn procentdel for hver farve**
-        Object.keys(colorCounts).forEach(playerId => {
-            let player = players.find(p => p.id == playerId);
-            let percentage = (colorCounts[playerId] / totalPixels) * 100;
-            let excludedPercentage = (excludedCounts[playerId] / totalPixels) * 100;
+       // 🎯 **Beregn procentdel for hver farve**
+Object.keys(colorCounts).forEach(playerId => {
+    let player = players.find(p => p.id == playerId);
+    let percentage = (colorCounts[playerId] / totalPixels) * 100;
+    let excludedPercentage = (excludedCounts[playerId] / totalPixels) * 100;
 
-            if (percentage === 0 && excludedPercentage === 0) {
-                return; // Ingen synlig farve
+    const minPercentageRequired = 1.0; // 🚀 Kræver mindst 1% dækning af billedet
+    
+    if (percentage === 0 && excludedPercentage === 0) {
+        return; // Ingen synlig farve
+    }
+
+    if (excludedPercentage > 0 && percentage < (excludedPercentage * 2)) {
+        return;
+    }
+
+    if (percentage < minPercentageRequired) {
+        console.warn(`⚠️ ${player.name} registreret, men for lidt farve i billedet (${percentage.toFixed(2)}%). Kræver mindst ${minPercentageRequired}%`);
+        return;
+    }
+
+    const now = Date.now();
+
+    // 🎯 **Ignorer første registrering for hver spiller**
+    if (!player.firstDetectionSkipped) {
+        player.firstDetectionSkipped = true;
+        player.lastDetectionTime = now; // **Sæt 2 sekunders pause efter første registrering**
+        console.log(`✅ Første registrering ignoreret for ${player.name}`);
+        return;
+    }
+
+    // 🎯 **Opdater spillerens omgang via `updatePlayerLaps()`**
+    if (!player.lastDetectionTime || now - player.lastDetectionTime > 2000) { // 2 sekunders delay
+        if (player.laps < raceSettings.rounds) {
+            updatePlayerLaps(player.id);
+            player.lastDetectionTime = now; // Opdater sidste registreringstid
+
+            // 🎉 **Check om spilleren har fuldført racet**
+            if (player.laps >= raceSettings.rounds && !player.finishTime) {
+                player.finishTime = now;
+                console.log(`🏁 ${player.name} har FULDFØRT racet! 🎉`);
+
+                // 🚀 **Start confetti og lyd**
+                console.log("🎉 Udløser konfetti!");
+                launchConfetti();
+
+                console.log("🔊 Afspiller applaus!");
+                playApplauseSound();
             }
-
-            if (excludedPercentage > 0 && percentage < (excludedPercentage * 2)) {
-                return;
-            }
-
-            const now = Date.now();
-
-            // 🎯 **Ignorer første registrering for hver spiller**
-            if (!player.firstDetectionSkipped) {
-                player.firstDetectionSkipped = true;
-                player.lastDetectionTime = now; // **Sæt 2 sekunders pause efter første registrering**
-                console.log(`✅ Første registrering ignoreret for ${player.name}`);
-                return;
-            }
-
-            // 🎯 **Opdater spillerens omgang via `updatePlayerLaps()`**
-            if (!player.lastDetectionTime || now - player.lastDetectionTime > 2000) { // 2 sekunders delay
-                if (player.laps < raceSettings.rounds) {
-                    updatePlayerLaps(player.id);
-                    player.lastDetectionTime = now; // Opdater sidste registreringstid
-
-                    // 🎉 **Check om spilleren har fuldført racet**
-                    if (player.laps >= raceSettings.rounds && !player.finishTime) {
-                        player.finishTime = now;
-                        console.log(`🏁 ${player.name} har FULDFØRT racet! 🎉`);
-
-                        // 🚀 **Start confetti og lyd**
-                        console.log("🎉 Udløser konfetti!");
-                        launchConfetti();
-
-                        console.log("🔊 Afspiller applaus!");
-                        playApplauseSound();
-                    }
-                }
-            }
-        });
+        }
+    }
+});
 
     }, 100); // 🎯 **Opdatering hver 100ms**
 }
