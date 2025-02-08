@@ -966,7 +966,7 @@ function addNewPlayer() {
         color: selectedColor,
         tolerance: tolerance,
         threshold: threshold,
-        profilePicture: selectedProfilePicture // 🔥 Gem billedevalg
+        profilePicture: selectedProfilePicture, // 🔥 Gem billedevalg
         laps: 0
     };
 
