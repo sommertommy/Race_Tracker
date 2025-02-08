@@ -127,7 +127,7 @@ function updatePlayerLaps(playerId) {
     player.laps++;
 
     console.log(`⏱ ${player.name} rundetid: ${lapTime}ms`);
-    console.log("📊 Opdateret spiller:", JSON.stringify(player, null, 2));
+    //console.log("📊 Opdateret spiller:", JSON.stringify(player, null, 2));
 
     if (player.laps === raceSettings.rounds) {
         player.finishTime = now;
