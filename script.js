@@ -213,24 +213,28 @@ backToStartRaceButton.addEventListener("click", () => {
         console.log("⏹ Tracking stoppet.");
     }
 
-    // 🏁 Nulstil race-status
+    // 🛑 Stop race-status
     raceActive = false;
 
-    // 🔄 Nulstil alle spillere
+    // 🎯 Nulstil ALLE spillere
     players.forEach(player => {
         player.laps = 0;
-        player.finishTime = null; // Fjern afslutningstidspunkt
-        player.lastDetectionTime = null; // Fjern sidste detektionstidspunkt
+        player.finishTime = null;
+        player.lastDetectionTime = null;
     });
 
-    console.log("🔄 Race nulstillet!");
+    // 🚀 Opret en ny tom spiller-liste for at sikre, at gamle data ikke hænger ved
+    players = JSON.parse(JSON.stringify(players));
 
-    // 🔃 Opdater leaderboard så det viser 0/antal runder
+    console.log("🔄 Race nulstillet! Spillere:", players);
+
+    // 🏁 Opdater leaderboard med nulstillet data
     updateLeaderboard();
 
     // 📺 Skift tilbage til startskærm
     showScreen(startScreen);
 });
+
 
 
 startRaceButton.addEventListener("click", () => {
