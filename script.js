@@ -200,7 +200,7 @@ function formatTime(ms) {
     let milliseconds = Math.floor((ms % 1000) / 10); // Kun 2 decimaler
 
     if (minutes === 0) {
-        return `${String(seconds).padStart(2, '0')}:${String(milliseconds).padStart(2, '0')} sek`;
+        return `${String(seconds).padStart(2, '0')}:${String(milliseconds).padStart(2, '0')}`;
     } else {
         return `${String(minutes)}:${String(seconds).padStart(2, '0')}:${String(milliseconds).padStart(2, '0')} sek`;
     }
@@ -698,7 +698,7 @@ function detectColorInRace() {
             let player = players.find(p => p.id == playerId);
             let percentage = (colorCounts[playerId] / totalPixels) * 100;
 
-            if (percentage < 2) {
+            if (percentage < 0.1) {
                 console.log(`❌ ${player.name} registreres ikke – kun ${percentage.toFixed(2)}% af billedet.`);
                 return; // 🚫 Kun registrer hvis mindst 2% af billedet er farven
             }
