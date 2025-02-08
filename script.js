@@ -224,6 +224,7 @@ function updateLapTimesTable() {
     tableBody.innerHTML = "";
     tableHeader.innerHTML = "<th>Runde</th>";
 
+    // 🎯 **Opret tabel-header med spillernavne**
     players.forEach(player => {
         let th = document.createElement("th");
         th.textContent = player.name;
@@ -233,12 +234,14 @@ function updateLapTimesTable() {
     let maxRounds = Math.max(...players.map(p => (p.lapTimes ? p.lapTimes.length : 0)), 0);
     let fastestLaps = {};
 
+    // 🎯 **Find hurtigste runde for hver spiller**
     players.forEach(player => {
         if (player.lapTimes && player.lapTimes.length > 0) {
             fastestLaps[player.id] = Math.min(...player.lapTimes);
         }
     });
 
+    // 🎯 **Fyld tabellen med runde-tider**
     for (let i = 0; i < maxRounds; i++) {
         let row = document.createElement("tr");
         let roundCell = document.createElement("td");
@@ -252,6 +255,7 @@ function updateLapTimesTable() {
                 let lapTime = player.lapTimes[i];
                 cell.textContent = formatTime(lapTime);
 
+                // 🎯 **Marker hurtigste runde med grøn farve**
                 if (lapTime === fastestLaps[player.id]) {
                     cell.style.backgroundColor = "lightgreen";
                     cell.style.fontWeight = "bold";
@@ -265,7 +269,25 @@ function updateLapTimesTable() {
 
         tableBody.appendChild(row);
     }
+
+    // 🎯 **Tilføj en ekstra række til total tid**
+    let totalRow = document.createElement("tr");
+    let totalCell = document.createElement("td");
+    totalCell.textContent = "Total tid:";
+    totalCell.style.fontWeight = "bold";
+    totalRow.appendChild(totalCell);
+
+    players.forEach(player => {
+        let totalTimeCell = document.createElement("td");
+        let totalTime = player.lapTimes ? player.lapTimes.reduce((acc, time) => acc + time, 0) : 0;
+        totalTimeCell.textContent = formatTime(totalTime);
+        totalTimeCell.style.fontWeight = "bold";
+        totalRow.appendChild(totalTimeCell);
+    });
+
+    tableBody.appendChild(totalRow);
 }
+
 
 
 
