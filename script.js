@@ -126,6 +126,19 @@ function updatePlayerLaps(playerId) {
     }
 }
 
+function resetRaceData() {
+    console.log("♻️ Nulstiller race-data...");
+    raceActive = false;
+    
+    players.forEach(player => {
+        player.laps = 0;
+        player.finishTime = null;
+        player.lastDetectionTime = null;
+    });
+
+    updateLeaderboard();
+}
+
 function stopRace() {
     raceActive = false;
     console.log("🏁 Race afsluttet!");
@@ -238,6 +251,7 @@ backToStartRaceButton.addEventListener("click", () => {
 
 
 startRaceButton.addEventListener("click", () => {
+    resetRaceData(); // 🚀 Sørger for, at racet starter fra 0
     console.log("🚀 Start Race trykket!");
 
     if (players.length === 0) {
