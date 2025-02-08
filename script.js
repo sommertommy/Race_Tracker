@@ -136,6 +136,11 @@ function updatePlayerLaps(playerId) {
 
 function toggleLapTimes() {
     const overlay = document.getElementById("lapTimesOverlay");
+    const raceScreen = document.getElementById("raceScreen");
+
+    // 🚀 Sikrer, at vi kun kan vise tiderne, hvis vi er i raceScreen
+    if (raceScreen.style.display === "none") return;
+
     overlay.style.display = overlay.style.display === "flex" ? "none" : "flex";
 
     if (overlay.style.display === "flex") {
