@@ -167,6 +167,10 @@ function updatePlayerLaps(playerId) {
     if (player.laps === raceSettings.rounds) {
         player.finishTime = now;
         console.log(`🏁 ${player.name} har FULDFØRT racet!`);
+        console.log("🎉 Udløser konfetti!");
+        launchConfetti();
+        console.log("🔊 Afspiller applaus!");
+        playApplauseSound();
     }
 
     updateLeaderboard();
