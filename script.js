@@ -208,8 +208,34 @@ backToStartButton.addEventListener("click", () => {
 });
 
 backToStartRaceButton.addEventListener("click", () => {
+    console.log("🔙 Tilbage til startskærm trykket!");
+
+    // 🚫 Stop tracking hvis det stadig kører
+    if (trackingInterval) {
+        clearInterval(trackingInterval);
+        trackingInterval = null;
+        console.log("⏹ Tracking stoppet.");
+    }
+
+    // 🏁 Nulstil race-status
+    raceActive = false;
+
+    // 🔄 Nulstil alle spillere
+    players.forEach(player => {
+        player.laps = 0;
+        player.finishTime = null; // Fjern afslutningstidspunkt
+        player.lastDetectionTime = null; // Fjern sidste detektionstidspunkt
+    });
+
+    console.log("🔄 Race nulstillet!");
+
+    // 🔃 Opdater leaderboard så det viser 0/antal runder
+    updateLeaderboard();
+
+    // 📺 Skift tilbage til startskærm
     showScreen(startScreen);
 });
+
 
 startRaceButton.addEventListener("click", () => {
     console.log("🚀 Start Race trykket!");
