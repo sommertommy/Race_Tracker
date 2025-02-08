@@ -398,6 +398,11 @@ startRaceButton.addEventListener("click", () => {
         return;
     }
 
+    // 🚨 Sørg for at firstDetectionSkipped nulstilles for alle spillere
+    players.forEach(player => {
+        player.firstDetectionSkipped = false;
+    });
+
     updateExcludedColors(); // 🚫 Opdater eksklusionsfarver inden start
     showScreen(raceScreen);
     console.log("🔍 raceScreen vist!");
