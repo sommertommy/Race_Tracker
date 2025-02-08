@@ -110,18 +110,19 @@ function updatePlayerLaps(playerId) {
     if (!player) return;
 
     const now = Date.now();
-    
+
     if (player.laps < raceSettings.rounds) { 
         if (!player.lapTimes) player.lapTimes = []; // 🔥 Sikrer at lapTimes eksisterer
 
         let lapTime = player.lapTimes.length === 0 
-            ? now - raceStartTime 
-            : now - player.lapTimes[player.lapTimes.length - 1]; // Tiden mellem sidste omgang og nu
+            ? now - raceStartTime  // Første omgang er fra race start
+            : now - player.lastDetectionTime; // Tid siden sidste omgang
 
-        player.lapTimes.push(lapTime);
+        player.lapTimes.push(lapTime); // 📌 Tilføj rundetiden til spilleren
+        player.lastDetectionTime = now; // 🔥 Opdater seneste detektering
 
-        console.log(`⏱ ${player.name} rundetid: ${lapTime}ms`); // 🔥 Debugging af rundetid
-        console.log("🔎 Spilleren nu:", player);
+        console.log(`⏱ ${player.name} rundetid: ${lapTime}ms`);
+        console.log("🔎 Spilleren nu:", JSON.stringify(player, null, 2)); // 🎯 Debug log
 
         player.laps++;
 
@@ -131,7 +132,7 @@ function updatePlayerLaps(playerId) {
         }
 
         updateLeaderboard();
-        updateLapTimesTable(); // 📌 Opdater tabellen
+        updateLapTimesTable(); // 📌 Opdater tabellen, når der kommer en ny tid
     }
 
     if (players.every(p => p.laps >= raceSettings.rounds)) {
@@ -139,6 +140,7 @@ function updatePlayerLaps(playerId) {
         stopRace();
     }
 }
+
 
 
 function toggleLapTimes() {
@@ -174,6 +176,7 @@ function updateLapTimesTable() {
     }
 
     console.log("📊 Opdaterer lap times tabel:", players); // 🔥 Se om `lapTimes` findes
+    console.log("📊 Spillere efter race:", JSON.stringify(players, null, 2));
 
     tableBody.innerHTML = "";
     tableHeader.innerHTML = "<th>Runde</th>"; // Beholder "Runde" som første kolonne
