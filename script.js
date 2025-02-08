@@ -158,9 +158,15 @@ function toggleLapTimes() {
 function formatTime(ms) {
     let minutes = Math.floor(ms / 60000);
     let seconds = Math.floor((ms % 60000) / 1000);
-    let milliseconds = ms % 1000;
-    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}:${String(milliseconds).padStart(3, '0')}`;
+    let milliseconds = Math.floor((ms % 1000) / 10); // Kun 2 decimaler
+
+    if (minutes === 0) {
+        return `${String(seconds).padStart(2, '0')}:${String(milliseconds).padStart(2, '0')} sek`;
+    } else {
+        return `${String(minutes)}:${String(seconds).padStart(2, '0')}:${String(milliseconds).padStart(2, '0')} sek`;
+    }
 }
+
 
 
 function updateLapTimesTable() {
@@ -172,7 +178,7 @@ function updateLapTimesTable() {
         return;
     }
 
-    console.log("📊 Opdaterer lap times tabel:", players); // 🔥 Se om `lapTimes` findes
+    console.log("📊 Opdaterer lap times tabel:", players);
     console.log("📊 Spillere efter race:", JSON.stringify(players, null, 2));
 
     tableBody.innerHTML = "";
@@ -186,6 +192,14 @@ function updateLapTimesTable() {
 
     let maxRounds = Math.max(...players.map(p => (p.lapTimes ? p.lapTimes.length : 0)), 0);
 
+    // 🎯 **Find hurtigste runde for hver spiller**
+    let fastestLaps = {};
+    players.forEach(player => {
+        if (player.lapTimes && player.lapTimes.length > 0) {
+            fastestLaps[player.id] = Math.min(...player.lapTimes);
+        }
+    });
+
     for (let i = 0; i < maxRounds; i++) {
         let row = document.createElement("tr");
         let roundCell = document.createElement("td");
@@ -196,7 +210,14 @@ function updateLapTimesTable() {
             let cell = document.createElement("td");
 
             if (player.lapTimes && player.lapTimes[i] !== undefined) {
-                cell.textContent = formatTime(player.lapTimes[i]);
+                let lapTime = player.lapTimes[i];
+                cell.textContent = formatTime(lapTime);
+
+                // 🎯 **Markér hurtigste runde med grøn baggrund**
+                if (lapTime === fastestLaps[player.id]) {
+                    cell.style.backgroundColor = "lightgreen";
+                    cell.style.fontWeight = "bold";
+                }
             } else {
                 cell.textContent = "--";
             }
@@ -207,6 +228,7 @@ function updateLapTimesTable() {
         tableBody.appendChild(row);
     }
 }
+
 
 
 
