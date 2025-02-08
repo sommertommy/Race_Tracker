@@ -91,8 +91,10 @@ function addPlayer(name) {
         id: players.length + 1,
         name: name,
         laps: 0, // Start med 0 kørte runder
-        totalLaps: 12 // Sæt det samlede antal runder
+        totalLaps: raceSettings.rounds, // Brug den valgte mængde runder
+        lapTimes: [] // 🔥 Tilføj tom liste til rundetider
     };
+
     players.push(newPlayer);
     
     updateLeaderboard(); // Opdater leaderboardet
@@ -149,6 +151,13 @@ function toggleLapTimes() {
     }
 }
 
+function formatTime(ms) {
+    let minutes = Math.floor(ms / 60000);
+    let seconds = Math.floor((ms % 60000) / 1000);
+    let milliseconds = ms % 1000;
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}:${String(milliseconds).padStart(3, '0')}`;
+}
+
 function updateLapTimesTable() {
     const tableBody = document.getElementById("lapTableBody");
     const tableHeader = document.getElementById("lapTableHeader");
@@ -181,9 +190,8 @@ function updateLapTimesTable() {
         players.forEach(player => {
             let cell = document.createElement("td");
 
-            // 📌 Tjekker om `lapTimes` findes, ellers sætter vi tomt felt
-            if (player.lapTimes && player.lapTimes[i]) {
-                cell.textContent = player.lapTimes[i];
+            if (player.lapTimes && player.lapTimes[i] !== undefined) {
+                cell.textContent = formatTime(player.lapTimes[i]); // 🎯 Formatér tid korrekt
             } else {
                 cell.textContent = "--"; // Placeholder hvis ingen tid endnu
             }
@@ -196,7 +204,6 @@ function updateLapTimesTable() {
 
     console.log("✅ Rundetider opdateret:", players);
 }
-
 
 
 function resetRaceData() {
