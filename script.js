@@ -87,6 +87,15 @@ addPlayerButton.addEventListener("click", () => {
     getCameras();
 });
 
+// 🎉 Funktion til at vise konfetti, når en spiller fuldfører racet
+function showConfetti() {
+    confetti({
+        particleCount: 150,   // Antal konfettistykker
+        spread: 70,           // Hvor spredt det skal være
+        origin: { y: 0.6 },   // Hvorfra konfettien starter (midten)
+    });
+}
+
 
 function addPlayer(name) {
     const newPlayer = {
@@ -649,6 +658,12 @@ function detectColorInRace() {
                     updatePlayerLaps(player.id); // 🎯 KALD FUNKTIONEN HER
                     player.lastDetectionTime = now; // Opdater sidste registreringstid
                     console.log(`🏎 ${player.name} har nu ${player.laps} runder!`);
+
+                    // 🎉 **Udløs konfetti, hvis spilleren fuldfører racet**
+                    if (player.laps === raceSettings.rounds) {
+                        console.log(`🏁 ${player.name} har fuldført racet! 🎉`);
+                        showConfetti(); // 🎉 Kør konfetti
+                    }
                 }
             }
         });
