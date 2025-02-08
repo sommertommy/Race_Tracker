@@ -676,12 +676,10 @@ function detectColorInRace() {
         const data = imageData.data;
 
         let colorCounts = {}; // 🎯 Holder styr på farveantal
-        let excludedCounts = {}; // 🚫 Holder styr på ekskluderede farver
         let totalPixels = raceCanvas.width * raceCanvas.height;
 
         players.forEach(player => {
             colorCounts[player.id] = 0;
-            excludedCounts[player.id] = 0;
         });
 
         // 🎯 **Gå igennem hvert pixel i billedet**
@@ -692,70 +690,54 @@ function detectColorInRace() {
                 if (colorMatch(r, g, b, player.color, player.tolerance)) {
                     colorCounts[player.id]++; // 🎯 Tæl farven for denne spiller
                 }
-
-                // 🚫 Tæl også ekskluderede farver
-                if (player.excludedColors.some(excluded => colorMatch(r, g, b, excluded, player.tolerance))) {
-                    excludedCounts[player.id]++;
-                }
             });
         }
 
         // 🎯 **Beregn procentdel for hver farve**
-       // 🎯 **Beregn procentdel for hver farve**
-Object.keys(colorCounts).forEach(playerId => {
-    let player = players.find(p => p.id == playerId);
-    let percentage = (colorCounts[playerId] / totalPixels) * 100;
-    let excludedPercentage = (excludedCounts[playerId] / totalPixels) * 100;
+        Object.keys(colorCounts).forEach(playerId => {
+            let player = players.find(p => p.id == playerId);
+            let percentage = (colorCounts[playerId] / totalPixels) * 100;
 
-    const minPercentageRequired = 0.1; // 🚀 Kræver mindst 2% dækning af billedet
-    
-    if (percentage === 0 && excludedPercentage === 0) {
-        return; // Ingen synlig farve
-    }
-
-    if (excludedPercentage > 0 && percentage < (excludedPercentage * 2)) {
-        return;
-    }
-
-    if (percentage < minPercentageRequired) {
-        console.warn(`⚠️ ${player.name} registreret, men for lidt farve i billedet (${percentage.toFixed(2)}%). Kræver mindst ${minPercentageRequired}%`);
-        return;
-    }
-
-    const now = Date.now();
-
-    // 🎯 **Ignorer første registrering for hver spiller**
-    if (!player.firstDetectionSkipped) {
-        player.firstDetectionSkipped = true;
-        player.lastDetectionTime = now; // **Sæt 2 sekunders pause efter første registrering**
-        console.log(`✅ Første registrering ignoreret for ${player.name}`);
-        return;
-    }
-
-    // 🎯 **Opdater spillerens omgang via `updatePlayerLaps()`**
-    if (!player.lastDetectionTime || now - player.lastDetectionTime > 2000) { // 2 sekunders delay
-        if (player.laps < raceSettings.rounds) {
-            updatePlayerLaps(player.id);
-            player.lastDetectionTime = now; // Opdater sidste registreringstid
-
-            // 🎉 **Check om spilleren har fuldført racet**
-            if (player.laps >= raceSettings.rounds && !player.finishTime) {
-                player.finishTime = now;
-                console.log(`🏁 ${player.name} har FULDFØRT racet! 🎉`);
-
-                // 🚀 **Start confetti og lyd**
-                console.log("🎉 Udløser konfetti!");
-                launchConfetti();
-
-                console.log("🔊 Afspiller applaus!");
-                playApplauseSound();
+            if (percentage < 2) {
+                console.log(`❌ ${player.name} registreres ikke – kun ${percentage.toFixed(2)}% af billedet.`);
+                return; // 🚫 Kun registrer hvis mindst 2% af billedet er farven
             }
-        }
-    }
-});
+
+            const now = Date.now();
+
+            // 🎯 **Ignorer første registrering for hver spiller**
+            if (!player.firstDetectionSkipped) {
+                player.firstDetectionSkipped = true;
+                player.lastDetectionTime = now; // **Sæt 2 sekunders pause efter første registrering**
+                console.log(`✅ Første registrering ignoreret for ${player.name}`);
+                return;
+            }
+
+            // 🎯 **Opdater spillerens omgang via `updatePlayerLaps()`**
+            if (!player.lastDetectionTime || now - player.lastDetectionTime > 2000) { // 2 sekunders delay
+                if (player.laps < raceSettings.rounds) {
+                    updatePlayerLaps(player.id);
+                    player.lastDetectionTime = now; // Opdater sidste registreringstid
+
+                    // 🎉 **Check om spilleren har fuldført racet**
+                    if (player.laps >= raceSettings.rounds && !player.finishTime) {
+                        player.finishTime = now;
+                        console.log(`🏁 ${player.name} har FULDFØRT racet! 🎉`);
+
+                        // 🚀 **Start confetti og lyd**
+                        console.log("🎉 Udløser konfetti!");
+                        launchConfetti();
+
+                        console.log("🔊 Afspiller applaus!");
+                        playApplauseSound();
+                    }
+                }
+            }
+        });
 
     }, 100); // 🎯 **Opdatering hver 100ms**
 }
+
 
 
 
