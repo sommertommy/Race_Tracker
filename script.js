@@ -474,7 +474,7 @@ function detectColorInRace() {
 
             // 🚫 Ignorer hvis spillerens farve ikke er mindst dobbelt så stor som den største ekskluderede farve
             if (excludedPercentage > 0 && percentage < (excludedPercentage * 2)) {
-                console.warn(`🚫 ${player.name} ignoreret – kun ${percentage.toFixed(2)}% vs. ekskluderede ${excludedPercentage.toFixed(2)}%`);
+                //console.warn(`🚫 ${player.name} ignoreret – kun ${percentage.toFixed(2)}% vs. ekskluderede ${excludedPercentage.toFixed(2)}%`);
                 return;
             }
 
