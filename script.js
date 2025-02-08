@@ -88,13 +88,26 @@ addPlayerButton.addEventListener("click", () => {
 });
 
 // 🎉 Funktion til at vise konfetti, når en spiller fuldfører racet
-function showConfetti() {
-    confetti({
-        particleCount: 150,   // Antal konfettistykker
-        spread: 70,           // Hvor spredt det skal være
-        origin: { y: 0.6 },   // Hvorfra konfettien starter (midten)
-    });
+function launchConfetti() {
+    const confettiContainer = document.createElement("div");
+    confettiContainer.classList.add("confetti-container");
+    document.body.appendChild(confettiContainer);
+
+    for (let i = 0; i < 100; i++) {
+        const confetti = document.createElement("div");
+        confetti.classList.add("confetti");
+        confetti.style.left = Math.random() * 100 + "vw";
+        confetti.style.animationDuration = (Math.random() * 2 + 3) + "s";
+        confetti.style.backgroundColor = ["#ff0", "#ff4500", "#ff1493", "#00ff7f", "#1e90ff", "#ff8c00"][Math.floor(Math.random() * 6)];
+        confettiContainer.appendChild(confetti);
+    }
+
+    // Fjern konfettien efter 5 sekunder
+    setTimeout(() => {
+        confettiContainer.remove();
+    }, 5000);
 }
+
 
 
 function addPlayer(name) {
@@ -662,7 +675,7 @@ function detectColorInRace() {
                     // 🎉 **Udløs konfetti, hvis spilleren fuldfører racet**
                     if (player.laps === raceSettings.rounds) {
                         console.log(`🏁 ${player.name} har fuldført racet! 🎉`);
-                        showConfetti(); // 🎉 Kør konfetti
+                        launchConfetti();
                     }
                 }
             }
