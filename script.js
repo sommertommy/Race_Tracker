@@ -89,6 +89,12 @@ addPlayerButton.addEventListener("click", () => {
 
 // 🎉 Funktion til at vise konfetti, når en spiller fuldfører racet
 function launchConfetti() {
+    // 🎶 Afspil lyd
+    const applause = new Audio("applaus.mp3");
+    applause.volume = 0.8; // Sæt volumen (0.0 - 1.0)
+    applause.play().catch(error => console.warn("⚠️ Kunne ikke afspille lyd:", error));
+
+    // 🎉 Skab konfetti
     const confettiContainer = document.createElement("div");
     confettiContainer.classList.add("confetti-container");
     document.body.appendChild(confettiContainer);
@@ -107,6 +113,7 @@ function launchConfetti() {
         confettiContainer.remove();
     }, 5000);
 }
+
 
 
 
