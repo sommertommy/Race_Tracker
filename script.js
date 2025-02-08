@@ -136,10 +136,11 @@ function updatePlayerLaps(playerId) {
 
 function toggleLapTimes() {
     const overlay = document.getElementById("lapTimesOverlay");
-    const raceScreen = document.getElementById("raceScreen");
 
-    // 🚀 Sikrer, at vi kun kan vise tiderne, hvis vi er i raceScreen
-    if (raceScreen.style.display === "none") return;
+    if (!players || players.length === 0) {
+        console.warn("❌ Ingen spillere til rådighed for rundetider!");
+        return;
+    }
 
     overlay.style.display = overlay.style.display === "flex" ? "none" : "flex";
 
@@ -149,39 +150,53 @@ function toggleLapTimes() {
 }
 
 function updateLapTimesTable() {
-    const headerRow = document.getElementById("lapTableHeader");
-    const body = document.getElementById("lapTableBody");
+    const tableBody = document.getElementById("lapTableBody");
+    const tableHeader = document.getElementById("lapTableHeader");
 
-    headerRow.innerHTML = "<th>Runde</th>"; 
-    body.innerHTML = "";
+    if (!players || players.length === 0) {
+        console.warn("❌ Ingen spillere fundet til rundetider!");
+        return;
+    }
 
-    let maxLaps = Math.max(...players.map(p => p.lapTimes.length));
+    // Ryd tidligere data
+    tableBody.innerHTML = "";
+    tableHeader.innerHTML = "<th>Runde</th>"; // Beholder "Runde" som første kolonne
 
+    // 📌 Tilføj spillernavne til headeren
     players.forEach(player => {
         let th = document.createElement("th");
         th.textContent = player.name;
-        headerRow.appendChild(th);
+        tableHeader.appendChild(th);
     });
 
-    for (let i = 0; i < maxLaps; i++) {
+    // Find maksimalt antal runder, så vi sikrer nok rækker
+    let maxRounds = Math.max(...players.map(p => (p.lapTimes ? p.lapTimes.length : 0)), 0);
+
+    for (let i = 0; i < maxRounds; i++) {
         let row = document.createElement("tr");
         let roundCell = document.createElement("td");
-        roundCell.textContent = i + 1;
+        roundCell.textContent = i + 1; // Runde nummer starter fra 1
         row.appendChild(roundCell);
 
         players.forEach(player => {
             let cell = document.createElement("td");
-            if (player.lapTimes[i]) {
-                cell.textContent = (player.lapTimes[i] / 1000).toFixed(2) + "s"; // Konverter ms til sekunder
+
+            // 📌 Tjekker om `lapTimes` findes, ellers sætter vi tomt felt
+            if (player.lapTimes && player.lapTimes[i]) {
+                cell.textContent = player.lapTimes[i];
             } else {
-                cell.textContent = "-";
+                cell.textContent = "--"; // Placeholder hvis ingen tid endnu
             }
+
             row.appendChild(cell);
         });
 
-        body.appendChild(row);
+        tableBody.appendChild(row);
     }
+
+    console.log("✅ Rundetider opdateret:", players);
 }
+
 
 
 function resetRaceData() {
