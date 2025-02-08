@@ -628,24 +628,34 @@ function detectColorInRace() {
 
             const now = Date.now();
 
-            // 🎯 **Ignorer første registrering for hver bil**
+            // 🎯 **Ignorer første registrering og vent 2 sekunder før ny registrering er mulig**
             if (!player.firstDetectionSkipped) {
-                console.log(`🚦 Ignorerer første registrering for ${player.name}`);
-                player.firstDetectionSkipped = true; // ✅ Nu ignoreres første passage
-                return;
+                if (!player.firstDetectionTime) {
+                    player.firstDetectionTime = now; // Gem tidspunkt for første registrering
+                }
+
+                if (now - player.firstDetectionTime > 2000) { // Vent 2 sekunder
+                    player.firstDetectionSkipped = true; // ✅ Nu ignoreres første passage
+                    console.log(`✅ Første registrering ignoreret for ${player.name}`);
+                } else {
+                    console.log(`🚦 Ignorerer første registrering for ${player.name}, venter...`);
+                    return; // Spring over denne registrering
+                }
             }
 
-            // 🎯 **Opdater spillerens omgang via `updatePlayerLaps()`**
-            if (!player.lastDetectionTime || now - player.lastDetectionTime > 1000) {
+            // 🎯 **Tilføj 2 sekunders forsinkelse mellem registreringer**
+            if (!player.lastDetectionTime || now - player.lastDetectionTime > 2000) {
                 if (player.laps < raceSettings.rounds) {
                     updatePlayerLaps(player.id); // 🎯 KALD FUNKTIONEN HER
                     player.lastDetectionTime = now; // Opdater sidste registreringstid
+                    console.log(`🏎 ${player.name} har nu ${player.laps} runder!`);
                 }
             }
         });
 
     }, 100); // 🎯 **Opdatering hver 100ms**
 }
+
 
 
 
