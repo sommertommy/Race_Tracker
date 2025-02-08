@@ -240,13 +240,13 @@ function resetRaceData() {
         player.laps = 0;
         player.finishTime = null;
         player.lastDetectionTime = null;
-        player.lapTimes = []; // 🔥 Nulstil runde-tider
+        player.firstDetectionSkipped = false; // 🔥 Sørg for at første registrering ignoreres i næste løb
+        player.lapTimes = [];
     });
 
     updateLeaderboard();
-    updateLapTimesTable(); // 📌 Nulstil også tidstabellen!
+    updateLapTimesTable();
 }
-
 
 function stopRace() {
     raceActive = false;
@@ -627,6 +627,13 @@ function detectColorInRace() {
             }
 
             const now = Date.now();
+
+            // 🎯 **Ignorer første registrering for hver bil**
+            if (!player.firstDetectionSkipped) {
+                console.log(`🚦 Ignorerer første registrering for ${player.name}`);
+                player.firstDetectionSkipped = true; // ✅ Nu ignoreres første passage
+                return;
+            }
 
             // 🎯 **Opdater spillerens omgang via `updatePlayerLaps()`**
             if (!player.lastDetectionTime || now - player.lastDetectionTime > 1000) {
