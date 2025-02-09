@@ -181,25 +181,41 @@ function updatePlayerLaps(playerId) {
     player.lapTimes.push(lapTime); // 🎯 GEM rundetiden!
     player.lastDetectionTime = now; // Opdater seneste omgang
 
-    player.laps++;
+    if (raceMode === "LapCounts") {
+        player.laps++;
 
-    console.log(`⏱ ${player.name} rundetid: ${lapTime}ms`);
-    //console.log("📊 Opdateret spiller:", JSON.stringify(player, null, 2));
+        console.log(`⏱ ${player.name} rundetid: ${lapTime}ms`);
 
-    if (player.laps === raceSettings.rounds) {
-        player.finishTime = now;
-        console.log(`🏁 ${player.name} har FULDFØRT racet!`);
-        console.log("🎉 Udløser konfetti!");
-        launchConfetti();
-        console.log("🔊 Afspiller applaus!");
-        playApplauseSound();
+        if (player.laps === raceSettings.rounds) {
+            player.finishTime = now;
+            console.log(`🏁 ${player.name} har FULDFØRT racet! 🎉`);
+
+            console.log("🎉 Udløser konfetti!");
+            launchConfetti();
+
+            console.log("🔊 Afspiller applaus!");
+            playApplauseSound();
+        }
+    } else if (raceMode === "FastestLap") {
+        console.log(`⏱ ${player.name} registrerede en omgang på ${lapTime}ms`);
+
+        // 🎯 **Sortér leaderboard efter hurtigste runde**
+        sortLeaderboardByFastestLap();
     }
 
     updateLeaderboard();
     updateLapTimesTable(); // 📌 Opdater tabellen, når der kommer en ny tid
 }
 
+function sortLeaderboardByFastestLap() {
+    players.sort((a, b) => {
+        let fastestLapA = a.lapTimes.length > 0 ? Math.min(...a.lapTimes) : Infinity;
+        let fastestLapB = b.lapTimes.length > 0 ? Math.min(...b.lapTimes) : Infinity;
+        return fastestLapA - fastestLapB;
+    });
 
+    updateLeaderboard();
+}
 
 function toggleLapTimes() {
     const overlay = document.getElementById("lapTimesOverlay");
@@ -768,25 +784,27 @@ function detectColorInRace() {
             }
 
             // 🎯 **Opdater spillerens omgang via `updatePlayerLaps()`**
+            // 🎯 **Opdater spillerens omgang via `updatePlayerLaps()`**
             if (!player.lastDetectionTime || now - player.lastDetectionTime > 2000) { // 2 sekunders delay
-                if (player.laps < raceSettings.rounds) {
+                if (raceMode === "LapCounts" && player.laps < raceSettings.rounds) {
                     updatePlayerLaps(player.id);
                     player.lastDetectionTime = now; // Opdater sidste registreringstid
-
-                    // 🎉 **Check om spilleren har fuldført racet**
+            
+                    // 🎉 **Check om spilleren har fuldført racet (kun i LapCounts)**
                     if (player.laps >= raceSettings.rounds && !player.finishTime) {
                         player.finishTime = now;
                         console.log(`🏁 ${player.name} har FULDFØRT racet! 🎉`);
-
-                        // 🚀 **Start confetti og lyd**
-                        console.log("🎉 Udløser konfetti!");
+            
+                        // 🚀 **Start confetti og lyd (kun i LapCounts)**
                         launchConfetti();
-
-                        console.log("🔊 Afspiller applaus!");
                         playApplauseSound();
                     }
+                } else if (raceMode === "FastestLap") {
+                    updatePlayerLaps(player.id);
+                    player.lastDetectionTime = now;
                 }
             }
+
         });
 
     }, 100); // 🎯 **Opdatering hver 100ms**
