@@ -18,6 +18,10 @@ const backToStartButton = document.getElementById("backToStart");
 const playerList = document.getElementById("playerList");
 const roundsInput = document.getElementById("rounds");
 
+let raceMode = "LapCounts"; // Standardmode
+let raceTimer = null; // Gem timer reference
+
+
 const video = document.getElementById("video");
 const canvas = document.getElementById("overlayCanvas");
 
@@ -80,6 +84,12 @@ function showScreen(targetScreen) {
     screens.forEach(screen => screen.style.display = "none");
     targetScreen.style.display = "block";
 }
+
+document.getElementById("raceMode").addEventListener("change", function () {
+    raceMode = this.value;
+    console.log(`🏁 Ræs-type ændret til: ${raceMode}`);
+});
+
 
 
 // 🎯 **Skift til farvevalg (hent kameraer kun, når brugeren trykker)**
@@ -343,24 +353,31 @@ function updateLeaderboard() {
 
     leaderboardDiv.innerHTML = "<h3>LEADERBOARD:</h3>";
 
-    const medals = ["🥇", "🥈", "🥉"];
-    let finishedPlayers = players.filter(p => p.laps >= raceSettings.rounds);
-    finishedPlayers.sort((a, b) => a.finishTime - b.finishTime);
-    let ongoingPlayers = players.filter(p => p.laps < raceSettings.rounds);
-    ongoingPlayers.sort((a, b) => b.laps - a.laps);
-    let sortedPlayers = [...finishedPlayers, ...ongoingPlayers];
+    let sortedPlayers = [];
+
+    if (raceMode === "LapCounts") {
+        // 🎯 **Lap Counts mode: Sortér efter flest runder**
+        sortedPlayers = [...players].sort((a, b) => b.laps - a.laps);
+    } else {
+        // 🎯 **Fastest Lap mode: Sortér efter hurtigste omgangstid**
+        sortedPlayers = [...players].sort((a, b) => {
+            let bestLapA = a.lapTimes.length > 0 ? Math.min(...a.lapTimes) : Infinity;
+            let bestLapB = b.lapTimes.length > 0 ? Math.min(...b.lapTimes) : Infinity;
+            return bestLapA - bestLapB; // Den laveste tid først
+        });
+    }
 
     sortedPlayers.forEach((player, index) => {
         let playerEntry = document.createElement("div");
         playerEntry.classList.add("leaderboard-player");
 
-        let medal = (index < medals.length && player.laps >= raceSettings.rounds) ? medals[index] : "";
+        let medal = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : "";
 
         playerEntry.innerHTML = `
             <div class="player-profile">
                 <img src="${player.profilePicture}" class="leaderboard-profile-pic">
                 <span class="player-name">${player.name}</span>
-                <span class="player-laps">${player.laps}/${raceSettings.rounds}</span>
+                <span class="player-laps">${raceMode === "LapCounts" ? `${player.laps}/${raceSettings.rounds}` : formatTime(player.lapTimes.length > 0 ? Math.min(...player.lapTimes) : 0)}</span>
                 <span class="medal">${medal}</span>
             </div>
         `;
@@ -370,6 +387,7 @@ function updateLeaderboard() {
 
     console.log("✅ Leaderboard opdateret:", sortedPlayers);
 }
+
 
 
 function updateExcludedColors() {
@@ -439,27 +457,33 @@ startRaceButton.addEventListener("click", () => {
 });
 
 function startRace() {
-    resetRaceData(); // 🚀 Sørger for, at racet starter fra 0
-    raceStartTime = Date.now(); // 🔥 Gem starttidspunktet for løbet
+    resetRaceData();
+    raceStartTime = Date.now();
     console.log("🚀 Start Race!");
 
-    updateExcludedColors(); // 🚫 Opdater eksklusionsfarver inden start
+    updateExcludedColors();
     showScreen(raceScreen);
     console.log("🔍 raceScreen vist!");
 
     raceActive = true;
     console.log("🏁 Race er nu aktiv:", raceActive);
 
-    updateLeaderboard(); // 🔥 Vis leaderboard fra start
-
+    updateLeaderboard();
     startRaceCamera();
 
+    // 🔥 Hvis Fastest Lap mode, start en timer
+    if (raceMode === "FastestLap") {
+        raceTimer = setTimeout(() => {
+            console.log("⏳ Tid er gået! Race stoppes.");
+            stopRace();
+        }, 2 * 60 * 1000); // 2 minutter (2 * 60 * 1000 ms)
+    }
+
     setTimeout(() => {
-        console.log("🔥 Forsøger at starte detectColorInRace manuelt...");
         if (!trackingInterval) {
             detectColorInRace();
         } else {
-            console.warn("⚠️ detectColorInRace kører allerede, starter ikke igen.");
+            console.warn("⚠️ detectColorInRace kører allerede.");
         }
     }, 1000);
 }
