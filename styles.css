@@ -29,6 +29,23 @@ body {
     display:block
 }
 
+.green-button {
+    width: 100%;
+    background-color: #28a745; /* Grøn farve */
+    color: white;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.green-button:hover {
+    background-color: #218838;
+}
+
 #lapTimesOverlay {
     position: fixed;
     top: 0;
