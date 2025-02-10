@@ -136,7 +136,7 @@ const currentLapsDisplay = document.getElementById("currentLapsDisplay");
 const backToSetupRaceButton = document.getElementById("backToSetupRace");
 
 const openColorPickerButton = document.getElementById("openColorPicker");
-const closeColorPickerButton = document.getElementById("closeColorPicker");
+const closeColorPickerButton = document.getElementById("closeColorPickerButton");
 const colorPickerOverlay = document.getElementById("colorPickerOverlay");
 const cameraSelect = document.getElementById("cameraSelect");
 
