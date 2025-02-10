@@ -95,13 +95,19 @@ document.getElementById("raceMode").addEventListener("change", function () {
 
 
 // 🎨 Åbn overlay
-openColorPickerButton.addEventListener("click", () => {
-    colorPickerOverlay.classList.remove("hidden");
-    getCameras(); // Hent kameraer når brugeren åbner overlayet
-});
+    openColorPickerButton.addEventListener("click", () => {
+        console.log("📸 Åbner kamera-overlay...");
+        colorPickerOverlay.classList.remove("hidden");
+        
+        // ✅ Hent kameraer KUN hvis dropdown er tom
+        if (cameraSelect.options.length === 0) {
+            getCameras();
+        }
+    });
 
 // ❌ Luk overlay
 closeColorPickerButton.addEventListener("click", () => {
+    console.log("❌ Lukker kamera-overlay...");
     colorPickerOverlay.classList.add("hidden");
 });
 
