@@ -985,7 +985,6 @@ function detectColorInRace() {
 // 🎯 **Start det valgte kamera**
 
 
-let cameraStarted = false; // 🔥 Nyt flag for at forhindre gentagne kald
 
 function startSelectedCamera() {
     if (!selectedCameraId) {
