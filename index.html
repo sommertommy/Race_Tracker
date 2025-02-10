@@ -85,40 +85,47 @@
         </div>
     </div>
     
-  <!-- 🎨 Opdateret Overlay til farveregistrering -->
-    <div id="colorPickerOverlay">
-        <div class="overlay-content">
-            <h2>Vælg bilfarve</h2>
-            <div class="controls">
-                <button id="useSelectedCamera">Brug kamera</button>
-                <select id="cameraSelect"></select>
-            </div>
-            <!-- 📌 Placeholder til kameraet (vises indtil kameraet er aktivt) -->
-            <div class="camera-container">
-                <video id="video" autoplay playsinline></video>
-                <canvas id="overlayCanvas"></canvas>
-                <div id="cameraPlaceholder">Kamera vil blive vist her...</div>
-            </div>
-            <div id="selectedColor" style="width: 50px; height: 50px; border: 1px solid black;"></div>
-            <div class="adjustments">
-                <button id="adjustTolerance">Juster tolerance</button>
-                <button id="adjustColor" style="display: none;">Juster farve</button>
-                
-    
-                <div id="toleranceControls" style="display: none;">
-                    <label for="tolerance">Tolerance:</label>
-                    <input type="range" id="tolerance" min="0" max="100" value="50">
-                    <p>Tolerance: <span id="toleranceValue">50</span></p>
-    
-                    <label for="threshold">Threshold:</label>
-                    <input type="range" id="threshold" min="0" max="255" value="100">
-                    <p>Threshold: <span id="thresholdValue">100</span></p>
-                </div>
-            </div>
-    
-            <button id="closeColorPicker">Luk</button>
+<!-- 🎨 Opdateret Overlay til farveregistrering -->
+<div id="colorPickerOverlay">
+    <div class="overlay-content">
+        <h2>Vælg bilfarve</h2>
+        
+        <!-- 🎥 Kameraopsætning -->
+        <div class="controls">
+            <button id="useSelectedCamera">Brug kamera</button>
+            <select id="cameraSelect"></select>
         </div>
+        
+        <!-- 📌 Placeholder til kameraet (vises indtil kameraet er aktivt) -->
+        <div class="camera-container">
+            <video id="video" autoplay playsinline></video>
+            <canvas id="overlayCanvas"></canvas>
+            <div id="cameraPlaceholder">Kamera vil blive vist her...</div>
+        </div>
+
+        <!-- 🎨 Vis valgte farve -->
+        <div id="selectedColor" style="width: 50px; height: 50px; border: 1px solid black;"></div>
+        
+        <!-- 🎯 Justeringsmuligheder -->
+        <div class="adjustments">
+            <button id="adjustTolerance">Juster tolerance</button>
+            <button id="adjustColor" style="display: none;">Juster farve</button>
+
+            <div id="toleranceControls" style="display: none;">
+                <label for="tolerance">Tolerance:</label>
+                <input type="range" id="tolerance" min="0" max="100" value="50">
+                <p>Tolerance: <span id="toleranceValue">50</span></p>
+
+                <label for="threshold">Threshold:</label>
+                <input type="range" id="threshold" min="0" max="255" value="100">
+                <p>Threshold: <span id="thresholdValue">100</span></p>
+            </div>
+        </div>
+
+        <!-- ✅ Ny grøn knap i bunden -->
+        <button id="acceptColorSelection" class="green-button">Accepter farvevalg</button>
     </div>
+</div>
 
     
     
