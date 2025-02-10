@@ -8,6 +8,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const overlayCanvas = document.getElementById("overlayCanvas");
     const cameraPlaceholder = document.getElementById("cameraPlaceholder");
     const openColorPickerButton = document.getElementById("openColorPicker");
+    const closeColorPickerButton = document.getElementById("closeColorPicker");
+
+    // 🎯 **Debugging - log elementerne**
+    console.log("🔍 Debugging:");
+    console.log("   🟢 acceptColorSelectionButton:", acceptColorSelectionButton);
+    console.log("   🎥 videoElement:", videoElement);
+    console.log("   🖼️ overlayCanvas:", overlayCanvas);
+    console.log("   📷 cameraPlaceholder:", cameraPlaceholder);
+    console.log("   🔲 colorPickerOverlay:", colorPickerOverlay);
+    console.log("   🎯 openColorPickerButton:", openColorPickerButton);
+    console.log("   ❌ closeColorPickerButton:", closeColorPickerButton);
 
     // 🎯 **Skjul overlay fra start**
     if (colorPickerOverlay) {
@@ -47,6 +58,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     } else {
         console.error("❌ Fejl: openColorPickerButton ikke fundet!");
+    }
+
+    // 🎯 **Event listener til lukning af farvevælgeren**
+    if (closeColorPickerButton) {
+        closeColorPickerButton.addEventListener("click", () => {
+            console.log("❌ Lukker kamera-overlay...");
+            colorPickerOverlay.classList.remove("show");
+            colorPickerOverlay.style.display = "none";
+        });
+    } else {
+        console.error("❌ Fejl: closeColorPickerButton ikke fundet!");
     }
 
     console.log("✅ DOM setup færdig!");
