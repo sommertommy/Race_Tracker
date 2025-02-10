@@ -425,7 +425,8 @@ function stopRace() {
         trackingInterval = null;
     }
 
-    stopCamera();
+    isTracking = false; // 🚀 Stopper `trackColor()`
+    stopCamera(); // Stopper kameraet
 }
 
 function updateLeaderboard() {
@@ -1021,12 +1022,22 @@ adjustColorButton.addEventListener("click", () => {
 
 // 🎯 **Track farve og vis som sort/hvid (Tolerance & Threshold)**
 function trackColor() {
-    if (!selectedColor || !isTracking) return;
+    if (!selectedColor || !isTracking) {
+        console.warn("⏹ trackColor() stoppet – ingen farve valgt eller tracking inaktiv.");
+        return;
+    }
 
-    // 🚀 **Tjek om video er klar**
+    // 🚀 **Stop, hvis videoen er slukket**
+    if (!video.srcObject) {
+        console.warn("⏹ trackColor() stoppet – ingen aktiv videostream.");
+        isTracking = false; // 🚫 Stopper tracking helt
+        return;
+    }
+
+    // 🚀 **Tjek om videoen er klar**
     if (video.videoWidth === 0 || video.videoHeight === 0) {
         console.warn("Video er ikke klar, afventer...");
-        requestAnimationFrame(trackColor);
+        requestAnimationFrame(trackColor); // Prøv igen senere
         return;
     }
 
@@ -1040,7 +1051,7 @@ function trackColor() {
 
     for (let i = 0; i < data.length; i += 4) {
         const r = data[i], g = data[i + 1], b = data[i + 2];
-        const brightness = (r + g + b) / 3; 
+        const brightness = (r + g + b) / 3;
 
         if (colorMatch(r, g, b, selectedColor, tolerance) && brightness >= threshold) {
             data[i] = data[i + 1] = data[i + 2] = 255; // Hvid
@@ -1051,9 +1062,13 @@ function trackColor() {
 
     ctx.putImageData(imageData, 0, 0);
 
-    if (isTracking) {
-        requestAnimationFrame(trackColor);
+    // 🚀 **Stop, hvis tracking er inaktiv**
+    if (!isTracking) {
+        console.warn("⏹ trackColor() stoppet – tracking blev deaktiveret.");
+        return;
     }
+
+    requestAnimationFrame(trackColor); // Kører næste frame, hvis tracking stadig er aktiv
 }
 
 // 🎯 **Matcher farver med tolerance**
@@ -1135,6 +1150,7 @@ function stopCamera() {
     }
 
     video.srcObject = null;
+    isTracking = false; // 🚀 Sørg for, at trackColor() stopper!
 }
 
 function updatePlayer(playerId) {
