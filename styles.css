@@ -25,6 +25,10 @@ body {
     gap: 15px;
 }
 
+#countdownVideo{
+    display:block
+}
+
 /* 📸 Kamera-overlay - vises som fuldskærm */
 #colorPickerOverlay {
     position: fixed;
