@@ -50,6 +50,9 @@ const currentPlayerDisplay = document.getElementById("currentPlayer");
 const currentLapsDisplay = document.getElementById("currentLapsDisplay");
 const backToSetupRaceButton = document.getElementById("backToSetupRace");
 
+const openColorPickerButton = document.getElementById("openColorPicker");
+const closeColorPickerButton = document.getElementById("closeColorPicker");
+const colorPickerOverlay = document.getElementById("colorPickerOverlay");
 
 let colorCounts = {}; // Holder styr på hvor mange gange hver farve er fundet
 let editingPlayerIndex = null; // 🔥 Sporer om en spiller redigeres
@@ -90,6 +93,16 @@ document.getElementById("raceMode").addEventListener("change", function () {
     console.log(`🏁 Ræs-type ændret til: ${raceMode}`);
 });
 
+
+// 🎨 Åbn overlay
+openColorPickerButton.addEventListener("click", () => {
+    colorPickerOverlay.classList.remove("hidden");
+});
+
+// ❌ Luk overlay
+closeColorPickerButton.addEventListener("click", () => {
+    colorPickerOverlay.classList.add("hidden");
+});
 
 
 // 🎯 **Skift til farvevalg (hent kameraer kun, når brugeren trykker)**
