@@ -53,6 +53,7 @@ const backToSetupRaceButton = document.getElementById("backToSetupRace");
 const openColorPickerButton = document.getElementById("openColorPicker");
 const closeColorPickerButton = document.getElementById("closeColorPicker");
 const colorPickerOverlay = document.getElementById("colorPickerOverlay");
+const cameraSelect = document.getElementById("cameraSelect");
 
 let colorCounts = {}; // Holder styr på hvor mange gange hver farve er fundet
 let editingPlayerIndex = null; // 🔥 Sporer om en spiller redigeres
@@ -97,6 +98,7 @@ document.getElementById("raceMode").addEventListener("change", function () {
 // 🎨 Åbn overlay
 openColorPickerButton.addEventListener("click", () => {
     colorPickerOverlay.classList.remove("hidden");
+    getCameras(); // 📸 Hent kun kameraer, når overlay åbnes
 });
 
 // ❌ Luk overlay
