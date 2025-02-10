@@ -911,43 +911,42 @@ let cameraActive = false;
 function startSelectedCamera() {
     if (!selectedCameraId) {
         alert("Vælg et kamera først!");
-        return; // 🚫 Stopper funktionen, hvis ingen kamera er valgt
+        return;
     }
 
     if (cameraActive) {
         console.warn("⚠️ Kameraet kører allerede. Afbryder ekstra anmodning.");
-        return; // 🚫 Forhindrer flere samtidige forsøg
+        return;
     }
 
     console.log("🎥 Prøver at starte kamera:", selectedCameraId);
+    cameraActive = true; // Marker kamera som aktivt
 
-    stopCamera(); // 🚀 Stopper tidligere kamera, hvis nødvendigt
+    stopCamera().then(() => { // 🔥 Stopper tidligere kamera, hvis nødvendigt
+        navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: selectedCameraId } } })
+            .then(stream => {
+                console.log("📷 Kamera stream modtaget!", stream);
+                activeStream = stream;
 
-    cameraActive = true; // 🔥 Marker kamera som aktivt
+                const videoElement = document.getElementById("video");
+                if (!videoElement) {
+                    console.error("❌ Fejl: videoElement blev ikke fundet!");
+                    return;
+                }
 
-    navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: selectedCameraId } } })
-        .then(stream => {
-            activeStream = stream;
-            const videoElement = document.getElementById("video");
-
-            if (!videoElement) {
-                console.error("❌ Fejl: videoElement blev ikke fundet!");
-                return;
-            }
-
-            videoElement.srcObject = stream;
-            videoElement.play().then(() => {
+                videoElement.srcObject = stream;
+                return videoElement.play(); // Returnerer en promise, så vi kan fange fejl
+            })
+            .then(() => {
                 console.log("🎥 Kameraet er nu aktivt!");
-            }).catch(err => {
+            })
+            .catch(err => {
                 console.error("❌ Fejl ved afspilning af video:", err);
+                cameraActive = false; // 🚀 Sørg for at kunne prøve igen
             });
-        })
-        .catch(err => {
-            console.error("❌ Fejl ved start af kamera:", err);
-            alert("Kunne ikke starte kameraet. Prøv et andet kamera.");
-            cameraActive = false; // 🚀 Sørg for at kunne prøve igen
-        });
+    });
 }
+
 
 
 // 🎬 **Start valgte kamera**
@@ -1170,18 +1169,17 @@ function addNewPlayer() {
 }
 
 function stopCamera() {
-    if (activeStream) {
-        console.log("📸 Stopper tidligere kamera-stream...");
-        activeStream.getTracks().forEach(track => {
-            track.stop();
-        });
-        activeStream = null;
-    }
-    const videoElement = document.getElementById("video");
-    if (videoElement) {
-        videoElement.srcObject = null;
-    }
+    return new Promise(resolve => {
+        if (activeStream) {
+            console.log("📸 Stopper tidligere kamera-stream...");
+            activeStream.getTracks().forEach(track => track.stop());
+            activeStream = null;
+        }
+        cameraActive = false;
+        resolve(); // 🚀 Fortsæt straks med at starte det nye kamera
+    });
 }
+
 function updatePlayer(playerId) {
     let playerIndex = players.findIndex(p => p.id === playerId);
     if (playerIndex === -1) {
