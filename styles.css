@@ -29,6 +29,22 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+#playerSetupContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 90%;
+    max-width: 900px;
+    margin: auto;
+}
+/* 🎥 Venstre side */
+#playerSetupLeft {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .leaderboard-player {
     display: flex;
     align-items: center;
@@ -94,10 +110,10 @@ body {
     display: inline-block;
 }
 
-video {
-    width: 640px;
-    height: 480px;
-    border: 2px solid black;
+#video {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 10px;
 }
 
 canvas {
@@ -133,8 +149,8 @@ button:hover {
 }
 
 #toleranceControls {
-    display: none;
     margin-top: 10px;
+    text-align: center;
 }
 
 #playerList {
@@ -155,6 +171,15 @@ button:hover {
     border: 1px solid black;
 }
 
+/* 🏎️ Højre side */
+#playerSetupRight {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-left: 20px;
+}
+
 .overlay {
     display: none; 
     position: fixed;
@@ -166,6 +191,13 @@ button:hover {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+#playerName {
+    width: 80%;
+    padding: 8px;
+    margin-bottom: 10px;
+    font-size: 16px;
 }
 
 .overlay-content {
@@ -213,9 +245,9 @@ th, td {
     }
 }
 
+/* 🎭 Profilbilleder */
 .profile-options {
     display: flex;
-    justify-content: center;
     gap: 10px;
 }
 
@@ -229,6 +261,13 @@ th, td {
 
 .profile-pic-option:hover {
     transform: scale(1.1);
+}
+
+#savePlayer, #backToStart {
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
 }
 
 .selected-profile {
