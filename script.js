@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const overlayCanvas = document.getElementById("overlayCanvas");
     const cameraPlaceholder = document.getElementById("cameraPlaceholder");
     const openColorPickerButton = document.getElementById("openColorPicker");
-    // const closeColorPickerButton = document.getElementById("closeColorPicker");
+    const closeColorPickerButton = document.getElementById("closeColorPicker");
 
     // 🎯 **Debugging - log elementerne**
     console.log("🔍 Debugging:");
@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("   📷 cameraPlaceholder:", cameraPlaceholder);
     console.log("   🔲 colorPickerOverlay:", colorPickerOverlay);
     console.log("   🎯 openColorPickerButton:", openColorPickerButton);
-    // console.log("   ❌ closeColorPickerButton:", closeColorPickerButton);
+    console.log("   ❌ closeColorPickerButton:", closeColorPickerButton);
 
     // 🎯 **Skjul overlay fra start**
     if (colorPickerOverlay) {
@@ -61,15 +61,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 🎯 **Event listener til lukning af farvevælgeren**
-    // if (closeColorPickerButton) {
-    //     closeColorPickerButton.addEventListener("click", () => {
-    //         console.log("❌ Lukker kamera-overlay...");
-    //         colorPickerOverlay.classList.remove("show");
-    //         colorPickerOverlay.style.display = "none";
-    //     });
-    // } else {
-    //     console.error("❌ Fejl: closeColorPickerButton ikke fundet!");
-    // }
+    if (closeColorPickerButton) {
+         closeColorPickerButton.addEventListener("click", () => {
+             console.log("❌ Lukker kamera-overlay...");
+             colorPickerOverlay.classList.remove("show");
+             colorPickerOverlay.style.display = "none";
+         });
+     } else {
+         console.error("❌ Fejl: closeColorPickerButton ikke fundet!");
+     }
 
     console.log("✅ DOM setup færdig!");
 });
@@ -121,7 +121,7 @@ const currentLapsDisplay = document.getElementById("currentLapsDisplay");
 const backToSetupRaceButton = document.getElementById("backToSetupRace");
 
 const openColorPickerButton = document.getElementById("openColorPicker");
-//const closeColorPickerButton = document.getElementById("closeColorPicker");
+const closeColorPickerButton = document.getElementById("closeColorPicker");
 const colorPickerOverlay = document.getElementById("colorPickerOverlay");
 const cameraSelect = document.getElementById("cameraSelect");
 
@@ -179,12 +179,12 @@ openColorPickerButton.addEventListener("click", () => {
     }
 });
 
-// ❌ **Luk farvevælger-overlay**
-// closeColorPickerButton.addEventListener("click", () => {
-//     console.log("❌ Lukker kamera-overlay...");
-//     colorPickerOverlay.classList.remove("show");
-//     colorPickerOverlay.style.display = "none";
-// });
+ ❌ **Luk farvevælger-overlay**
+   .addEventListener("click", () => {
+     console.log("❌ Lukker kamera-overlay...");
+     colorPickerOverlay.classList.remove("show");
+     colorPickerOverlay.style.display = "none";
+ });
 
 document.getElementById("acceptColorSelection").addEventListener("click", () => {
     console.log("✅ Farvevalg accepteret:", selectedColor);
