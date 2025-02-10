@@ -1015,10 +1015,27 @@ adjustToleranceButton.addEventListener("click", () => {
         alert("Vælg en farve først!");
         return;
     }
-    isTracking = true;
-    toleranceControls.style.display = "block";
-    canvas.style.display = "block";
-    trackColor(); // Starter visualisering
+
+    if (!isTracking) {
+        // 🔥 Start tolerance-justering (vis sort/hvid)
+        isTracking = true;
+        toleranceControls.style.display = "block";
+        overlayCanvas.style.display = "block";
+        video.style.display = "none"; // Skjul normal kameravisning
+
+        adjustToleranceButton.textContent = "Gå tilbage til farvevalg"; // Opdater knaptekst
+
+        trackColor(); // Start visualisering
+
+    } else {
+        // 🔄 Gå tilbage til normal kameravisning
+        isTracking = false;
+        overlayCanvas.style.display = "none"; // Skjul sort/hvid visualisering
+        video.style.display = "block"; // Vis normal kamera
+        toleranceControls.style.display = "none"; // Skjul tolerance-kontrol
+
+        adjustToleranceButton.textContent = "Juster tolerance"; // Skift tilbage til standardknap
+    }
 });
 
 // 🎯 **Stop tolerance-justering**
