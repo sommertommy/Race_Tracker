@@ -1,24 +1,25 @@
 document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ DOM er nu indlæst!");
 
-    // 🔍 Hent elementer sikkert
-    const colorPickerOverlay = document.getElementById("colorPickerOverlay");
+    const videoElement = document.getElementById("video");
+    const overlayCanvas = document.getElementById("overlayCanvas");
     const cameraPlaceholder = document.getElementById("cameraPlaceholder");
+    const colorPickerOverlay = document.getElementById("colorPickerOverlay");
 
-    // 🎨 Skjul kamera-overlay kun hvis det findes
+    // 🎨 Skjul overlay, hvis det findes
     if (colorPickerOverlay) {
         colorPickerOverlay.classList.remove("show");
-        colorPickerOverlay.style.display = "none"; // Tving skjult
-    } else {
-        console.warn("⚠️ colorPickerOverlay blev ikke fundet!");
+        colorPickerOverlay.style.display = "none";
     }
 
-    // 📷 Vis kameraets pladsholder kun hvis den findes
+    // 📷 Vis pladsholder, hvis den findes
     if (cameraPlaceholder) {
         cameraPlaceholder.style.display = "flex";
-    } else {
-        console.warn("⚠️ cameraPlaceholder blev ikke fundet!");
     }
+
+    // 🛑 Hvis video eller canvas ikke findes, giv en advarsel
+    if (!videoElement) console.warn("⚠️ video-element blev ikke fundet!");
+    if (!overlayCanvas) console.warn("⚠️ overlayCanvas blev ikke fundet!");
 });
  
 // 🎯 **Hent DOM-elementer**
@@ -895,13 +896,17 @@ function startSelectedCamera() {
             video.srcObject = stream;
             video.play();
 
-            // 📌 Når video er klar, fjern pladsholder og vis kamera
             video.onloadedmetadata = () => {
-                cameraPlaceholder.style.display = "none";
-                video.style.display = "block";
-                overlayCanvas.style.display = "block";
-
                 console.log("🎥 Kameraet er nu aktivt!");
+
+                // ✅ Tjek om `video` og `overlayCanvas` findes, før vi ændrer style
+                const videoElement = document.getElementById("video");
+                const overlayCanvas = document.getElementById("overlayCanvas");
+                const cameraPlaceholder = document.getElementById("cameraPlaceholder");
+
+                if (cameraPlaceholder) cameraPlaceholder.style.display = "none";
+                if (videoElement) videoElement.style.display = "block";
+                if (overlayCanvas) overlayCanvas.style.display = "block";
             };
         })
         .catch(err => {
