@@ -97,7 +97,7 @@ document.getElementById("raceMode").addEventListener("change", function () {
 // 🎨 Åbn overlay
 openColorPickerButton.addEventListener("click", () => {
     colorPickerOverlay.classList.remove("hidden");
-    getCameras(); // 📸 Hent kun kameraer, når overlay åbnes
+    getCameras(); // Hent kameraer når brugeren åbner overlayet
 });
 
 // ❌ Luk overlay
