@@ -299,11 +299,13 @@ function toggleLapTimes() {
         return;
     }
 
-    if (overlay.classList.contains("show")) {
-        overlay.classList.remove("show");
+    if (overlay.style.display === "none" || overlay.style.display === "") {
+        overlay.style.display = "flex"; // Sørger for, at det vises
+        setTimeout(() => overlay.classList.add("show"), 10); // Gør synligt med transition
+        updateLapTimesTable();
     } else {
-        overlay.classList.add("show");
-        updateLapTimesTable(); // Sørg for, at data opdateres
+        overlay.classList.remove("show");
+        setTimeout(() => overlay.style.display = "none", 300); // Skjuler efter transition
     }
 }
 
