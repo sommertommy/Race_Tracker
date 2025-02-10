@@ -30,21 +30,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const acceptColorSelectionButton = document.getElementById("acceptColorSelection");
 
-    if (acceptColorSelectionButton) {
-        acceptColorSelectionButton.addEventListener("click", () => {
-            console.log("✅ Farvevalg accepteret:", selectedColor);
-
-            // Skjul farvevælger-overlay
-            document.getElementById("colorPickerOverlay").style.display = "none";
-
-            // Sørg for, at tolerancejusteringen også skjules
-            document.getElementById("overlayCanvas").style.display = "none";
-            document.getElementById("toleranceControls").style.display = "none";
-            isTracking = false;
-        });
-    } else {
+    if (!acceptColorSelectionButton) {
         console.error("⚠️ Fejl: acceptColorSelection-knap ikke fundet i DOM'en!");
+        return; // Stop kodekørslen her for at undgå fejlen
     }
+
+    acceptColorSelectionButton.addEventListener("click", () => {
+        console.log("✅ Farvevalg accepteret:", selectedColor);
+
+        // Skjul farvevælger-overlay
+        document.getElementById("colorPickerOverlay").style.display = "none";
+
+        // Sørg for, at tolerancejusteringen også skjules
+        document.getElementById("overlayCanvas").style.display = "none";
+        document.getElementById("toleranceControls").style.display = "none";
+        isTracking = false;
+    });
 });
 
 // 🎯 **Hent DOM-elementer**
