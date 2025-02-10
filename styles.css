@@ -115,7 +115,10 @@ body {
 
 .video-container {
     position: relative;
-    display: inline-block;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    justify-content: center;
 }
 
 #video {
@@ -132,6 +135,15 @@ canvas {
     height: 480px;
     pointer-events: none;
     display: none;
+}
+
+video, canvas {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 #selectedColor {
@@ -190,7 +202,7 @@ button:hover {
 }
 
 /* 🚀 NYT: Overlay for farvevalg */
-.overlay {
+overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -208,10 +220,10 @@ button:hover {
 }
 
 #playerName {
-    width: 80%;
-    padding: 8px;
-    margin-bottom: 10px;
+    width: 200px;
+    padding: 10px;
     font-size: 16px;
+    text-align: center;
 }
 
 .video-container video {
@@ -283,7 +295,8 @@ th, td {
 /* 🎭 Profilbilleder */
 .profile-options {
     display: flex;
-    gap: 10px;
+    justify-content: center;
+    gap: 15px;
 }
 
 .profile-pic-option {
@@ -292,6 +305,14 @@ th, td {
     border-radius: 50%;
     cursor: pointer;
     transition: transform 0.2s;
+}
+
+/* 🎭 Ensrettet spillerindstillinger */
+.player-name-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
 
 .profile-pic-option:hover {
