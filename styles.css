@@ -25,6 +25,20 @@ body {
     gap: 15px;
 }
 
+/* 📸 Kamera-overlay - vises som fuldskærm */
+#colorPickerOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.9); /* Gennemsigtig sort baggrund */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* Sørg for at det er øverst */
+}
+
 #leaderboard {
     display: flex;
     flex-direction: column;
@@ -116,14 +130,12 @@ body {
 .video-container {
     position: relative;
     width: 100%;
-    max-width: 400px;
-    display: flex;
-    justify-content: center;
+    max-width: 500px;
+    margin: auto;
 }
 
 #video {
     width: 100%;
-    max-width: 500px;
     border-radius: 10px;
 }
 
@@ -135,6 +147,13 @@ canvas {
     height: 480px;
     pointer-events: none;
     display: none;
+}
+#overlayCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
 video, canvas {
@@ -219,6 +238,11 @@ overlay {
     display: none;
 }
 
+/* 🎨 Skjult overlay som standard */
+.hidden {
+    display: none;
+}
+
 #playerName {
     width: 200px;
     padding: 10px;
@@ -247,11 +271,9 @@ overlay {
     background: white;
     padding: 20px;
     border-radius: 10px;
+    width: 80%;
+    max-width: 600px;
     text-align: center;
-    max-width: 500px;
-    width: 90%;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
-    position: relative;
 }
 
 table {
