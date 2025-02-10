@@ -31,15 +31,27 @@ document.addEventListener("DOMContentLoaded", () => {
     // 🎯 **Event listener til accept-knappen (grøn knap)**
     if (acceptColorSelectionButton) {
         acceptColorSelectionButton.addEventListener("click", () => {
-            console.log("✅ Farvevalg accepteret:", selectedColor);
-            colorPickerOverlay.style.display = "none";
-            overlayCanvas.style.display = "none";
-            document.getElementById("toleranceControls").style.display = "none";
-            isTracking = false;
-        });
-    } else {
-        console.error("❌ Fejl: acceptColorSelection-knap ikke fundet!");
-    }
+                console.log("✅ Farvevalg accepteret:", selectedColor);
+        
+                // 🎯 Skjul farvevælger-overlay
+                if (colorPickerOverlay) {
+                    colorPickerOverlay.classList.remove("show");
+                    colorPickerOverlay.style.display = "none";
+                    console.log("🔴 Farvevælger-overlay er nu skjult.");
+                }
+        
+                // 🎯 Skjul tolerance-justeringen
+                if (overlayCanvas) overlayCanvas.style.display = "none";
+                if (document.getElementById("toleranceControls")) {
+                    document.getElementById("toleranceControls").style.display = "none";
+                }
+        
+                // 🎯 Deaktiver tracking
+                isTracking = false;
+            });
+        } else {
+            console.error("❌ Fejl: acceptColorSelection-knap ikke fundet!");
+        }
 
     // 🎯 **Vis pladsholder fra start**
     if (cameraPlaceholder) {
@@ -164,27 +176,35 @@ document.getElementById("raceMode").addEventListener("change", function () {
 
 
 // 🎨 **Åbn farvevælger-overlay**
-openColorPickerButton.addEventListener("click", () => {
-    console.log("📸 Åbner kamera-overlay...");
-    colorPickerOverlay.classList.add("show");
-    colorPickerOverlay.style.display = "flex";
+if (openColorPickerButton) {
+    openColorPickerButton.addEventListener("click", () => {
+        console.log("📸 Åbner kamera-overlay...");
+        colorPickerOverlay.classList.add("show");
+        colorPickerOverlay.style.display = "flex";
 
-    // ✅ Vis pladsholder, skjul kamera-elementer indtil de er klar
-    cameraPlaceholder.style.display = "flex";
-    video.style.display = "none";
-    overlayCanvas.style.display = "none";
+        // ✅ Vis pladsholder, skjul kamera-elementer indtil de er klar
+        cameraPlaceholder.style.display = "flex";
+        video.style.display = "none";
+        overlayCanvas.style.display = "none";
 
-    if (cameraSelect.options.length === 0) {
-        getCameras();
-    }
-});
+        if (cameraSelect.options.length === 0) {
+            getCameras();
+        }
+    });
+} else {
+    console.error("❌ Fejl: openColorPickerButton ikke fundet!");
+}
 
-// 🎯 Event listener til lukning af farvevælgeren
-   .addEventListener("click", () => {
-     console.log("❌ Lukker kamera-overlay...");
-     colorPickerOverlay.classList.remove("show");
-     colorPickerOverlay.style.display = "none";
- });
+// 🎯 **Event listener til lukning af farvevælgeren**
+if (closeColorPickerButton) {
+    closeColorPickerButton.addEventListener("click", () => {
+        console.log("❌ Lukker kamera-overlay...");
+        colorPickerOverlay.classList.remove("show");
+        colorPickerOverlay.style.display = "none";
+    });
+} else {
+    console.error("❌ Fejl: closeColorPickerButton ikke fundet!");
+}
 
 document.getElementById("acceptColorSelection").addEventListener("click", () => {
     console.log("✅ Farvevalg accepteret:", selectedColor);
