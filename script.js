@@ -190,27 +190,6 @@ document.getElementById("raceMode").addEventListener("change", function () {
 });
 
 
-
-// 🎨 **Åbn farvevælger-overlay**
-if (openColorPickerButton) {
-    openColorPickerButton.addEventListener("click", () => {
-        console.log("📸 Åbner kamera-overlay...");
-        colorPickerOverlay.classList.add("show");
-        colorPickerOverlay.style.display = "flex";
-
-        // ✅ Vis pladsholder, skjul kamera-elementer indtil de er klar
-        cameraPlaceholder.style.display = "flex";
-        video.style.display = "none";
-        overlayCanvas.style.display = "none";
-
-        if (cameraSelect.options.length === 0) {
-            getCameras();
-        }
-    });
-} else {
-    console.error("❌ Fejl: openColorPickerButton ikke fundet!");
-}
-
 // 🎯 **Event listener til lukning af farvevælgeren**
 if (closeColorPickerButton) {
     closeColorPickerButton.addEventListener("click", () => {
