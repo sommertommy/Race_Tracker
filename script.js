@@ -910,32 +910,28 @@ function detectColorInRace() {
 
 function startSelectedCamera() {
     if (!selectedCameraId) {
+        console.warn("⚠️ Intet kamera valgt!");
         alert("Vælg et kamera først!");
         return;
     }
 
-    // 🚀 Hvis kameraet allerede er startet, gør ingenting
-    if (cameraStarted) {
-        console.warn("📸 Kameraet er allerede startet, afbryder kaldet.");
-        return;
+    console.log(`🎥 Prøver at starte kamera: ${selectedCameraId}`);
+
+    // 🚀 Stopper tidligere stream (hvis en er aktiv)
+    if (activeStream) {
+        activeStream.getTracks().forEach(track => track.stop());
+        console.log("⏹ Stoppede tidligere kamera-stream.");
     }
-    
-    cameraStarted = true; // Marker at kameraet nu er startet
 
     navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: selectedCameraId } } })
         .then(stream => {
+            console.log("📷 Kamera stream modtaget!", stream);
+
             activeStream = stream;
             const videoElement = document.getElementById("video");
-            const overlayCanvas = document.getElementById("overlayCanvas");
-            const cameraPlaceholder = document.getElementById("cameraPlaceholder");
 
-            console.log("🔍 Tjekker DOM-elementer i startSelectedCamera():");
-            console.log("   🎥 videoElement:", videoElement);
-            console.log("   🖼️ overlayCanvas:", overlayCanvas);
-            console.log("   📷 cameraPlaceholder:", cameraPlaceholder);
-
-            if (!videoElement || !overlayCanvas) {
-                console.error("❌ Fejl: Video eller overlayCanvas blev ikke fundet i DOM'en!");
+            if (!videoElement) {
+                console.error("❌ Fejl: Video-element ikke fundet!");
                 return;
             }
 
@@ -944,26 +940,12 @@ function startSelectedCamera() {
 
             videoElement.onloadedmetadata = () => {
                 console.log("🎥 Kameraet er nu aktivt!");
-
-                if (cameraPlaceholder) {
-                    cameraPlaceholder.style.display = "none";
-                }
-
-                if (videoElement) {
-                    console.log("✅ Viser videoElement");
-                    videoElement.style.display = "block";
-                }
-
-                if (overlayCanvas) {
-                    console.log("✅ Viser overlayCanvas");
-                    overlayCanvas.style.display = "block";
-                }
+                videoElement.style.display = "block";
             };
         })
         .catch(err => {
             console.error("❌ Fejl ved start af kamera:", err);
-            alert("Kunne ikke starte kameraet. Prøv et andet kamera.");
-            cameraStarted = false; // Nulstil flaget, hvis der opstod en fejl
+            alert(`Kunne ikke starte kameraet: ${err.message}`);
         });
 }
 
