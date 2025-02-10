@@ -906,46 +906,46 @@ function detectColorInRace() {
 
 // 🎯 **Start det valgte kamera**
 
-
+let cameraActive = false;
 
 function startSelectedCamera() {
     if (!selectedCameraId) {
-        console.warn("⚠️ Intet kamera valgt!");
         alert("Vælg et kamera først!");
-        return;
+        return; // 🚫 Stopper funktionen, hvis ingen kamera er valgt
     }
 
-    console.log(`🎥 Prøver at starte kamera: ${selectedCameraId}`);
-
-    // 🚀 Stopper tidligere stream (hvis en er aktiv)
-    if (activeStream) {
-        activeStream.getTracks().forEach(track => track.stop());
-        console.log("⏹ Stoppede tidligere kamera-stream.");
+    if (cameraActive) {
+        console.warn("⚠️ Kameraet kører allerede. Afbryder ekstra anmodning.");
+        return; // 🚫 Forhindrer flere samtidige forsøg
     }
+
+    console.log("🎥 Prøver at starte kamera:", selectedCameraId);
+
+    stopCamera(); // 🚀 Stopper tidligere kamera, hvis nødvendigt
+
+    cameraActive = true; // 🔥 Marker kamera som aktivt
 
     navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: selectedCameraId } } })
         .then(stream => {
-            console.log("📷 Kamera stream modtaget!", stream);
-
             activeStream = stream;
             const videoElement = document.getElementById("video");
 
             if (!videoElement) {
-                console.error("❌ Fejl: Video-element ikke fundet!");
+                console.error("❌ Fejl: videoElement blev ikke fundet!");
                 return;
             }
 
             videoElement.srcObject = stream;
-            videoElement.play();
-
-            videoElement.onloadedmetadata = () => {
+            videoElement.play().then(() => {
                 console.log("🎥 Kameraet er nu aktivt!");
-                videoElement.style.display = "block";
-            };
+            }).catch(err => {
+                console.error("❌ Fejl ved afspilning af video:", err);
+            });
         })
         .catch(err => {
             console.error("❌ Fejl ved start af kamera:", err);
-            alert(`Kunne ikke starte kameraet: ${err.message}`);
+            alert("Kunne ikke starte kameraet. Prøv et andet kamera.");
+            cameraActive = false; // 🚀 Sørg for at kunne prøve igen
         });
 }
 
@@ -1171,15 +1171,17 @@ function addNewPlayer() {
 
 function stopCamera() {
     if (activeStream) {
-        activeStream.getTracks().forEach(track => track.stop());
+        console.log("📸 Stopper tidligere kamera-stream...");
+        activeStream.getTracks().forEach(track => {
+            track.stop();
+        });
         activeStream = null;
-        console.log("📸 Kamera stoppet.");
     }
-
-    video.srcObject = null;
-    isTracking = false; // 🚀 Sørg for, at trackColor() stopper!
+    const videoElement = document.getElementById("video");
+    if (videoElement) {
+        videoElement.srcObject = null;
+    }
 }
-
 function updatePlayer(playerId) {
     let playerIndex = players.findIndex(p => p.id === playerId);
     if (playerIndex === -1) {
