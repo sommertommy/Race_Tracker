@@ -26,25 +26,29 @@
 
     <!-- Farvevælger + Justering -->
        <div id="colorSetupScreen" style="display: none;">
-        <h2>Opret ny spiller</h2>
-    
-        <div class="player-name-container">
-            <label for="playerName">Indtast spillernavn:</label>
-            <input type="text" id="playerName" placeholder="Indtast spillernavn">
+            <h2>Opret ny spiller</h2>
+        
+            <!-- Spillernavn på én linje -->
+            <div class="player-name-container">
+                <label for="playerName">Indtast spillernavn:</label>
+                <input type="text" id="playerName" placeholder="Indtast spillernavn">
+            </div>
+        
+            <!-- Knappen til at åbne kamera-overlayet -->
+            <button id="openColorPicker">Vælg bil via kamera</button>
+        
+            <!-- Profilbilleder -->
+            <h3>Vælg din profil</h3>
+            <div id="profilePictureSelection" class="profile-options">
+                <img src="Reddriver.png" class="profile-pic-option" onclick="selectProfilePicture('Reddriver.png')">
+                <img src="Yellowdriver.png" class="profile-pic-option" onclick="selectProfilePicture('Yellowdriver.png')">
+                <img src="Bluedriver.png" class="profile-pic-option" onclick="selectProfilePicture('Bluedriver.png')">
+            </div>
+        
+            <!-- Knapper -->
+            <button id="savePlayer">Gem spiller</button>
+            <button id="backToStart">Tilbage</button>
         </div>
-    
-        <button id="openColorPicker">Vælg bil via kamera</button>
-    
-        <h3>Vælg din profil</h3>
-        <div id="profilePictureSelection" class="profile-options">
-            <img src="Reddriver.png" class="profile-pic-option" onclick="selectProfilePicture('Reddriver.png')">
-            <img src="Yellowdriver.png" class="profile-pic-option" onclick="selectProfilePicture('Yellowdriver.png')">
-            <img src="Bluedriver.png" class="profile-pic-option" onclick="selectProfilePicture('Bluedriver.png')">
-        </div>
-    
-        <button id="savePlayer">Gem spiller</button>
-        <button id="backToStart">Tilbage</button>
-    </div>
 
     <!-- Opsæt race skærm -->
     <div id="raceSetupScreen" style="display: none;">
@@ -81,37 +85,40 @@
     </div>
     
   <!-- 🎨 Opdateret Overlay til farveregistrering -->
-    <div id="colorPickerOverlay" class="overlay hidden">
-        <div class="overlay-content">
-            <h2>Vælg farve & Juster tolerance</h2>
-            <button id="closeColorPicker">✖ Luk</button>
-    
-            <label for="cameraSelect">Vælg kamera:</label>
-            <select id="cameraSelect"></select>
-            <button id="useSelectedCamera">Brug kamera</button>
-    
-            <div class="video-container">
-                <video id="video" autoplay></video>
-                <canvas id="overlayCanvas"></canvas>
+        <div id="colorPickerOverlay" class="hidden">
+            <div class="overlay-content">
+                <h2>Vælg bilfarve</h2>
+        
+                <label for="cameraSelect">Vælg kamera:</label>
+                <select id="cameraSelect"></select>
+                <button id="useSelectedCamera">Brug kamera</button>
+        
+                <!-- Kamera-visning -->
+                <div class="video-container">
+                    <video id="video" autoplay></video>
+                    <canvas id="overlayCanvas"></canvas>
+                </div>
+        
+                <p>Klik på en farve:</p>
+                <div id="selectedColor"></div>
+                <button id="adjustTolerance">Juster tolerance</button>
+                <button id="adjustColor" style="display: none;">Juster farve</button>
+        
+                <!-- Justering af tolerance -->
+                <div id="toleranceControls" style="display: none;">
+                    <label for="tolerance">Tolerance:</label>
+                    <input type="range" id="tolerance" min="0" max="100" value="50">
+                    <p>Tolerance: <span id="toleranceValue">50</span></p>
+        
+                    <label for="threshold">Threshold:</label>
+                    <input type="range" id="threshold" min="0" max="255" value="100">
+                    <p>Threshold: <span id="thresholdValue">100</span></p>
+                </div>
+        
+                <!-- Luk overlay -->
+                <button id="closeColorPicker">Luk</button>
             </div>
-    
-            <p>Klik på en farve:</p>
-            <div id="selectedColor"></div>
-    
-            <div id="toleranceControls">
-                <label for="tolerance">Tolerance:</label>
-                <input type="range" id="tolerance" min="0" max="100" value="50">
-                <p>Tolerance: <span id="toleranceValue">50</span></p>
-    
-                <label for="threshold">Threshold:</label>
-                <input type="range" id="threshold" min="0" max="255" value="100">
-                <p>Threshold: <span id="thresholdValue">100</span></p>
-            </div>
-    
-            <button id="adjustTolerance">Juster tolerance</button>
-            <button id="adjustColor" style="display: none;">Juster farve</button>
         </div>
-    </div>
 
     
     
