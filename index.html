@@ -25,11 +25,13 @@
     
 
     <!-- Farvevælger + Justering -->
-    <div id="colorSetupScreen" style="display: none;">
+       <div id="colorSetupScreen" style="display: none;">
         <h2>Opret ny spiller</h2>
     
-        <label for="playerName">Indtast spillernavn:</label>
-        <input type="text" id="playerName" placeholder="Indtast spillernavn">
+        <div class="player-name-container">
+            <label for="playerName">Indtast spillernavn:</label>
+            <input type="text" id="playerName" placeholder="Indtast spillernavn">
+        </div>
     
         <button id="openColorPicker">Vælg bil via kamera</button>
     
@@ -78,7 +80,7 @@
         </div>
     </div>
     
-    <!-- 🎨 NYT: Overlay til farveregistrering -->
+  <!-- 🎨 Opdateret Overlay til farveregistrering -->
     <div id="colorPickerOverlay" class="overlay hidden">
         <div class="overlay-content">
             <h2>Vælg farve & Juster tolerance</h2>
