@@ -27,17 +27,16 @@ body {
 
 /* 📸 Kamera-overlay - vises som fuldskærm */
 #colorPickerOverlay {
-    display: none !important; /* Sørger for at det er skjult fra starten */
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
+    background: rgba(0, 0, 0, 0.8); /* Mørk baggrund */
+    display: none !important; /* 📌 Tvinger det til at være skjult fra start */
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: 2000;
 }
 
 /* Når vi vil vise det via JavaScript */
@@ -140,9 +139,23 @@ body {
     margin: auto;
 }
 
-#video {
+video {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    border-radius: 10px;
+    height: 100%;
+    object-fit: cover; /* Sikrer, at videoen fylder boksen */
+    display: none; /* Skjult til at starte med */
+}
+
+#cameraPlaceholder {
+    position: absolute;
+    color: black;
+    font-size: 16px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 5px;
 }
 
 canvas {
@@ -273,13 +286,26 @@ overlay {
     cursor: pointer;
 }
 
+
 .overlay-content {
     background: white;
     padding: 20px;
     border-radius: 10px;
+    text-align: center;
+    position: relative;
     width: 80%;
     max-width: 600px;
-    text-align: center;
+}
+
+.camera-container {
+    position: relative;
+    width: 100%;
+    height: 300px; /* 📌 Fast højde for at forhindre hop */
+    background: #ddd; /* Grå baggrund før kameraet er valgt */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
 
 table {
