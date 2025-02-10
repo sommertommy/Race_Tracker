@@ -111,9 +111,13 @@ document.addEventListener("DOMContentLoaded", () => {
 openColorPickerButton.addEventListener("click", () => {
     console.log("📸 Åbner kamera-overlay...");
     colorPickerOverlay.classList.add("show");
-    colorPickerOverlay.style.display = "flex"; // ✅ Sikrer at det bliver synligt
+    colorPickerOverlay.style.display = "flex";
 
-    // ✅ Hent kameraer KUN hvis dropdown er tom
+    // ✅ Vis pladsholder, indtil kameraet er aktivt
+    document.getElementById("cameraPlaceholder").style.display = "flex";
+    document.getElementById("video").style.display = "none";
+    document.getElementById("overlayCanvas").style.display = "none";
+
     if (cameraSelect.options.length === 0) {
         getCameras();
     }
@@ -886,7 +890,26 @@ useSelectedCameraButton.addEventListener("click", () => {
         return;
     }
 
+    console.log(`🎥 Starter kamera: ${selectedCameraId}`);
+
     startSelectedCamera();
+
+    // 📌 Skjul pladsholder og vis video/canvas
+    const cameraPlaceholder = document.getElementById("cameraPlaceholder");
+    const videoElement = document.getElementById("video");
+    const overlayCanvas = document.getElementById("overlayCanvas");
+
+    if (cameraPlaceholder) {
+        cameraPlaceholder.style.display = "none"; // Skjuler pladsholderen
+    }
+
+    if (videoElement) {
+        videoElement.style.display = "block"; // Viser videostreamen
+    }
+
+    if (overlayCanvas) {
+        overlayCanvas.style.display = "block"; // Viser overlay til farvedetektering
+    }
 });
 
 
