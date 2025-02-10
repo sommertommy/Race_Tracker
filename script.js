@@ -39,7 +39,6 @@ const toleranceControls = document.getElementById("toleranceControls");
 const adjustToleranceButton = document.getElementById("adjustTolerance");
 const adjustColorButton = document.getElementById("adjustColor");
 
-const cameraSelect = document.getElementById("cameraSelect");
 const useSelectedCameraButton = document.getElementById("useSelectedCamera");
 
 // 🎯 **Hent referencer til race UI-elementer**
