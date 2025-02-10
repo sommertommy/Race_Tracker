@@ -153,16 +153,7 @@ document.getElementById("raceMode").addEventListener("change", function () {
 });
 
 
-// 🎯 **Event listener til lukning af farvevælgeren**
-if (closeColorPickerButton) {
-    closeColorPickerButton.addEventListener("click", () => {
-        console.log("❌ Lukker kamera-overlay...");
-        colorPickerOverlay.classList.remove("show");
-        colorPickerOverlay.style.display = "none";
-    });
-} else {
-    console.error("❌ Fejl: closeColorPickerButton ikke fundet!");
-}
+
 
 
 
