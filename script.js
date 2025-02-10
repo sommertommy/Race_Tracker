@@ -135,8 +135,8 @@ if (cameraPlaceholder) {
     cameraPlaceholder.style.display = "none"; // Skjul pladsholder
 }
 
-if (videoElement) {
-    videoElement.style.display = "block";
+if (video) {
+    video.style.display = "block";
 }
 
 if (overlayCanvas) {
