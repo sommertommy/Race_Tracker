@@ -27,16 +27,22 @@ body {
 
 /* 📸 Kamera-overlay - vises som fuldskærm */
 #colorPickerOverlay {
+    display: none; /* Skjul overlayet fra start */
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.9); /* Gennemsigtig sort baggrund */
+    background: rgba(0, 0, 0, 0.8);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000; /* Sørg for at det er øverst */
+    z-index: 1000;
+}
+
+/* Vis overlayet, når det skal vises */
+#colorPickerOverlay.show {
+    display: flex;
 }
 
 #leaderboard {
