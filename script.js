@@ -97,7 +97,7 @@ document.getElementById("raceMode").addEventListener("change", function () {
 // 🎨 Åbn overlay
     openColorPickerButton.addEventListener("click", () => {
         console.log("📸 Åbner kamera-overlay...");
-        colorPickerOverlay.classList.remove("hidden");
+        colorPickerOverlay.classList.add("show"); // Gør overlayet synligt
         
         // ✅ Hent kameraer KUN hvis dropdown er tom
         if (cameraSelect.options.length === 0) {
@@ -108,7 +108,7 @@ document.getElementById("raceMode").addEventListener("change", function () {
 // ❌ Luk overlay
 closeColorPickerButton.addEventListener("click", () => {
     console.log("❌ Lukker kamera-overlay...");
-    colorPickerOverlay.classList.add("hidden");
+    colorPickerOverlay.classList.remove("show"); // Skjul overlayet
 });
 
 
