@@ -15,9 +15,13 @@ document.addEventListener("DOMContentLoaded", () => {
         cameraPlaceholder.style.display = "flex";
     }
 
-    // 🔥 ADVARSEL HVIS ELEMENTER MANGLER
-    if (!videoElement) console.warn("⚠️ Fejl: Video-elementet findes ikke i DOM'en!");
-    if (!overlayCanvas) console.warn("⚠️ Fejl: OverlayCanvas findes ikke i DOM'en!");
+    if (!videoElement) {
+        console.error("⚠️ Fejl: Video-elementet findes ikke i DOM'en!");
+    }
+
+    if (!overlayCanvas) {
+        console.error("⚠️ Fejl: OverlayCanvas findes ikke i DOM'en!");
+    }
 });
  
 // 🎯 **Hent DOM-elementer**
@@ -895,6 +899,11 @@ function startSelectedCamera() {
             const overlayCanvas = document.getElementById("overlayCanvas");
             const cameraPlaceholder = document.getElementById("cameraPlaceholder");
 
+            console.log("🔍 Tjekker DOM-elementer i startSelectedCamera():");
+            console.log("   🎥 videoElement:", videoElement);
+            console.log("   🖼️ overlayCanvas:", overlayCanvas);
+            console.log("   📷 cameraPlaceholder:", cameraPlaceholder);
+
             if (!videoElement || !overlayCanvas) {
                 console.error("❌ Fejl: Video eller overlayCanvas blev ikke fundet i DOM'en!");
                 return;
@@ -906,10 +915,19 @@ function startSelectedCamera() {
             videoElement.onloadedmetadata = () => {
                 console.log("🎥 Kameraet er nu aktivt!");
 
-                // ✅ Tjek om elementerne findes, før vi ændrer deres style
-                if (cameraPlaceholder) cameraPlaceholder.style.display = "none";
-                if (videoElement) videoElement.style.display = "block";
-                if (overlayCanvas) overlayCanvas.style.display = "block";
+                if (cameraPlaceholder) {
+                    cameraPlaceholder.style.display = "none";
+                }
+
+                if (videoElement) {
+                    console.log("✅ Viser videoElement");
+                    videoElement.style.display = "block";
+                }
+
+                if (overlayCanvas) {
+                    console.log("✅ Viser overlayCanvas");
+                    overlayCanvas.style.display = "block";
+                }
             };
         })
         .catch(err => {
