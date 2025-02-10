@@ -7,6 +7,10 @@ document.addEventListener("DOMContentLoaded", () => {
     colorPickerOverlay.style.display = "none"; // Tving skjult
 });
  
+const canvas = document.getElementById("overlayCanvas");
+const video = document.getElementById("video");
+const ctx = canvas ? canvas.getContext("2d") : null;
+
 const startScreen = document.getElementById("startScreen");
 const colorSetupScreen = document.getElementById("colorSetupScreen");
 const raceSetupScreen = document.getElementById("raceSetupScreen");
