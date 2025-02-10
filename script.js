@@ -1,6 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
     console.log("DOM er nu indlæst!");
     console.log("Tjekker element:", document.getElementById("currentLapsDisplay"));
+     // Tving overlay til at være skjult ved page load
+    const colorPickerOverlay = document.getElementById("colorPickerOverlay");
+    colorPickerOverlay.classList.remove("show");
+    colorPickerOverlay.style.display = "none"; // Tving skjult
 });
  
 const startScreen = document.getElementById("startScreen");
@@ -94,21 +98,32 @@ document.getElementById("raceMode").addEventListener("change", function () {
 });
 
 
+// 🎯 Sikrer, at overlayet er skjult fra starten
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("✅ DOM indlæst – sikrer at overlayet er skjult");
+
+    const colorPickerOverlay = document.getElementById("colorPickerOverlay");
+    colorPickerOverlay.classList.remove("show");
+    colorPickerOverlay.style.display = "none"; // Tving skjult ved load
+});
+
 // 🎨 Åbn overlay
-    openColorPickerButton.addEventListener("click", () => {
-        console.log("📸 Åbner kamera-overlay...");
-        colorPickerOverlay.classList.add("show"); // Gør overlayet synligt
-        
-        // ✅ Hent kameraer KUN hvis dropdown er tom
-        if (cameraSelect.options.length === 0) {
-            getCameras();
-        }
-    });
+openColorPickerButton.addEventListener("click", () => {
+    console.log("📸 Åbner kamera-overlay...");
+    colorPickerOverlay.classList.add("show");
+    colorPickerOverlay.style.display = "flex"; // ✅ Sikrer at det bliver synligt
+
+    // ✅ Hent kameraer KUN hvis dropdown er tom
+    if (cameraSelect.options.length === 0) {
+        getCameras();
+    }
+});
 
 // ❌ Luk overlay
 closeColorPickerButton.addEventListener("click", () => {
     console.log("❌ Lukker kamera-overlay...");
-    colorPickerOverlay.classList.remove("show"); // Skjul overlayet
+    colorPickerOverlay.classList.remove("show");
+    colorPickerOverlay.style.display = "none"; // ✅ Tving det til at skjule sig helt
 });
 
 
