@@ -327,6 +327,26 @@ overlay {
     text-align: center; /* Centrerer tekst i cellerne */
 }
 
+#lapTimesTable th, #lapTimesTable td {
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+/* Gør "Runde" kolonnen smallere */
+#lapTimesTable th:first-child,
+#lapTimesTable td:first-child {
+    width: 10%; /* Justér denne værdi, hvis den stadig er for stor */
+    min-width: 80px; /* Sørg for at den ikke bliver for smal */
+    text-align: center;
+}
+
+/* Juster spiller-kolonnerne, så de kan fylde mere */
+#lapTimesTable th:not(:first-child),
+#lapTimesTable td:not(:first-child) {
+    width: auto; /* Sørg for, at de andre kolonner fylder det resterende */
+    min-width: 120px;
+}
+
 
 .overlay-content {
     background: white;
@@ -363,11 +383,6 @@ th, td {
     text-align: center;
 }
 
-
-#lapTimesTable th, #lapTimesTable td {
-    padding: 10px;
-    border: 1px solid #ccc;
-}
 
 .confetti-container {
     position: fixed;
