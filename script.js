@@ -1,13 +1,24 @@
 document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ DOM er nu indlæst!");
-    
-    // Tving kamera-overlay til at være skjult ved page load
-    const colorPickerOverlay = document.getElementById("colorPickerOverlay");
-    colorPickerOverlay.classList.remove("show");
-    colorPickerOverlay.style.display = "none"; // Tving skjult
 
-    // 💡 Sikrer at kameraets pladsholder vises, hvis ingen kameraer er valgt endnu
-    document.getElementById("cameraPlaceholder").style.display = "flex";
+    // 🔍 Hent elementer sikkert
+    const colorPickerOverlay = document.getElementById("colorPickerOverlay");
+    const cameraPlaceholder = document.getElementById("cameraPlaceholder");
+
+    // 🎨 Skjul kamera-overlay kun hvis det findes
+    if (colorPickerOverlay) {
+        colorPickerOverlay.classList.remove("show");
+        colorPickerOverlay.style.display = "none"; // Tving skjult
+    } else {
+        console.warn("⚠️ colorPickerOverlay blev ikke fundet!");
+    }
+
+    // 📷 Vis kameraets pladsholder kun hvis den findes
+    if (cameraPlaceholder) {
+        cameraPlaceholder.style.display = "flex";
+    } else {
+        console.warn("⚠️ cameraPlaceholder blev ikke fundet!");
+    }
 });
  
 // 🎯 **Hent DOM-elementer**
@@ -137,10 +148,14 @@ if (cameraPlaceholder) {
 
 if (video) {
     video.style.display = "block";
+} else {
+    console.warn("⚠️ video-elementet blev ikke fundet!");
 }
 
 if (overlayCanvas) {
     overlayCanvas.style.display = "block";
+} else {
+    console.warn("⚠️ overlayCanvas-elementet blev ikke fundet!");
 }
 
 // 🎯 **Skift til farvevalg (hent kameraer kun, når brugeren trykker)**
@@ -913,7 +928,7 @@ useSelectedCameraButton.addEventListener("click", () => {
 
 // 🎯 **Vælg farve ved klik på video**
 video.addEventListener("click", (event) => {
-    if (!video.videoWidth || !video.videoHeight) {
+    if (!video || !video.videoWidth || !video.videoHeight) {
         alert("Kameraet er ikke klar endnu. Prøv igen.");
         return;
     }
@@ -930,8 +945,14 @@ video.addEventListener("click", (event) => {
 
     const pixel = tempCtx.getImageData(x, y, 1, 1).data;
     selectedColor = { r: pixel[0], g: pixel[1], b: pixel[2] };
-
+    
     colorDisplay.style.backgroundColor = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
+
+    if (colorDisplay) {
+        colorDisplay.style.backgroundColor = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
+    } else {
+        console.warn("⚠️ colorDisplay ikke fundet!");
+    }
 });
 
 // 🎯 **Opdater tolerance live**
