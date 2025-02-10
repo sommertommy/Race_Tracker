@@ -179,7 +179,7 @@ openColorPickerButton.addEventListener("click", () => {
     }
 });
 
- ❌ **Luk farvevælger-overlay**
+// 🎯 Event listener til lukning af farvevælgeren
    .addEventListener("click", () => {
      console.log("❌ Lukker kamera-overlay...");
      colorPickerOverlay.classList.remove("show");
@@ -191,6 +191,7 @@ document.getElementById("acceptColorSelection").addEventListener("click", () => 
 
     // Skjul farvevælger-overlay
     document.getElementById("colorPickerOverlay").style.display = "none";
+    
 
     // Sørg for, at tolerancejusteringen også skjules
     document.getElementById("overlayCanvas").style.display = "none";
