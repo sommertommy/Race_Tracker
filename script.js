@@ -1,52 +1,73 @@
 document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ DOM er nu indlæst!");
 
-    const videoElement = document.getElementById("video");
-    const overlayCanvas = document.getElementById("overlayCanvas");
-    const cameraPlaceholder = document.getElementById("cameraPlaceholder");
+    // 🎯 **Tjek og skjul farvevælger-overlay fra start**
     const colorPickerOverlay = document.getElementById("colorPickerOverlay");
-
     if (colorPickerOverlay) {
         colorPickerOverlay.classList.remove("show");
         colorPickerOverlay.style.display = "none";
+    } else {
+        console.warn("⚠️ Farvevælger-overlay ikke fundet!");
     }
 
+    // 🎯 **Hent nødvendige DOM-elementer**
+    const acceptColorSelectionButton = document.getElementById("acceptColorSelection");
+    const videoElement = document.getElementById("video");
+    const overlayCanvas = document.getElementById("overlayCanvas");
+    const cameraPlaceholder = document.getElementById("cameraPlaceholder");
+    const openColorPickerButton = document.getElementById("openColorPicker");
+    const closeColorPickerButton = document.getElementById("closeColorPicker");
+
+    console.log("🔍 Debug: acceptColorSelectionButton =", acceptColorSelectionButton);
+
+    // 🎯 **Fejlhåndtering - Undgå at tilføje event listeners til null**
+    if (!acceptColorSelectionButton) {
+        console.error("❌ Fejl: acceptColorSelection-knap ikke fundet i DOM'en!");
+    } else {
+        acceptColorSelectionButton.addEventListener("click", () => {
+            console.log("✅ Farvevalg accepteret:", selectedColor);
+
+            // Skjul farvevælger-overlay
+            colorPickerOverlay.style.display = "none";
+
+            // Skjul tolerance-justering
+            overlayCanvas.style.display = "none";
+            document.getElementById("toleranceControls").style.display = "none";
+            isTracking = false;
+        });
+    }
+
+    // 🎯 **Sørg for at kamera-placeholder vises korrekt**
     if (cameraPlaceholder) {
         cameraPlaceholder.style.display = "flex";
     }
 
-    if (!videoElement) {
-        console.error("⚠️ Fejl: Video-elementet findes ikke i DOM'en!");
+    // 🎯 **Event listener til åbning af farvevælgeren**
+    if (openColorPickerButton) {
+        openColorPickerButton.addEventListener("click", () => {
+            console.log("📸 Åbner kamera-overlay...");
+            colorPickerOverlay.classList.add("show");
+            colorPickerOverlay.style.display = "flex";
+            cameraPlaceholder.style.display = "flex";
+            videoElement.style.display = "none";
+            overlayCanvas.style.display = "none";
+        });
+    } else {
+        console.error("❌ Fejl: openColorPickerButton ikke fundet!");
     }
 
-    if (!overlayCanvas) {
-        console.error("⚠️ Fejl: OverlayCanvas findes ikke i DOM'en!");
-    }
-});
-
-// 🎯 **Håndter "Accepter farvevalg"-knappen**
-document.addEventListener("DOMContentLoaded", () => {
-    console.log("✅ DOM indlæst – sikrer at accept-knappen fungerer");
-
-    const acceptColorSelectionButton = document.getElementById("acceptColorSelection");
-    console.log("🔍 Debug: acceptColorSelectionButton =", acceptColorSelectionButton);
-
-    if (!acceptColorSelectionButton) {
-        console.error("⚠️ Fejl: acceptColorSelection-knap ikke fundet i DOM'en!");
-        return; // Stop kodekørslen her for at undgå fejlen
+    // 🎯 **Event listener til lukning af farvevælgeren**
+    if (closeColorPickerButton) {
+        closeColorPickerButton.addEventListener("click", () => {
+            console.log("❌ Lukker kamera-overlay...");
+            colorPickerOverlay.classList.remove("show");
+            colorPickerOverlay.style.display = "none";
+        });
+    } else {
+        console.error("❌ Fejl: closeColorPickerButton ikke fundet!");
     }
 
-    acceptColorSelectionButton.addEventListener("click", () => {
-        console.log("✅ Farvevalg accepteret:", selectedColor);
-
-        // Skjul farvevælger-overlay
-        document.getElementById("colorPickerOverlay").style.display = "none";
-
-        // Sørg for, at tolerancejusteringen også skjules
-        document.getElementById("overlayCanvas").style.display = "none";
-        document.getElementById("toleranceControls").style.display = "none";
-        isTracking = false;
-    });
+    console.log("✅ DOM setup færdig!");
 });
 // 🎯 **Hent DOM-elementer**
 const canvas = document.getElementById("overlayCanvas");
@@ -136,14 +157,6 @@ document.getElementById("raceMode").addEventListener("change", function () {
 });
 
 
-// 🎯 Sikrer, at overlayet er skjult fra starten
-document.addEventListener("DOMContentLoaded", () => {
-    console.log("✅ DOM indlæst – sikrer at overlayet er skjult");
-
-    const colorPickerOverlay = document.getElementById("colorPickerOverlay");
-    colorPickerOverlay.classList.remove("show");
-    colorPickerOverlay.style.display = "none"; // Tving skjult ved load
-});
 
 // 🎨 **Åbn farvevælger-overlay**
 openColorPickerButton.addEventListener("click", () => {
