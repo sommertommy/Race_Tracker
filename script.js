@@ -83,21 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
         cameraPlaceholder.style.display = "flex";
     }
 
-    // 🎯 **Event listener til åbning af farvevælgeren**
-    if (openColorPickerButton) {
-        openColorPickerButton.addEventListener("click", () => {
-            console.log("📸 Åbner kamera-overlay...");
-            if (colorPickerOverlay) {
-                colorPickerOverlay.classList.add("show");
-                colorPickerOverlay.style.display = "flex";
-            }
-            if (cameraPlaceholder) cameraPlaceholder.style.display = "flex";
-            if (videoElement) videoElement.style.display = "none";
-            if (overlayCanvas) overlayCanvas.style.display = "none";
-        });
-    } else {
-        console.error("❌ Fejl: openColorPickerButton ikke fundet!");
-    }
+
 
     // 🎯 **Event listener til lukning af farvevælgeren**
     if (closeColorPickerButton) {
@@ -188,6 +174,7 @@ let lastDetectionTime = 0;
 
 let selectedProfilePicture = "Reddriver.png"; // Standardbillede
 let editingPlayerId = null; // 🔥 Holder styr på den spiller, der redigeres
+let cameraStarted = false;
 
 
 // 🎯 **Funktion til at styre skærmene**
@@ -998,18 +985,21 @@ function detectColorInRace() {
 // 🎯 **Start det valgte kamera**
 
 
+let cameraStarted = false; // 🔥 Nyt flag for at forhindre gentagne kald
+
 function startSelectedCamera() {
     if (!selectedCameraId) {
         alert("Vælg et kamera først!");
         return;
     }
 
-    // 🚀 Stop eksisterende stream, hvis der allerede kører en
-    if (activeStream) {
-        console.warn("⏹ Kamera kører allerede! Stopper nuværende stream...");
-        activeStream.getTracks().forEach(track => track.stop());
-        activeStream = null;
+    // 🚀 Hvis kameraet allerede er startet, gør ingenting
+    if (cameraStarted) {
+        console.warn("📸 Kameraet er allerede startet, afbryder kaldet.");
+        return;
     }
+    
+    cameraStarted = true; // Marker at kameraet nu er startet
 
     navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: selectedCameraId } } })
         .then(stream => {
@@ -1052,6 +1042,7 @@ function startSelectedCamera() {
         .catch(err => {
             console.error("❌ Fejl ved start af kamera:", err);
             alert("Kunne ikke starte kameraet. Prøv et andet kamera.");
+            cameraStarted = false; // Nulstil flaget, hvis der opstod en fejl
         });
 }
 
