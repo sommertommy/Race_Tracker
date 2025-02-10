@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ DOM indlæst – sikrer at accept-knappen fungerer");
 
     const acceptColorSelectionButton = document.getElementById("acceptColorSelection");
+    console.log("🔍 Debug: acceptColorSelectionButton =", acceptColorSelectionButton);
 
     if (!acceptColorSelectionButton) {
         console.error("⚠️ Fejl: acceptColorSelection-knap ikke fundet i DOM'en!");
@@ -47,7 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
         isTracking = false;
     });
 });
-
 // 🎯 **Hent DOM-elementer**
 const canvas = document.getElementById("overlayCanvas");
 const video = document.getElementById("video");
