@@ -321,15 +321,24 @@ overlay {
     cursor: pointer;
 }
 
+#lapTimesTable {
+    width: 100%; /* Sørg for, at den ikke går ud over containeren */
+    border-collapse: collapse;
+    text-align: center; /* Centrerer tekst i cellerne */
+}
+
 
 .overlay-content {
     background: white;
     padding: 20px;
     border-radius: 10px;
-    text-align: center;
-    position: relative;
-    width: 80%;
-    max-width: 600px;
+    text-align: center; /* Centrer tekst i boksen */
+    max-width: 80%;
+    width: 600px; /* Eller en passende bredde */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centrer indholdet */
+    justify-content: center;
 }
 
 .camera-container {
@@ -352,6 +361,12 @@ th, td {
     padding: 2px;
     border: 1px solid #ddd;
     text-align: center;
+}
+
+
+#lapTimesTable th, #lapTimesTable td {
+    padding: 10px;
+    border: 1px solid #ccc;
 }
 
 .confetti-container {
