@@ -837,7 +837,7 @@ function detectColorInRace() {
             let percentage = (colorCounts[playerId] / totalPixels) * 100;
 
             if (percentage < 0.1) {
-                console.log(`❌ ${player.name} registreres ikke – kun ${percentage.toFixed(2)}% af billedet.`);
+                //console.log(`❌ ${player.name} registreres ikke – kun ${percentage.toFixed(2)}% af billedet.`);
                 return; // 🚫 Kun registrer hvis mindst 2% af billedet er farven
             }
 
@@ -971,12 +971,12 @@ video.addEventListener("click", (event) => {
 
     const pixel = tempCtx.getImageData(x, y, 1, 1).data;
     selectedColor = { r: pixel[0], g: pixel[1], b: pixel[2] };
-    console.log("📌 Debugging: Hvilket element mangler?");
-    console.log("   🎥 Video:", document.getElementById("video"));
-    console.log("   🖼️ Canvas:", document.getElementById("overlayCanvas"));
-    console.log("   📷 Kamera-pladsholder:", document.getElementById("cameraPlaceholder"));
-    console.log("   🔲 ColorPickerOverlay:", document.getElementById("colorPickerOverlay"));
-    console.log("   🎯 Detaljer om fejl-linje:", event);
+    //console.log("📌 Debugging: Hvilket element mangler?");
+    //console.log("   🎥 Video:", document.getElementById("video"));
+    //console.log("   🖼️ Canvas:", document.getElementById("overlayCanvas"));
+    //console.log("   📷 Kamera-pladsholder:", document.getElementById("cameraPlaceholder"));
+    //console.log("   🔲 ColorPickerOverlay:", document.getElementById("colorPickerOverlay"));
+    //console.log("   🎯 Detaljer om fejl-linje:", event);
     colorDisplay.style.backgroundColor = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
 
     if (colorDisplay) {
