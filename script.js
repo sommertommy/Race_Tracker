@@ -920,9 +920,9 @@ function startSelectedCamera() {
     }
 
     console.log("🎥 Prøver at starte kamera:", selectedCameraId);
-    cameraActive = true; // Marker kamera som aktivt
+    cameraActive = true;
 
-    stopCamera().then(() => { // 🔥 Stopper tidligere kamera, hvis nødvendigt
+    stopCamera().then(() => {
         navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: selectedCameraId } } })
             .then(stream => {
                 console.log("📷 Kamera stream modtaget!", stream);
@@ -935,14 +935,28 @@ function startSelectedCamera() {
                 }
 
                 videoElement.srcObject = stream;
-                return videoElement.play(); // Returnerer en promise, så vi kan fange fejl
+                return videoElement.play(); // Afspil videoen
             })
             .then(() => {
                 console.log("🎥 Kameraet er nu aktivt!");
+
+                // 🔥 Gør video synlig
+                const videoElement = document.getElementById("video");
+                if (videoElement) {
+                    videoElement.style.display = "block"; 
+                    videoElement.style.opacity = "1";
+                    videoElement.style.visibility = "visible";
+                }
+
+                // 🔥 Sørg for at colorPickerOverlay også er synligt
+                const colorPickerOverlay = document.getElementById("colorPickerOverlay");
+                if (colorPickerOverlay) {
+                    colorPickerOverlay.style.display = "flex";
+                }
             })
             .catch(err => {
                 console.error("❌ Fejl ved afspilning af video:", err);
-                cameraActive = false; // 🚀 Sørg for at kunne prøve igen
+                cameraActive = false; 
             });
     });
 }
