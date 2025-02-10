@@ -1,16 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ DOM er nu indlæst!");
 
-    // 🎯 **Tjek og skjul farvevælger-overlay fra start**
-    const colorPickerOverlay = document.getElementById("colorPickerOverlay");
-    if (colorPickerOverlay) {
-        colorPickerOverlay.classList.remove("show");
-        colorPickerOverlay.style.display = "none";
-    } else {
-        console.warn("⚠️ Farvevælger-overlay ikke fundet!");
-    }
-
     // 🎯 **Hent nødvendige DOM-elementer**
+    const colorPickerOverlay = document.getElementById("colorPickerOverlay");
     const acceptColorSelectionButton = document.getElementById("acceptColorSelection");
     const videoElement = document.getElementById("video");
     const overlayCanvas = document.getElementById("overlayCanvas");
@@ -18,26 +10,28 @@ document.addEventListener("DOMContentLoaded", () => {
     const openColorPickerButton = document.getElementById("openColorPicker");
     const closeColorPickerButton = document.getElementById("closeColorPicker");
 
-    console.log("🔍 Debug: acceptColorSelectionButton =", acceptColorSelectionButton);
-
-    // 🎯 **Fejlhåndtering - Undgå at tilføje event listeners til null**
-    if (!acceptColorSelectionButton) {
-        console.error("❌ Fejl: acceptColorSelection-knap ikke fundet i DOM'en!");
+    // 🎯 **Skjul overlay fra start**
+    if (colorPickerOverlay) {
+        colorPickerOverlay.classList.remove("show");
+        colorPickerOverlay.style.display = "none";
     } else {
+        console.warn("⚠️ Farvevælger-overlay ikke fundet!");
+    }
+
+    // 🎯 **Event listener til accept-knappen**
+    if (acceptColorSelectionButton) {
         acceptColorSelectionButton.addEventListener("click", () => {
             console.log("✅ Farvevalg accepteret:", selectedColor);
-
-            // Skjul farvevælger-overlay
             colorPickerOverlay.style.display = "none";
-
-            // Skjul tolerance-justering
             overlayCanvas.style.display = "none";
             document.getElementById("toleranceControls").style.display = "none";
             isTracking = false;
         });
+    } else {
+        console.error("❌ Fejl: acceptColorSelection-knap ikke fundet!");
     }
 
-    // 🎯 **Sørg for at kamera-placeholder vises korrekt**
+    // 🎯 **Vis pladsholder fra start**
     if (cameraPlaceholder) {
         cameraPlaceholder.style.display = "flex";
     }
