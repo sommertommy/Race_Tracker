@@ -20,6 +20,32 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("   🎯 openColorPickerButton:", openColorPickerButton);
     console.log("   ❌ closeColorPickerButton:", closeColorPickerButton);
 
+    // Definer funktionerne for event listeners først
+    function openColorPickerHandler() {
+        console.log("📸 Åbner kamera-overlay...");
+        colorPickerOverlay.classList.add("show");
+        colorPickerOverlay.style.display = "flex";
+        cameraPlaceholder.style.display = "flex";
+        videoElement.style.display = "none";
+        overlayCanvas.style.display = "none";
+    }
+    
+    function acceptColorHandler() {
+        console.log("✅ Farvevalg accepteret:", selectedColor);
+        colorPickerOverlay.style.display = "none";
+        overlayCanvas.style.display = "none";
+        document.getElementById("toleranceControls").style.display = "none";
+        isTracking = false;
+    }
+
+    // 🚀 Fjern og tilføj event listeners for at forhindre dobbelt-bindinger
+    openColorPickerButton.removeEventListener("click", openColorPickerHandler);
+    openColorPickerButton.addEventListener("click", openColorPickerHandler);
+    
+    acceptColorSelectionButton.removeEventListener("click", acceptColorHandler);
+    acceptColorSelectionButton.addEventListener("click", acceptColorHandler);
+
+
     // 🎯 **Skjul overlay fra start**
     if (colorPickerOverlay) {
         colorPickerOverlay.classList.remove("show");
@@ -978,6 +1004,13 @@ function startSelectedCamera() {
         return;
     }
 
+    // 🚀 Stop eksisterende stream, hvis der allerede kører en
+    if (activeStream) {
+        console.warn("⏹ Kamera kører allerede! Stopper nuværende stream...");
+        activeStream.getTracks().forEach(track => track.stop());
+        activeStream = null;
+    }
+
     navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: selectedCameraId } } })
         .then(stream => {
             activeStream = stream;
@@ -1129,21 +1162,19 @@ function trackColor() {
         return;
     }
 
-    // 🚀 **Stop, hvis videoen er slukket**
     if (!video.srcObject) {
-        console.warn("⏹ trackColor() stoppet – ingen aktiv videostream.");
-        isTracking = false; // 🚫 Stopper tracking helt
+        console.warn("⏹ Ingen aktiv videostream, stopper tracking.");
+        isTracking = false;
         return;
     }
 
-    // 🚀 **Tjek om videoen er klar**
+    // Hvis videoen ikke er klar, vent og prøv igen
     if (video.videoWidth === 0 || video.videoHeight === 0) {
-        console.warn("Video er ikke klar, afventer...");
-        requestAnimationFrame(trackColor); // Prøv igen senere
+        console.warn("⏹ Video ikke klar, forsøger igen...");
+        requestAnimationFrame(trackColor);
         return;
     }
 
-    // 📌 **Sæt canvas dimensioner korrekt**
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -1164,13 +1195,13 @@ function trackColor() {
 
     ctx.putImageData(imageData, 0, 0);
 
-    // 🚀 **Stop, hvis tracking er inaktiv**
+    // 🚀 Stop tracking hvis `isTracking` er sat til false
     if (!isTracking) {
         console.warn("⏹ trackColor() stoppet – tracking blev deaktiveret.");
         return;
     }
 
-    requestAnimationFrame(trackColor); // Kører næste frame, hvis tracking stadig er aktiv
+    requestAnimationFrame(trackColor);
 }
 
 // 🎯 **Matcher farver med tolerance**
