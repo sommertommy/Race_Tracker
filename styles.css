@@ -27,7 +27,7 @@ body {
 
 /* 📸 Kamera-overlay - vises som fuldskærm */
 #colorPickerOverlay {
-    display: none; /* Skjul overlayet fra start */
+    display: none !important; /* Sørger for at det er skjult fra starten */
     position: fixed;
     top: 0;
     left: 0;
@@ -40,9 +40,9 @@ body {
     z-index: 1000;
 }
 
-/* Vis overlayet, når det skal vises */
+/* Når vi vil vise det via JavaScript */
 #colorPickerOverlay.show {
-    display: flex;
+    display: flex !important;
 }
 
 #leaderboard {
