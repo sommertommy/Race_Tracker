@@ -144,6 +144,17 @@ closeColorPickerButton.addEventListener("click", () => {
     colorPickerOverlay.style.display = "none";
 });
 
+document.getElementById("acceptColorSelection").addEventListener("click", () => {
+    console.log("✅ Farvevalg accepteret:", selectedColor);
+
+    // Skjul farvevælger-overlay
+    document.getElementById("colorPickerOverlay").style.display = "none";
+
+    // Sørg for, at tolerancejusteringen også skjules
+    document.getElementById("overlayCanvas").style.display = "none";
+    document.getElementById("toleranceControls").style.display = "none";
+    isTracking = false;
+});
 
 if (cameraPlaceholder) {
     cameraPlaceholder.style.display = "none"; // Skjul pladsholder
