@@ -26,8 +26,10 @@ let raceMode = "LapCounts"; // Standardmode
 let raceTimer = null; // Gem timer reference
 
 
-const video = document.getElementById("video");
-const canvas = document.getElementById("overlayCanvas");
+const cameraPlaceholder = document.getElementById("cameraPlaceholder");
+const videoElement = document.getElementById("video");
+const overlayCanvas = document.getElementById("overlayCanvas");
+
 
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
@@ -130,6 +132,18 @@ closeColorPickerButton.addEventListener("click", () => {
     colorPickerOverlay.style.display = "none"; // ✅ Tving det til at skjule sig helt
 });
 
+
+if (cameraPlaceholder) {
+    cameraPlaceholder.style.display = "none"; // Skjul pladsholder
+}
+
+if (videoElement) {
+    videoElement.style.display = "block";
+}
+
+if (overlayCanvas) {
+    overlayCanvas.style.display = "block";
+}
 
 // 🎯 **Skift til farvevalg (hent kameraer kun, når brugeren trykker)**
 addPlayerButton.addEventListener("click", () => {
@@ -636,8 +650,7 @@ saveRaceButton.addEventListener("click", () => {
 function getCameras() {
     console.log("getCameras() kaldt!");
 
-    navigator.mediaDevices.getUserMedia({ video: true }) // Anmoder om adgang for at få deviceId
-    .then(() => navigator.mediaDevices.enumerateDevices())
+    navigator.mediaDevices.enumerateDevices()
     .then(devices => {
         const videoDevices = devices.filter(device => device.kind === "videoinput");
 
@@ -651,21 +664,12 @@ function getCameras() {
 
         videoDevices.forEach((device, index) => {
             let option = document.createElement("option");
-
-            // Brug fallback hvis deviceId mangler
-            let deviceId = device.deviceId || `fallback-${index}`;
-            option.value = deviceId;
+            option.value = device.deviceId;
             option.textContent = device.label || `Kamera ${index + 1}`;
             cameraSelect.appendChild(option);
-
-            console.log(`🎥 Kamera ${index + 1}: ${device.label || "Ukendt"} - ID: ${deviceId}`);
         });
 
-        // Vælg første kamera, hvis intet er valgt
-        if (!selectedCameraId && videoDevices[0]) {
-            selectedCameraId = videoDevices[0].deviceId || `fallback-0`;
-            console.log("📸 Første kamera valgt:", selectedCameraId);
-        }
+        console.log(`🎥 Fundne kameraer:`, videoDevices);
     })
     .catch(err => {
         console.error("⚠️ Fejl ved hentning af kameraer:", err);
@@ -802,6 +806,14 @@ function detectColorInRace() {
             });
         }
 
+        raceCanvas.width = hiddenVideo.videoWidth || 640;
+        raceCanvas.height = hiddenVideo.videoHeight || 480;
+        
+        if (raceCanvas.width === 0 || raceCanvas.height === 0) {
+            console.error("🚨 Kameraet er ikke klar – prøver igen...");
+            return;
+        }
+
         // 🎯 **Beregn procentdel for hver farve**
         Object.keys(colorCounts).forEach(playerId => {
             let player = players.find(p => p.id == playerId);
@@ -885,31 +897,16 @@ function startSelectedCamera() {
 
 // 🎯 **Opdateret kameraopstart – gemmer valgte kamera**
 useSelectedCameraButton.addEventListener("click", () => {
-    if (!selectedCameraId) {
+    if (!cameraSelect.value) {
         alert("Vælg et kamera fra listen!");
         return;
     }
 
-    console.log(`🎥 Starter kamera: ${selectedCameraId}`);
+    console.log(`🎥 Starter kamera: ${cameraSelect.value}`);
 
+    stopCamera(); // 🚀 Luk eksisterende kamera først
+    selectedCameraId = cameraSelect.value; // 🔥 Gem det valgte kamera
     startSelectedCamera();
-
-    // 📌 Skjul pladsholder og vis video/canvas
-    const cameraPlaceholder = document.getElementById("cameraPlaceholder");
-    const videoElement = document.getElementById("video");
-    const overlayCanvas = document.getElementById("overlayCanvas");
-
-    if (cameraPlaceholder) {
-        cameraPlaceholder.style.display = "none"; // Skjuler pladsholderen
-    }
-
-    if (videoElement) {
-        videoElement.style.display = "block"; // Viser videostreamen
-    }
-
-    if (overlayCanvas) {
-        overlayCanvas.style.display = "block"; // Viser overlay til farvedetektering
-    }
 });
 
 
