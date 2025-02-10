@@ -23,7 +23,30 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("⚠️ Fejl: OverlayCanvas findes ikke i DOM'en!");
     }
 });
- 
+
+// 🎯 **Håndter "Accepter farvevalg"-knappen**
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("✅ DOM indlæst – sikrer at accept-knappen fungerer");
+
+    const acceptColorSelectionButton = document.getElementById("acceptColorSelection");
+
+    if (acceptColorSelectionButton) {
+        acceptColorSelectionButton.addEventListener("click", () => {
+            console.log("✅ Farvevalg accepteret:", selectedColor);
+
+            // Skjul farvevælger-overlay
+            document.getElementById("colorPickerOverlay").style.display = "none";
+
+            // Sørg for, at tolerancejusteringen også skjules
+            document.getElementById("overlayCanvas").style.display = "none";
+            document.getElementById("toleranceControls").style.display = "none";
+            isTracking = false;
+        });
+    } else {
+        console.error("⚠️ Fejl: acceptColorSelection-knap ikke fundet i DOM'en!");
+    }
+});
+
 // 🎯 **Hent DOM-elementer**
 const canvas = document.getElementById("overlayCanvas");
 const video = document.getElementById("video");
