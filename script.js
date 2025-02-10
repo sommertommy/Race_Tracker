@@ -289,15 +289,21 @@ function sortLeaderboardByFastestLap() {
 function toggleLapTimes() {
     const overlay = document.getElementById("lapTimesOverlay");
 
+    if (!overlay) {
+        console.warn("⚠️ tidsoverbliks-overlay ikke fundet!");
+        return;
+    }
+
     if (!players || players.length === 0) {
         console.warn("❌ Ingen spillere til rådighed for rundetider!");
         return;
     }
 
-    overlay.style.display = overlay.style.display === "flex" ? "none" : "flex";
-
-    if (overlay.style.display === "flex") {
-        updateLapTimesTable();
+    if (overlay.classList.contains("show")) {
+        overlay.classList.remove("show");
+    } else {
+        overlay.classList.add("show");
+        updateLapTimesTable(); // Sørg for, at data opdateres
     }
 }
 
