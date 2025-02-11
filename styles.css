@@ -35,7 +35,12 @@ body {
 }
 
 #buttonContainer button {
-    width: 200px;  /* 🖥️ Juster knappernes bredde */
+    width: 300px;  /* 🖥️ Juster knappernes bredde */
+    padding: 10px;
+    font-size: 16px;
+}
+#buttonContainer select {
+    width: 300px;  /* 🖥️ Juster knappernes bredde */
     padding: 10px;
     font-size: 16px;
 }
