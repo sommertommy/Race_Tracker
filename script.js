@@ -207,7 +207,7 @@ function resetPlayerForm() {
 function showScreen(targetScreen) {
     const screens = [startScreen, colorSetupScreen, raceSetupScreen, raceScreen];
     screens.forEach(screen => screen.style.display = "none");
-    targetScreen.style.display = "block";
+    targetScreen.style.display = "flex";
 }
 
 document.getElementById("raceMode").addEventListener("change", function () {
