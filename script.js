@@ -11,15 +11,26 @@ document.addEventListener("DOMContentLoaded", () => {
     const closeColorPickerButton = document.getElementById("closeColorPickerButton");
     const toleranceControls = document.getElementById("toleranceControls");
 
-    // 🎯 **Debugging - log elementerne**
-    // console.log("🔍 Debugging:");
-    // console.log("   🟢 acceptColorSelectionButton:", acceptColorSelectionButton);
-    // console.log("   🎥 videoElement:", videoElement);
-    // console.log("   🖼️ overlayCanvas:", overlayCanvas);
-    // console.log("   📷 cameraPlaceholder:", cameraPlaceholder);
-    // console.log("   🔲 colorPickerOverlay:", colorPickerOverlay);
-    // console.log("   🎯 openColorPickerButton:", openColorPickerButton);
-    // console.log("   ❌ closeColorPickerButton:", closeColorPickerButton);
+    // 🎯 **Profilbillede slider-funktion**
+    const profileSelection = document.getElementById("profilePictureSelection");
+    const leftBtn = document.querySelector(".left-btn");
+    const rightBtn = document.querySelector(".right-btn");
+
+    if (profileSelection && leftBtn && rightBtn) {
+        const scrollAmount = 150; // 📌 Hvor meget der scrolles pr. klik
+
+        leftBtn.addEventListener("click", () => {
+            profileSelection.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+        });
+
+        rightBtn.addEventListener("click", () => {
+            profileSelection.scrollBy({ left: scrollAmount, behavior: "smooth" });
+        });
+
+        console.log("✅ Profilbillede-slider er sat op!");
+    } else {
+        console.error("❌ Fejl: Profilbillede-slider kunne ikke initialiseres!");
+    }
 
     // 🎯 **Funktion til at åbne farvevælger-overlay**
     function openColorPickerHandler() {
@@ -96,25 +107,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     } else {
         console.error("❌ Fejl: closeColorPickerButton ikke fundet!");
-    }
-    const profileSelection = document.getElementById("profilePictureSelection");
-    const leftBtn = document.querySelector(".left-btn");
-    const rightBtn = document.querySelector(".right-btn");
-
-    if (profileSelection && leftBtn && rightBtn) {
-        const scrollAmount = 150; // 📌 Hvor meget der scrolles pr. klik
-
-        leftBtn.addEventListener("click", () => {
-            profileSelection.scrollBy({ left: -scrollAmount, behavior: "smooth" });
-        });
-
-        rightBtn.addEventListener("click", () => {
-            profileSelection.scrollBy({ left: scrollAmount, behavior: "smooth" });
-        });
-
-        console.log("✅ Profilbillede-slider er sat op!");
-    } else {
-        console.error("❌ Fejl: Profilbillede-slider kunne ikke initialiseres!");
     }
 
     console.log("✅ DOM setup færdig!");
