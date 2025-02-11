@@ -38,28 +38,30 @@
                <h2>Opret ny spiller</h2>
             
                 <!-- Spillernavn på én linje -->
-                <div class="player-name-container">
-                    <label for="playerName">Indtast spillernavn:</label>
-                    <input type="text" id="playerName" placeholder="Indtast spillernavn">
-                </div>
-            
-                <!-- Knappen til at åbne kamera-overlayet -->
-                <button id="openColorPicker">Vælg bil via kamera</button>
-            
-                <!-- Profilbilleder -->
-                <h3>Vælg din profil</h3>
-                <div id="profilePictureSelection" class="profile-options">
-                    <img src="kevin.jpg" class="profile-pic-option" onclick="selectProfilePicture('kevin.jpg')">
-                    <img src="leclerc.jpg" class="profile-pic-option" onclick="selectProfilePicture('leclerc.jpg')">
-                    <img src="norris.jpg" class="profile-pic-option" onclick="selectProfilePicture('norris.jpg')">
-                    <img src="russell.jpg" class="profile-pic-option" onclick="selectProfilePicture('russell.jpg')">
-                    <img src="tom.jpg" class="profile-pic-option" onclick="selectProfilePicture('tom.jpg')">
-                    <img src="verstappen.jpg" class="profile-pic-option" onclick="selectProfilePicture('verstappen.jpg')">
-                </div>
-            
-                <!-- Knapper -->
-                <button id="savePlayer">Gem spiller</button>
-                <button id="backToStart">Tilbage</button>
+               <div id="buttonContainer"> 
+                   <div class="player-name-container">
+                        <label for="playerName">Indtast spillernavn:</label>
+                        <input type="text" id="playerName" placeholder="Indtast spillernavn">
+                    </div>
+                
+                    <!-- Knappen til at åbne kamera-overlayet -->
+                    <button id="openColorPicker">Vælg bil via kamera</button>
+                
+                    <!-- Profilbilleder -->
+                    <h3>Vælg din profil</h3>
+                    <div id="profilePictureSelection" class="profile-options">
+                        <img src="kevin.jpg" class="profile-pic-option" onclick="selectProfilePicture('kevin.jpg')">
+                        <img src="leclerc.jpg" class="profile-pic-option" onclick="selectProfilePicture('leclerc.jpg')">
+                        <img src="norris.jpg" class="profile-pic-option" onclick="selectProfilePicture('norris.jpg')">
+                        <img src="russell.jpg" class="profile-pic-option" onclick="selectProfilePicture('russell.jpg')">
+                        <img src="tom.jpg" class="profile-pic-option" onclick="selectProfilePicture('tom.jpg')">
+                        <img src="verstappen.jpg" class="profile-pic-option" onclick="selectProfilePicture('verstappen.jpg')">
+                    </div>
+                
+                    <!-- Knapper -->
+                    <button id="savePlayer">Gem spiller</button>
+                    <button id="backToStart">Tilbage</button>
+               </div>
            </div>
         </div>
 
