@@ -486,27 +486,48 @@ th, td {
 }
 
 
+/* 📌 Container for slider */
 .profile-slider-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 80%; /* Juster bredden efter behov */
-    margin: auto;
     position: relative;
-    overflow: hidden; /* Skjuler billeder uden for viewport */
+    width: 350px; /* 📌 Justér bredde efter behov */
+    overflow: hidden; /* 🚫 Undgå at vise billeder udenfor container */
 }
 
 /* 🎭 Profilbilleder */
 .profile-options {
     display: flex;
-    overflow-x: scroll; /* Gør det muligt at scrolle horisontalt */
-    scroll-behavior: smooth; /* Blød scroll-effekt */
-    width: 100%;
-    white-space: nowrap; /* Holder billederne i en linje */
-    scrollbar-width: none; /* Skjuler scrollbar i Firefox */
+    gap: 10px;
+    overflow-x: auto; /* 🎡 Mulighed for at scrolle horisontalt */
+    scroll-behavior: smooth;
+    white-space: nowrap;
+    padding: 10px;
 }
 .profile-options::-webkit-scrollbar {
     display: none; /* Skjuler scrollbar i Chrome & Safari */
+}
+
+/* 📌 Gør billederne mindre så de kan slides */
+.profile-options img {
+    width: 100px; /* 📌 Justér størrelsen */
+    height: 100px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+/* 🏹 Pil-knapper */
+.profile-slider-container button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.6);
+    border: none;
+    color: white;
+    font-size: 20px;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10;
 }
 
 .profile-pic-option {
@@ -529,6 +550,28 @@ th, td {
     padding: 10px;
     cursor: pointer;
     border-radius: 50%;
+}
+
+/* 🎨 Fade-effekt i enderne */
+.profile-slider-container::before,
+.profile-slider-container::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 50px;
+    height: 100%;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.profile-slider-container::before {
+    left: 0;
+    background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+}
+
+.profile-slider-container::after {
+    right: 0;
+    background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
 }
 
 .left-btn {
