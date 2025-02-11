@@ -12,14 +12,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const toleranceControls = document.getElementById("toleranceControls");
 
     // 🎯 **Debugging - log elementerne**
-    console.log("🔍 Debugging:");
-    console.log("   🟢 acceptColorSelectionButton:", acceptColorSelectionButton);
-    console.log("   🎥 videoElement:", videoElement);
-    console.log("   🖼️ overlayCanvas:", overlayCanvas);
-    console.log("   📷 cameraPlaceholder:", cameraPlaceholder);
-    console.log("   🔲 colorPickerOverlay:", colorPickerOverlay);
-    console.log("   🎯 openColorPickerButton:", openColorPickerButton);
-    console.log("   ❌ closeColorPickerButton:", closeColorPickerButton);
+    // console.log("🔍 Debugging:");
+    // console.log("   🟢 acceptColorSelectionButton:", acceptColorSelectionButton);
+    // console.log("   🎥 videoElement:", videoElement);
+    // console.log("   🖼️ overlayCanvas:", overlayCanvas);
+    // console.log("   📷 cameraPlaceholder:", cameraPlaceholder);
+    // console.log("   🔲 colorPickerOverlay:", colorPickerOverlay);
+    // console.log("   🎯 openColorPickerButton:", openColorPickerButton);
+    // console.log("   ❌ closeColorPickerButton:", closeColorPickerButton);
 
     // 🎯 **Funktion til at åbne farvevælger-overlay**
     function openColorPickerHandler() {
@@ -31,7 +31,6 @@ document.addEventListener("DOMContentLoaded", () => {
         overlayCanvas.style.display = "none";
     }
     
-    // 🎯 **Funktion til at acceptere farvevalg**
     function acceptColorHandler() {
         console.log("✅ Farvevalg accepteret:", selectedColor);
         
@@ -39,7 +38,23 @@ document.addEventListener("DOMContentLoaded", () => {
         colorPickerOverlay.style.display = "none";
         overlayCanvas.style.display = "none";
         if (toleranceControls) toleranceControls.style.display = "none";
-        
+    
+        // 🎯 Stop kameraet
+        if (videoElement) {
+            videoElement.pause();
+            videoElement.srcObject = null; // Frigør stream
+        }
+    
+        if (activeStream) {
+            activeStream.getTracks().forEach(track => track.stop()); // Stop alle spor
+            activeStream = null;
+        }
+    
+        // 🚫 **Skjul placeholderen, så den ikke kommer frem igen**
+        if (cameraPlaceholder) {
+            cameraPlaceholder.style.display = "none";
+        }
+    
         isTracking = false;
     }
 
