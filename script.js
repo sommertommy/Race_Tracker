@@ -11,54 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const closeColorPickerButton = document.getElementById("closeColorPickerButton");
     const toleranceControls = document.getElementById("toleranceControls");
 
-    const profileSelection = document.getElementById("profilePictureSelection");
-    const leftBtn = document.querySelector(".left-btn");
-    const rightBtn = document.querySelector(".right-btn");
-
-    // 🎯 **Profilbillede slider-funktion** 🎯
-    if (profileSelection && leftBtn && rightBtn) {
-        const scrollAmount = 150; // 📌 Hvor meget der scrolles pr. klik
-
-        // 🚀 **Pil-knapper**
-        leftBtn.addEventListener("click", () => {
-            profileSelection.scrollBy({ left: -scrollAmount, behavior: "smooth" });
-        });
-
-        rightBtn.addEventListener("click", () => {
-            profileSelection.scrollBy({ left: scrollAmount, behavior: "smooth" });
-        });
-
-        // 🖱️ **Mouse Drag funktionalitet**
-        let isDown = false;
-        let startX;
-        let scrollLeft;
-
-        profileSelection.addEventListener("mousedown", (e) => {
-            isDown = true;
-            startX = e.pageX - profileSelection.offsetLeft;
-            scrollLeft = profileSelection.scrollLeft;
-        });
-
-        profileSelection.addEventListener("mouseleave", () => {
-            isDown = false;
-        });
-
-        profileSelection.addEventListener("mouseup", () => {
-            isDown = false;
-        });
-
-        profileSelection.addEventListener("mousemove", (e) => {
-            if (!isDown) return;
-            e.preventDefault();
-            const x = e.pageX - profileSelection.offsetLeft;
-            const walk = (x - startX) * 2; // 📌 Hvor hurtigt det scroller
-            profileSelection.scrollLeft = scrollLeft - walk;
-        });
-
-        console.log("✅ Profilbillede-slider er sat op!");
-    } else {
-        console.error("❌ Fejl: Profilbillede-slider kunne ikke initialiseres!");
-    }
+    console.log("✅ Profilbilleder vises statisk uden slider!");
 
     // 🎯 **Funktion til at åbne farvevælger-overlay**
     function openColorPickerHandler() {
@@ -120,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // 🚀 **Event listeners** 🚀
+    // 🚀 **Event listeners**
     openColorPickerButton.addEventListener("click", openColorPickerHandler);
     acceptColorSelectionButton.addEventListener("click", acceptColorHandler);
 
