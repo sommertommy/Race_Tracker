@@ -820,20 +820,15 @@ function startRaceCamera() {
 
         hiddenVideo.oncanplay = () => {
             console.log("✅ Race-video kan nu afspilles i baggrunden!");
-            setTimeout(() => {
-                if (hiddenVideo.videoWidth > 0 && hiddenVideo.videoHeight > 0) {
-                    console.log("🏁 Race-video er fuldt indlæst, starter farvesporing!");
-                    
-                    if (!trackingInterval) { 
-                        detectColorInRace();
-                    } else {
-                        console.warn("⚠️ detectColorInRace kører allerede, undgår dobbelt-opstart.");
-                    }
+
+            // 🚀 **Vent på at videoen er klar før farvesporing**
+            ensureVideoReady(() => {
+                if (!trackingInterval) { 
+                    detectColorInRace();
                 } else {
-                    console.error("❌ Fejl: Race-video stadig ikke klar, prøver igen...");
-                    setTimeout(startRaceCamera, 500);
+                    console.warn("⚠️ detectColorInRace kører allerede, undgår dobbelt-opstart.");
                 }
-            }, 500);
+            });
         };
     })
     .catch(err => { 
@@ -841,6 +836,7 @@ function startRaceCamera() {
         alert("Kunne ikke starte kameraet. Tjek kameraindstillinger.");
     });
 }
+
 
 
 function detectColorInRace() {
@@ -878,8 +874,14 @@ function detectColorInRace() {
         }
 
         const raceCanvas = document.createElement("canvas");
-        raceCanvas.width = hiddenVideo.videoWidth;
-        raceCanvas.height = hiddenVideo.videoHeight;
+        raceCanvas.width = hiddenVideo.videoWidth || 640;
+        raceCanvas.height = hiddenVideo.videoHeight || 480;
+        
+        if (raceCanvas.width === 0 || raceCanvas.height === 0) {
+            console.error("🚨 Kameraet er ikke klar – prøver igen...");
+            return;
+        }
+
         const raceCtx = raceCanvas.getContext("2d");
 
         raceCtx.drawImage(hiddenVideo, 0, 0, raceCanvas.width, raceCanvas.height);
@@ -904,22 +906,13 @@ function detectColorInRace() {
             });
         }
 
-        raceCanvas.width = hiddenVideo.videoWidth || 640;
-        raceCanvas.height = hiddenVideo.videoHeight || 480;
-        
-        if (raceCanvas.width === 0 || raceCanvas.height === 0) {
-            console.error("🚨 Kameraet er ikke klar – prøver igen...");
-            return;
-        }
-
         // 🎯 **Beregn procentdel for hver farve**
         Object.keys(colorCounts).forEach(playerId => {
             let player = players.find(p => p.id == playerId);
             let percentage = (colorCounts[playerId] / totalPixels) * 100;
 
             if (percentage < 0.1) {
-                //console.log(`❌ ${player.name} registreres ikke – kun ${percentage.toFixed(2)}% af billedet.`);
-                return; // 🚫 Kun registrer hvis mindst 2% af billedet er farven
+                return; // 🚫 Ignorer hvis under 0.1% af billedet er farven
             }
 
             const now = Date.now();
@@ -933,18 +926,15 @@ function detectColorInRace() {
             }
 
             // 🎯 **Opdater spillerens omgang via `updatePlayerLaps()`**
-            // 🎯 **Opdater spillerens omgang via `updatePlayerLaps()`**
             if (!player.lastDetectionTime || now - player.lastDetectionTime > 2000) { // 2 sekunders delay
                 if (raceMode === "LapCounts" && player.laps < raceSettings.rounds) {
                     updatePlayerLaps(player.id);
-                    player.lastDetectionTime = now; // Opdater sidste registreringstid
-            
-                    // 🎉 **Check om spilleren har fuldført racet (kun i LapCounts)**
+                    player.lastDetectionTime = now; 
+
                     if (player.laps >= raceSettings.rounds && !player.finishTime) {
                         player.finishTime = now;
                         console.log(`🏁 ${player.name} har FULDFØRT racet! 🎉`);
-            
-                        // 🚀 **Start confetti og lyd (kun i LapCounts)**
+
                         launchConfetti();
                         playApplauseSound();
                     }
@@ -960,7 +950,17 @@ function detectColorInRace() {
 }
 
 
+function ensureVideoReady(callback) {
+    const hiddenVideo = document.getElementById("hiddenRaceVideo");
 
+    if (!hiddenVideo || hiddenVideo.videoWidth === 0 || hiddenVideo.videoHeight === 0) {
+        console.warn("⏳ Video ikke klar, prøver igen...");
+        setTimeout(() => ensureVideoReady(callback), 100); // 🔄 Prøv igen efter 100ms
+    } else {
+        console.log("✅ Video er klar, starter farvesporing!");
+        callback();
+    }
+}
 
 
 
