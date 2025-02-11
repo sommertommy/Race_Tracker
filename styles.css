@@ -486,12 +486,7 @@ th, td {
 }
 
 
-/* 📌 Container for slider */
-.profile-slider-container {
-    position: relative;
-    width: 350px; /* 📌 Justér bredde efter behov */
-    overflow: hidden; /* 🚫 Undgå at vise billeder udenfor container */
-}
+
 
 /* 🎭 Profilbilleder */
 .profile-options {
@@ -515,76 +510,7 @@ th, td {
     transition: transform 0.2s ease-in-out;
 }
 
-/* 🏹 Pil-knapper */
-.profile-slider-container button {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: rgba(0, 0, 0, 0.6);
-    border: none;
-    color: white;
-    font-size: 20px;
-    padding: 10px;
-    border-radius: 50%;
-    cursor: pointer;
-    z-index: 10;
-}
 
-.profile-pic-option {
-    width: 120px; /* Juster billedestørrelsen */
-    height: 120px;
-    margin: 10px;
-    border-radius: 50%; /* Runde billeder */
-    cursor: pointer;
-    transition: transform 0.3s ease-in-out;
-}
-/* Pile til at navigere */
-.slider-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
-    font-size: 24px;
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 50%;
-}
-
-/* 🎨 Fade-effekt i enderne */
-.profile-slider-container::before,
-.profile-slider-container::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    width: 50px;
-    height: 100%;
-    z-index: 5;
-    pointer-events: none;
-}
-
-.profile-slider-container::before {
-    left: 0;
-    background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
-}
-
-.profile-slider-container::after {
-    right: 0;
-    background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
-}
-
-.left-btn {
-    left: 0;
-}
-
-.right-btn {
-    right: 0;
-}
-
-.slider-btn:hover {
-    background-color: rgba(0, 0, 0, 0.8);
-}
 
 /* 🎭 Ensrettet spillerindstillinger */
 .player-name-container {
