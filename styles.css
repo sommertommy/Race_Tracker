@@ -34,12 +34,29 @@ body {
     color: white; /* 🎨 Sørger for at tekst er synlig */
 } 
 
-/* 🎨 Generelt layout for spilleropsætning */
 #colorSetupScreen {
-    display: flex;
+    background-image: url("garage.jpg"); /* 🖼️ Indsætter billedet */
+    background-size: cover;  /* 📌 Sørger for at det dækker hele skærmen */
+    background-position: center; /* 🎯 Centrerer billedet */
+    background-repeat: no-repeat; /* 🚫 Undgår gentagelse */
+    width: 100vw;  /* 🎥 Fylder hele bredden */
+    height: 100vh; /* 📏 Fylder hele højden */
+    display: flex; /* 📌 Fleksibel container */
     flex-direction: column;
     align-items: center;
-    gap: 15px;
+    justify-content: center;
+    color: white; /* 🎨 Sikrer, at tekst stadig er synlig */
+}
+
+#colorSetupScreen::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* 📌 50% mørk overlay */
+    z-index: -1;
 }
 
 
@@ -521,17 +538,3 @@ th, td {
     border: 2px solid white;
 }
 
-/* Gør baggrunden ensartet på alle skærme */
-#colorSetupScreen, #raceSetupScreen, #raceScreen, #lapTimesOverlay {
-    background-color: rgba(0, 0, 0, 0.8); /* 📌 Mørk gennemsigtig baggrund */
-    width: 100vw;
-    height: 100vh;
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: white; /* 📌 Sørger for at tekst er læsbar */
-}
