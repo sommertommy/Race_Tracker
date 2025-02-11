@@ -32,30 +32,39 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
     function acceptColorHandler() {
-        console.log("✅ Farvevalg accepteret:", selectedColor);
-        
-        // 🎯 Skjul farvevælger-overlay og tolerance-justering
-        colorPickerOverlay.style.display = "none";
+    console.log("✅ Farvevalg accepteret:", selectedColor);
+
+    // 🎯 Skjul farvevælger-overlay og tolerance-justering
+    colorPickerOverlay.style.display = "none";
         overlayCanvas.style.display = "none";
         if (toleranceControls) toleranceControls.style.display = "none";
     
-        // 🎯 Stop kameraet
+        // 🚀 **Stop tracking, hvis det stadig kører**
+        isTracking = false;
+    
+        // 🚀 **Stop trackColor-animationen**
+        if (typeof trackColor === "function") {
+            console.log("⏹ trackColor() stoppes!");
+            cancelAnimationFrame(trackColor); // Forsøg at stoppe animation
+        }
+    
+        // 🎯 **Stop kameraet og frigør stream**
         if (videoElement) {
             videoElement.pause();
-            videoElement.srcObject = null; // Frigør stream
+            videoElement.srcObject = null;
         }
     
         if (activeStream) {
-            activeStream.getTracks().forEach(track => track.stop()); // Stop alle spor
+            console.log("📸 Stopper aktiv kamera-stream...");
+            activeStream.getTracks().forEach(track => track.stop());
             activeStream = null;
         }
     
-        // 🚫 **Skjul placeholderen, så den ikke kommer frem igen**
+        // 🚫 **Sørg for at placeholder IKKE vises**
         if (cameraPlaceholder) {
+            console.log("📷 Skjuler kamera-placeholder...");
             cameraPlaceholder.style.display = "none";
         }
-    
-        isTracking = false;
     }
 
     // 🚀 **Fjern tidligere event listeners og tilføj kun én gang**
