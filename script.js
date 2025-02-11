@@ -781,16 +781,21 @@ function startRaceCamera() {
         const videoDevices = devices.filter(device => device.kind === "videoinput");
 
         if (videoDevices.length === 0) {
-            console.error("Ingen kameraer fundet!");
+            console.error("❌ Ingen kameraer fundet!");
             alert("Ingen kameraer fundet. Tjek din enhed.");
             return;
         }
 
         const cameraId = selectedCameraId || videoDevices[0].deviceId;
-        console.log(`Bruger kamera: ${cameraId}`);
+        console.log(`🎥 Bruger kamera: ${cameraId}`);
 
         return navigator.mediaDevices.getUserMedia({
-            video: { deviceId: { exact: cameraId } }
+            video: { 
+                deviceId: { exact: cameraId },
+                width: { ideal: 1920 }, // 📏 Full HD opløsning
+                height: { ideal: 1080 }, 
+                facingMode: "environment" // 📱 Brug bagkamera hvis muligt
+            }
         });
     })
     .then(stream => {
@@ -810,14 +815,14 @@ function startRaceCamera() {
         hiddenVideo.play();
 
         hiddenVideo.onloadedmetadata = () => {
-            console.log("Race-video metadata indlæst!");
+            console.log("🎥 Race-video metadata indlæst!");
         };
 
         hiddenVideo.oncanplay = () => {
-            console.log("Race-video kan nu afspilles i baggrunden!");
+            console.log("✅ Race-video kan nu afspilles i baggrunden!");
             setTimeout(() => {
                 if (hiddenVideo.videoWidth > 0 && hiddenVideo.videoHeight > 0) {
-                    console.log("Race-video er fuldt indlæst, starter farvesporing!");
+                    console.log("🏁 Race-video er fuldt indlæst, starter farvesporing!");
                     
                     if (!trackingInterval) { 
                         detectColorInRace();
@@ -825,14 +830,14 @@ function startRaceCamera() {
                         console.warn("⚠️ detectColorInRace kører allerede, undgår dobbelt-opstart.");
                     }
                 } else {
-                    console.error("Fejl: Race-video stadig ikke klar, prøver igen...");
+                    console.error("❌ Fejl: Race-video stadig ikke klar, prøver igen...");
                     setTimeout(startRaceCamera, 500);
                 }
             }, 500);
         };
     })
-    .catch(err => { // 🔴 Flyttet `catch()` udenfor `.then()`
-        console.error("Fejl ved adgang til kamera", err);
+    .catch(err => { 
+        console.error("❌ Fejl ved adgang til kamera", err);
         alert("Kunne ikke starte kameraet. Tjek kameraindstillinger.");
     });
 }
