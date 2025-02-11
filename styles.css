@@ -42,6 +42,8 @@ body {
     gap: 15px;
 }
 
+
+
 #countdownVideo{
     display:block
 }
@@ -517,4 +519,19 @@ th, td {
     height: 80px;
     border-radius: 50%;
     border: 2px solid white;
+}
+
+/* Gør baggrunden ensartet på alle skærme */
+#colorSetupScreen, #raceSetupScreen, #raceScreen, #lapTimesOverlay {
+    background-color: rgba(0, 0, 0, 0.8); /* 📌 Mørk gennemsigtig baggrund */
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white; /* 📌 Sørger for at tekst er læsbar */
 }
