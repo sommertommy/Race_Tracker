@@ -32,12 +32,25 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
     function acceptColorHandler() {
-    console.log("✅ Farvevalg accepteret:", selectedColor);
-
-    // 🎯 Skjul farvevælger-overlay og tolerance-justering
-    colorPickerOverlay.style.display = "none";
-        overlayCanvas.style.display = "none";
-        if (toleranceControls) toleranceControls.style.display = "none";
+        console.log("✅ Farvevalg accepteret:", selectedColor);
+    
+        // 🎯 **Skjul hele colorPickerOverlay**
+        if (colorPickerOverlay) {
+            console.log("🛑 Lukker colorPickerOverlay...");
+            colorPickerOverlay.classList.remove("show");
+            colorPickerOverlay.style.display = "none";
+        }
+    
+        // 🎯 **Skjul tolerance-justering og overlayCanvas**
+        if (toleranceControls) {
+            console.log("🎚 Skjuler tolerance-controls...");
+            toleranceControls.style.display = "none";
+        }
+    
+        if (overlayCanvas) {
+            console.log("🖼️ Skjuler overlayCanvas...");
+            overlayCanvas.style.display = "none";
+        }
     
         // 🚀 **Stop tracking, hvis det stadig kører**
         isTracking = false;
@@ -45,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // 🚀 **Stop trackColor-animationen**
         if (typeof trackColor === "function") {
             console.log("⏹ trackColor() stoppes!");
-            cancelAnimationFrame(trackColor); // Forsøg at stoppe animation
+            cancelAnimationFrame(trackColor);
         }
     
         // 🎯 **Stop kameraet og frigør stream**
