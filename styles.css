@@ -485,19 +485,62 @@ th, td {
     }
 }
 
+
+.profile-slider-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80%; /* Juster bredden efter behov */
+    margin: auto;
+    position: relative;
+    overflow: hidden; /* Skjuler billeder uden for viewport */
+}
+
 /* 🎭 Profilbilleder */
 .profile-options {
     display: flex;
-    justify-content: center;
-    gap: 15px;
+    overflow-x: scroll; /* Gør det muligt at scrolle horisontalt */
+    scroll-behavior: smooth; /* Blød scroll-effekt */
+    width: 100%;
+    white-space: nowrap; /* Holder billederne i en linje */
+    scrollbar-width: none; /* Skjuler scrollbar i Firefox */
+}
+.profile-options::-webkit-scrollbar {
+    display: none; /* Skjuler scrollbar i Chrome & Safari */
 }
 
 .profile-pic-option {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
+    width: 120px; /* Juster billedestørrelsen */
+    height: 120px;
+    margin: 10px;
+    border-radius: 50%; /* Runde billeder */
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: transform 0.3s ease-in-out;
+}
+/* Pile til at navigere */
+.slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    font-size: 24px;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.left-btn {
+    left: 0;
+}
+
+.right-btn {
+    right: 0;
+}
+
+.slider-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8);
 }
 
 /* 🎭 Ensrettet spillerindstillinger */
