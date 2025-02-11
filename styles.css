@@ -20,6 +20,28 @@ body {
     border-radius: 10px;
 }
 
+#profilePictureSelection {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 📌 5 billeder pr. række */
+    gap: 10px; /* 📌 Afstand mellem billederne */
+    justify-content: center;
+    align-items: center;
+    max-width: 80%; /* 📌 Sikrer at det ikke strækker sig for langt */
+    margin: 0 auto; /* 📌 Centrerer billederne */
+}
+
+.profile-pic-option {
+    width: 100%; /* 📌 Gør billederne responsivt ift. deres container */
+    max-width: 120px; /* 📌 Maks bredde pr. billede */
+    height: auto; /* 📌 Bevarer proportionerne */
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.profile-pic-option:hover {
+    transform: scale(1.1); /* 📌 Lille zoom-effekt ved hover */
+}
+
  #startScreen {
     background-image: url("background-start.jpg"); /* 🖼️ Brug din billedfil */
     background-size: cover;  /* 📌 Dækker hele skærmen */
