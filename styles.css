@@ -20,7 +20,7 @@ body {
     border-radius: 10px;
 }
 
-#startScreen {
+/* #startScreen {
     background-image: url("background-start.jpg"); /* 🖼️ Brug din billedfil */
     background-size: cover;  /* 📌 Dækker hele skærmen */
     background-position: center; /* 🎯 Centrer billedet */
@@ -32,7 +32,7 @@ body {
     align-items: center;
     justify-content: center;
     color: white; /* 🎨 Sørger for at tekst er synlig */
-}
+} */
 
 /* 🎨 Generelt layout for spilleropsætning */
 #colorSetupScreen {
