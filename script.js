@@ -953,6 +953,11 @@ function startSelectedCamera() {
                 if (colorPickerOverlay) {
                     colorPickerOverlay.style.display = "flex";
                 }
+                 // 🔥 Skjul cameraPlaceholder
+                const cameraPlaceholder = document.getElementById("cameraPlaceholder");
+                if (cameraPlaceholder) {
+                    cameraPlaceholder.style.display = "none";
+                }
             })
             .catch(err => {
                 console.error("❌ Fejl ved afspilning af video:", err);
