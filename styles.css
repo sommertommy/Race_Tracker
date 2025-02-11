@@ -305,14 +305,14 @@ button {
     padding: 10px;
     margin: 5px;
     border: none;
-    background-color: #007BFF;
+    background-color: #131313;
     color: white;
     cursor: pointer;
     border-radius: 5px;
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #1a3538;
 }
 
 #toleranceControls {
