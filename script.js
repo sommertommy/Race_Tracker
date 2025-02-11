@@ -1324,9 +1324,9 @@ function updatePlayerList() {
         playerList.appendChild(div);
     });
 
-    if (players.length > 0) {
-        setupRaceButton.style.display = "block";
-    }
+    //if (players.length > 0) {
+    //    setupRaceButton.style.display = "block";
+    //}
 }
 // 🎯 **Slet spiller baseret på ID**
 function removePlayer(playerId) {
