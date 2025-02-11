@@ -22,11 +22,11 @@ body {
 
 #profilePictureSelection {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* 📌 5 billeder pr. række */
+    grid-template-columns: repeat(4, 1fr); /* 📌 5 billeder pr. række */
     gap: 10px; /* 📌 Afstand mellem billederne */
     justify-content: center;
     align-items: center;
-    max-width: 80%; /* 📌 Sikrer at det ikke strækker sig for langt */
+    max-width: 100%; /* 📌 Sikrer at det ikke strækker sig for langt */
     margin: 0 auto; /* 📌 Centrerer billederne */
 }
 
@@ -100,23 +100,21 @@ body {
 }
 
 #buttonContainer button {
-    width: 300px;  /* 🖥️ Juster knappernes bredde */
+    width: 450px;  /* 🖥️ Juster knappernes bredde */
     padding: 10px;
     font-size: 16px;
 }
 #buttonContainer select {
-    width: 300px;  /* 🖥️ Juster knappernes bredde */
+    width: 450px;  /* 🖥️ Juster knappernes bredde */
     padding: 10px;
     font-size: 16px;
 }
 
 .green-button {
-    width: 100%;
-    background-color: #28a745; /* Grøn farve */
+        background-color: #118145; /* Grøn farve */
     color: white;
     padding: 15px;
-    font-size: 18px;
-    font-weight: bold;
+    font-size: 16px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -394,7 +392,7 @@ overlay {
 }
 
 #playerName {
-    width: 200px;
+    width: 450px;
     padding: 10px;
     font-size: 16px;
     text-align: center;
