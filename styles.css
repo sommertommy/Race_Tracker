@@ -539,7 +539,7 @@ th, td {
 }
 
 .selected-profile {
-    border: 3px solid #FFD700; /* Gul kant til markeret profil */
+    border: 5px solid #f44336; /* Gul kant til markeret profil */
 }
 
 .player-profile {
