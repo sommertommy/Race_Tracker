@@ -11,20 +11,48 @@ document.addEventListener("DOMContentLoaded", () => {
     const closeColorPickerButton = document.getElementById("closeColorPickerButton");
     const toleranceControls = document.getElementById("toleranceControls");
 
-    // 🎯 **Profilbillede slider-funktion**
     const profileSelection = document.getElementById("profilePictureSelection");
     const leftBtn = document.querySelector(".left-btn");
     const rightBtn = document.querySelector(".right-btn");
 
+    // 🎯 **Profilbillede slider-funktion** 🎯
     if (profileSelection && leftBtn && rightBtn) {
         const scrollAmount = 150; // 📌 Hvor meget der scrolles pr. klik
 
+        // 🚀 **Pil-knapper**
         leftBtn.addEventListener("click", () => {
             profileSelection.scrollBy({ left: -scrollAmount, behavior: "smooth" });
         });
 
         rightBtn.addEventListener("click", () => {
             profileSelection.scrollBy({ left: scrollAmount, behavior: "smooth" });
+        });
+
+        // 🖱️ **Mouse Drag funktionalitet**
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        profileSelection.addEventListener("mousedown", (e) => {
+            isDown = true;
+            startX = e.pageX - profileSelection.offsetLeft;
+            scrollLeft = profileSelection.scrollLeft;
+        });
+
+        profileSelection.addEventListener("mouseleave", () => {
+            isDown = false;
+        });
+
+        profileSelection.addEventListener("mouseup", () => {
+            isDown = false;
+        });
+
+        profileSelection.addEventListener("mousemove", (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - profileSelection.offsetLeft;
+            const walk = (x - startX) * 2; // 📌 Hvor hurtigt det scroller
+            profileSelection.scrollLeft = scrollLeft - walk;
         });
 
         console.log("✅ Profilbillede-slider er sat op!");
@@ -41,49 +69,50 @@ document.addEventListener("DOMContentLoaded", () => {
         videoElement.style.display = "none";
         overlayCanvas.style.display = "none";
     }
-    
+
+    // 🎯 **Funktion til at acceptere farvevalg**
     function acceptColorHandler() {
         console.log("✅ Farvevalg accepteret:", selectedColor);
-    
+
         // 🎯 **Skjul hele colorPickerOverlay**
         if (colorPickerOverlay) {
             console.log("🛑 Lukker colorPickerOverlay...");
             colorPickerOverlay.classList.remove("show");
             colorPickerOverlay.style.display = "none";
         }
-    
+
         // 🎯 **Skjul tolerance-justering og overlayCanvas**
         if (toleranceControls) {
             console.log("🎚 Skjuler tolerance-controls...");
             toleranceControls.style.display = "none";
         }
-    
+
         if (overlayCanvas) {
             console.log("🖼️ Skjuler overlayCanvas...");
             overlayCanvas.style.display = "none";
         }
-    
+
         // 🚀 **Stop tracking, hvis det stadig kører**
         isTracking = false;
-    
+
         // 🚀 **Stop trackColor-animationen**
         if (typeof trackColor === "function") {
             console.log("⏹ trackColor() stoppes!");
             cancelAnimationFrame(trackColor);
         }
-    
+
         // 🎯 **Stop kameraet og frigør stream**
         if (videoElement) {
             videoElement.pause();
             videoElement.srcObject = null;
         }
-    
+
         if (activeStream) {
             console.log("📸 Stopper aktiv kamera-stream...");
             activeStream.getTracks().forEach(track => track.stop());
             activeStream = null;
         }
-    
+
         // 🚫 **Sørg for at placeholder IKKE vises**
         if (cameraPlaceholder) {
             console.log("📷 Skjuler kamera-placeholder...");
@@ -91,11 +120,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // 🚀 **Fjern tidligere event listeners og tilføj kun én gang**
-    openColorPickerButton.removeEventListener("click", openColorPickerHandler);
+    // 🚀 **Event listeners** 🚀
     openColorPickerButton.addEventListener("click", openColorPickerHandler);
-    
-    acceptColorSelectionButton.removeEventListener("click", acceptColorHandler);
     acceptColorSelectionButton.addEventListener("click", acceptColorHandler);
 
     // 🎯 **Event listener til lukning af farvevælgeren**
