@@ -97,6 +97,25 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
         console.error("❌ Fejl: closeColorPickerButton ikke fundet!");
     }
+    const profileSelection = document.getElementById("profilePictureSelection");
+    const leftBtn = document.querySelector(".left-btn");
+    const rightBtn = document.querySelector(".right-btn");
+
+    if (profileSelection && leftBtn && rightBtn) {
+        const scrollAmount = 150; // 📌 Hvor meget der scrolles pr. klik
+
+        leftBtn.addEventListener("click", () => {
+            profileSelection.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+        });
+
+        rightBtn.addEventListener("click", () => {
+            profileSelection.scrollBy({ left: scrollAmount, behavior: "smooth" });
+        });
+
+        console.log("✅ Profilbillede-slider er sat op!");
+    } else {
+        console.error("❌ Fejl: Profilbillede-slider kunne ikke initialiseres!");
+    }
 
     console.log("✅ DOM setup færdig!");
 });
