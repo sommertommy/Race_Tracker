@@ -177,6 +177,32 @@ let editingPlayerId = null; // 🔥 Holder styr på den spiller, der redigeres
 let cameraStarted = false;
 
 
+function resetPlayerForm() {
+    console.log("♻️ Nulstiller spilleroprettelse...");
+
+    // 🎯 Nulstil spillerens navn i inputfeltet
+    const playerNameInput = document.getElementById("playerName");
+    if (playerNameInput) {
+        playerNameInput.value = "";
+        console.log("📝 Inputfeltet er nulstillet.");
+    }
+
+    // 🎯 Nulstil den valgte farve
+    selectedColor = null;
+    console.log("🎨 Farvevalget er nulstillet.");
+
+    // 🎯 Opdater UI, så farveboksen ikke viser en gammel farve
+    const colorDisplay = document.getElementById("selectedColor");
+    if (colorDisplay) {
+        colorDisplay.style.backgroundColor = "transparent";
+    }
+
+    // 🎯 Sørg for at tolerancejusteringen starter forfra
+    tolerance = 50;
+    threshold = 100;
+}
+
+
 // 🎯 **Funktion til at styre skærmene**
 function showScreen(targetScreen) {
     const screens = [startScreen, colorSetupScreen, raceSetupScreen, raceScreen];
@@ -212,6 +238,8 @@ if (overlayCanvas) {
 
 // 🎯 **Skift til farvevalg (hent kameraer kun, når brugeren trykker)**
 addPlayerButton.addEventListener("click", () => {
+    console.log("➕ Tilføjer ny spiller...");
+    resetPlayerForm(); // 🚀 Nulstil input og farvevalg
     showScreen(colorSetupScreen);
     console.log("Tilføj spiller trykket - henter kameraer...");
     getCameras();
