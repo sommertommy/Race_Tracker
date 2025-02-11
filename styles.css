@@ -15,8 +15,9 @@ body {
 }
 
 .contentBox{
-    background-color:#000;
-    padding: 30px;
+    background-color: #0000003b;
+    padding: 60px 30px;
+    border-radius: 10px;
 }
 
 #startScreen {
