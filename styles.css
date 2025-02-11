@@ -35,19 +35,24 @@ body {
 } 
 
 #colorSetupScreen {
-    background-image: url("garage.jpg"); /* 🖼️ Indsætter billedet */
-    background-size: cover;  /* 📌 Sørger for at det dækker hele skærmen */
+    background-image: url("garage.jpg"); /* 🖼️ Baggrundsbillede */
+    background-size: cover;  /* 📌 Dækker hele skærmen */
     background-position: center; /* 🎯 Centrerer billedet */
     background-repeat: no-repeat; /* 🚫 Undgår gentagelse */
     width: 100vw;  /* 🎥 Fylder hele bredden */
     height: 100vh; /* 📏 Fylder hele højden */
+    position: fixed; /* 📌 Sørger for at den altid fylder skærmen */
+    top: 0;
+    left: 0;
     display: flex; /* 📌 Fleksibel container */
     flex-direction: column;
     align-items: center;
     justify-content: center;
     color: white; /* 🎨 Sikrer, at tekst stadig er synlig */
+    z-index: 10; /* Sørger for, at den er over andre elementer */
 }
 
+/* 🔹 Mørk overlay baggrund */
 #colorSetupScreen::before {
     content: "";
     position: absolute;
@@ -56,7 +61,7 @@ body {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.5); /* 📌 50% mørk overlay */
-    z-index: -1;
+    z-index: -1; /* Sikrer at overlay er bag indholdet */
 }
 
 
