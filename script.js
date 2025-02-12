@@ -43,6 +43,20 @@ document.addEventListener("DOMContentLoaded", () => {
     let selectedCameraId = localStorage.getItem("selectedCamera") || null;
     let activeStream = null;
 
+
+    function updateRaceModeUI() {
+        if (raceModeSelector.value === "LapCounts") {
+            lapCountSettings.style.display = "block";
+            timeLimitSettings.style.display = "none";
+            console.log("🔄 Skiftet til 'Lap Counts' - Runder aktiveret, tid skjult.");
+        } else {
+            lapCountSettings.style.display = "none";
+            timeLimitSettings.style.display = "block";
+            console.log("🔄 Skiftet til 'Fastest Lap' - Tid aktiveret, runder skjult.");
+        }
+    }
+        raceModeSelector.addEventListener("change", updateRaceModeUI);
+
     // 🎯 **Vent på acceptColorSelectionButton før eventListener tilføjes**
     function ensureAcceptButtonExists() {
         let button = document.getElementById("acceptColorSelection");
@@ -117,40 +131,40 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // 🎯 **Gem race-indstillinger**
-    if (saveRaceButton) {
+    if (!saveRaceButton) {
+    console.error("❌ Fejl: saveRaceButton blev ikke fundet i DOM'en!");
+    } else {
         saveRaceButton.addEventListener("click", () => {
             console.log("🏁 Gemmer race-indstillinger...");
-
+    
             if (raceModeSelector.value === "LapCounts") {
                 const selectedRounds = parseInt(roundsInput.value);
-
                 if (isNaN(selectedRounds) || selectedRounds < 1) {
                     alert("Indtast et gyldigt antal runder!");
                     return;
                 }
-
-                raceSettings.mode = "LapCounts";
-                raceSettings.rounds = selectedRounds;
+                raceSettings = {
+                    mode: "LapCounts",
+                    rounds: selectedRounds
+                };
             } else {
                 const selectedTimeLimit = parseInt(timeLimitInput.value);
-
                 if (isNaN(selectedTimeLimit) || selectedTimeLimit < 10) {
                     alert("Indtast en gyldig tid (mindst 10 sek)!");
                     return;
                 }
-
-                raceSettings.mode = "FastestLap";
-                raceSettings.timeLimit = selectedTimeLimit;
+                raceSettings = {
+                    mode: "FastestLap",
+                    timeLimit: selectedTimeLimit
+                };
             }
-
+    
             console.log("✅ Race gemt:", raceSettings);
-
+    
             // 🚀 Skift tilbage til startskærmen
             document.getElementById("raceSetupScreen").style.display = "none";
             document.getElementById("startScreen").style.display = "block";
         });
-    } else {
-        console.error("❌ saveRaceButton blev ikke fundet i DOM'en!");
     }
 
     // 🎥 **Start det valgte kamera**
