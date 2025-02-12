@@ -1173,6 +1173,21 @@ useSelectedCameraButton.addEventListener("click", () => {
 });
 
 
+function updateCanvasSize() {
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("overlayCanvas");
+
+    if (video && canvas) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        console.log(`📏 Canvas opdateret til: ${canvas.width}x${canvas.height}`);
+    }
+}
+
+// 🚀 **Kør funktionen, når videoen er klar**
+document.getElementById("video").addEventListener("loadedmetadata", updateCanvasSize);
+window.addEventListener("resize", updateCanvasSize);
+
 // 🎯 **Vælg farve ved klik på video**
 video.addEventListener("click", (event) => {
     if (!video || !video.videoWidth || !video.videoHeight) {
@@ -1180,31 +1195,39 @@ video.addEventListener("click", (event) => {
         return;
     }
 
-    const rect = video.getBoundingClientRect(); // Få videoens reelle størrelse på skærmen
-    const x = Math.floor((event.clientX - rect.left) * (video.videoWidth / rect.width));
-    const y = Math.floor((event.clientY - rect.top) * (video.videoHeight / rect.height));
+    // 🎯 Hent videoens reelle størrelse på skærmen
+    const rect = video.getBoundingClientRect();
+    
+    // 🎯 Opret et midlertidigt canvas til at analysere pixeldata
+    const tempCanvas = document.createElement("canvas");
     const tempCtx = tempCanvas.getContext("2d");
+
+    // 🎯 Sørg for at canvas matcher videoens dimensioner
+    tempCanvas.width = video.videoWidth;
+    tempCanvas.height = video.videoHeight;
+
+    // 🎯 Tegn videoens frame på canvas
     tempCtx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
 
-    const rect = video.getBoundingClientRect();
+    // 🎯 Juster klikkoordinaterne i forhold til den reelle videostørrelse
     const x = Math.floor((event.clientX - rect.left) * (video.videoWidth / rect.width));
     const y = Math.floor((event.clientY - rect.top) * (video.videoHeight / rect.height));
 
+    // 🎯 Hent farven fra den valgte pixel
     const pixel = tempCtx.getImageData(x, y, 1, 1).data;
     selectedColor = { r: pixel[0], g: pixel[1], b: pixel[2] };
-    //console.log("📌 Debugging: Hvilket element mangler?");
-    //console.log("   🎥 Video:", document.getElementById("video"));
-    //console.log("   🖼️ Canvas:", document.getElementById("overlayCanvas"));
-    //console.log("   📷 Kamera-pladsholder:", document.getElementById("cameraPlaceholder"));
-    //console.log("   🔲 ColorPickerOverlay:", document.getElementById("colorPickerOverlay"));
-    //console.log("   🎯 Detaljer om fejl-linje:", event);
-    colorDisplay.style.backgroundColor = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
 
+    // 🎯 Vis den valgte farve i interfacet
     if (colorDisplay) {
-        colorDisplay.style.backgroundColor = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
+        colorDisplay.style.backgroundColor = `rgb(${selectedColor.r}, ${selectedColor.g}, ${selectedColor.b})`;
     } else {
         console.warn("⚠️ colorDisplay ikke fundet!");
     }
+
+    // 🛠 Debugging-log
+    console.log(`📌 Klik: Skærmkoordinater = X:${event.clientX}, Y:${event.clientY}`);
+    console.log(`🎯 Justerede videokoordinater = X:${x}, Y:${y}`);
+    console.log(`🎨 Valgt farve: RGB(${selectedColor.r}, ${selectedColor.g}, ${selectedColor.b})`);
 });
 
 // 🎯 **Opdater tolerance live**
