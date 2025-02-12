@@ -1,7 +1,29 @@
+let raceModeSelector;
+let lapCountSettings;
+let timeLimitSettings;
+let roundsInput;
+let timeLimitInput;
+let saveRaceButton;
+
 document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ DOM er nu indlæst!");
 
     // 🎯 **DOM-elementer**
+
+     // 🎯 **3. Hent DOM-elementer**
+    raceModeSelector = document.getElementById("raceMode");
+    lapCountSettings = document.getElementById("lapCountSettings");
+    timeLimitSettings = document.getElementById("timeLimitSettings");
+    roundsInput = document.getElementById("rounds");
+    timeLimitInput = document.getElementById("timeLimit");
+    saveRaceButton = document.getElementById("saveRace");
+
+    let raceSettings = {
+        mode: "LapCounts", // Standard mode
+        rounds: 10,
+        timeLimit: 60
+    };
+
     const colorPickerOverlay = document.getElementById("colorPickerOverlay");
     const acceptColorSelectionButton = document.getElementById("acceptColorSelection");
     const videoElement = document.getElementById("video");
@@ -80,6 +102,31 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert("Kunne ikke hente kameraer. Tjek kameraindstillinger.");
             });
     }
+
+       // 🎯 Skift mellem runder og tid baseret på race mode
+    raceModeSelector.addEventListener("change", function () {
+        if (this.value === "LapCounts") {
+            lapCountSettings.style.display = "block";
+            timeLimitSettings.style.display = "none";
+        } else {
+            lapCountSettings.style.display = "none";
+            timeLimitSettings.style.display = "block";
+        }
+    });
+
+    // 🎯 Gem race-indstillinger
+    document.getElementById("saveRace").addEventListener("click", () => {
+        if (raceModeSelector.value === "LapCounts") {
+            raceSettings.mode = "LapCounts";
+            raceSettings.rounds = parseInt(roundsInput.value) || 10;
+        } else {
+            raceSettings.mode = "FastestLap";
+            raceSettings.timeLimit = parseInt(timeLimitInput.value) || 60;
+        }
+
+        console.log("🏁 Race gemt:", raceSettings);
+        showScreen("startScreen"); // Tilbage til startskærm
+    });
 
     // 🎥 **Start det valgte kamera**
     function startSelectedCamera() {
@@ -162,15 +209,13 @@ const raceSetupScreen = document.getElementById("raceSetupScreen");
 
 const addPlayerButton = document.getElementById("addPlayer");
 const setupRaceButton = document.getElementById("setupRace");
-const saveRaceButton = document.getElementById("saveRace");
 const backToStartRaceButton = document.getElementById("backToStartRace");
 
 const savePlayerButton = document.getElementById("savePlayer");
 const backToStartButton = document.getElementById("backToStart");
 
 const playerList = document.getElementById("playerList");
-const roundsInput = document.getElementById("rounds");
-const raceModeSelector = document.getElementById("raceMode");
+
 
 const cameraPlaceholder = document.getElementById("cameraPlaceholder");
 const overlayCanvas = document.getElementById("overlayCanvas");
@@ -215,7 +260,7 @@ let tolerance = 50;
 let threshold = 100;
 let isTracking = false;
 let players = [];
-let raceSettings = { rounds: 10 };
+
 
 let raceStartTime = 0; // 🔥 Gem starttidspunkt
 let raceActive = false;
@@ -400,6 +445,29 @@ function addPlayer(name) {
     
     console.log(`Spiller tilføjet: ${name}`);
 }
+
+
+function startRace() {
+    resetRaceData();
+    raceStartTime = Date.now();
+    console.log("🚀 Start Race!");
+
+    updateExcludedColors();
+    showScreen("raceScreen");
+
+    raceActive = true;
+    updateLeaderboard();
+    startRaceCamera();
+
+    if (raceSettings.mode === "FastestLap") {
+        console.log(`⏳ Starter nedtælling på ${raceSettings.timeLimit} sek.`);
+        raceTimer = setTimeout(() => {
+            console.log("⏳ Tid er gået! Race stoppes.");
+            stopRace();
+        }, raceSettings.timeLimit * 1000);
+    }
+}
+
 
 // Funktion der opdaterer en spillers runder og opdaterer leaderboardet, Her sikrer vi, at en spillers runder aldrig overstiger det valgte antal runder:
 function updatePlayerLaps(playerId) {
