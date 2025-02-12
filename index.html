@@ -24,7 +24,7 @@
                 <option value="LapCounts">Lap Counts</option>
                 <option value="FastestLap">Fastest Lap</option>
                 </select>
-            
+                <button id="openTrackSetup">Juster Kamera Tracking</button>
                 <button id="setupRace">Opsæt race</button>
                 <button id="startRace">Start Race</button>
             </div>
@@ -139,6 +139,26 @@
         <!-- ✅ Ny grøn knap i bunden -->
         <button id="closeColorPickerButton" class="close-button">Luk</button>
         <button id="acceptColorSelection" class="green-button">Accepter farvevalg</button>
+    </div>
+</div>
+
+    
+<!-- 📸 Track Setup Overlay -->
+<div id="trackSetupOverlay">
+    <div class="overlay-content">
+        <h2>Juster Kamera Tracking</h2>
+
+        <!-- 🎥 Kamera-feed -->
+        <div id="trackCameraContainer">
+            <video id="trackVideo" autoplay playsinline></video>
+            
+            <!-- 📌 Justerbar tracking-boks -->
+            <div id="trackingBox"></div>
+        </div>
+
+        <!-- 🎯 Justeringsknapper -->
+        <button id="saveTracking">Gem Trackingområde</button>
+        <button id="closeTrackSetup">Luk</button>
     </div>
 </div>
 
