@@ -14,6 +14,20 @@ body {
     border-radius: 10px;
 }
 
+#raceScreen{
+    background-image: url("background-start.jpg"); /* 🖼️ Brug din billedfil */
+    background-size: cover;  /* 📌 Dækker hele skærmen */
+    background-position: center; /* 🎯 Centrer billedet */
+    background-repeat: no-repeat; /* 🚫 Undgå gentagelse */
+    width: 100vw;  /* 🎥 Fylder hele bredden */
+    height: 100vh; /* 📏 Fylder hele højden */
+    display: flex; /* 🏗️ Gør det muligt at centrere indhold */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white; /* 🎨 Sørger for at tekst er synlig */
+}
+
 .contentBox{
     background-color: #0000003b;
     padding: 60px 30px;
