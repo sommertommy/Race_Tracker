@@ -89,14 +89,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 🎯 **Hent elementer til tracking-justering**
-    const adjustCameraTrackingButton = document.getElementById("adjustCameraTracking");
+    const openTrackSetupButton = document.getElementById("openTrackSetup");
     const trackSetupOverlay = document.getElementById("trackSetupOverlay");
     const closeTrackSetupButton = document.getElementById("closeTrackSetup");
     const trackVideo = document.getElementById("trackVideo");
     const trackingBox = document.getElementById("trackingBox");
 
     // 🎥 **Åbn tracking-setup overlay**
-    adjustCameraTrackingButton.addEventListener("click", () => {
+    openTrackSetupButton.addEventListener("click", () => {
         console.log("🔧 Åbner TrackSetup overlay...");
         trackSetupOverlay.style.display = "flex";
 
