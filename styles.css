@@ -29,26 +29,20 @@ body {
 }
 
 /* 📌 Track Setup Overlay */
+/* 🎯 TrackSetup Overlay */
 #trackSetupOverlay {
-    display: none; /* Starter skjult */
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.7); /* Mørk baggrund */
+    background: rgba(0, 0, 0, 0.8);
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    z-index: 1000;
 }
 
-.overlay-content {
-    position: relative;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-}
 
 /* 📸 Kamera-container */
 #trackCameraContainer {
@@ -64,17 +58,17 @@ body {
 }
 
 /* 🔴 Justerbar trackingboks */
+/* 🎯 Tracking-boks */
 #trackingBox {
     position: absolute;
-    top: 30%;
-    left: 25%;
-    width: 50%;
-    height: 15%;
-    border: 3px solid red;
-    background: rgba(255, 0, 0, 0.3);
+    width: 100px;
+    height: 50px;
+    background: rgba(255, 0, 0, 0.5);
+    border: 2px solid red;
     cursor: move;
-    resize: both;
-    overflow: hidden;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .contentBox{
