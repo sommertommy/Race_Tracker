@@ -1166,16 +1166,26 @@ document.querySelectorAll(".cameraSelect").forEach(selectElement => {
 // 🎯 **Start kamera, når brugeren trykker på "Brug kamera"-knappen**
 document.querySelectorAll(".useSelectedCameraButton").forEach(button => {
     button.addEventListener("click", (event) => {
-        const targetVideo = event.target.getAttribute("data-target"); // Hent hvilket video-element der skal bruges
-        const videoElement = document.getElementById(targetVideo);
+        const targetVideo = document.getElementById(event.target.getAttribute("data-target"));
+        const cameraSelect = targetVideo.id === "playerVideo" 
+            ? document.getElementById("playerCameraSelect") 
+            : document.getElementById("trackCameraSelect");
 
-        if (!selectedCameraId) {
+        if (!cameraSelect.value) {
             alert("Vælg et kamera fra listen!");
             return;
         }
 
-        console.log("🎥 Starter kamera:", selectedCameraId);
-        startCamera(videoElement);
+        console.log(`🎥 Starter kamera: ${cameraSelect.value} for ${targetVideo.id}`);
+
+        navigator.mediaDevices.getUserMedia({
+            video: { deviceId: { exact: cameraSelect.value } }
+        }).then(stream => {
+            targetVideo.srcObject = stream;
+            targetVideo.play();
+        }).catch(err => {
+            console.error("❌ Fejl ved adgang til kamera:", err);
+        });
     });
 });
 
