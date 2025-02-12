@@ -29,34 +29,40 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ Profilbilleder vises statisk uden slider!");
 
     // 🚀 **Funktion til at hente kameraer for begge overlays**
-    function loadCameras() {
-        navigator.mediaDevices.enumerateDevices()
-            .then(devices => {
-                const videoDevices = devices.filter(device => device.kind === "videoinput");
-    
-                console.log("📸 Fundne kameraer:", videoDevices);
-    
-                cameraSelect.innerHTML = ""; // Ryd dropdown
-    
-                if (videoDevices.length === 0) {
-                    console.warn("❌ Ingen kameraer fundet!");
-                    cameraSelect.innerHTML = "<option>Ingen kameraer fundet</option>";
-                    return;
-                }
-    
-                videoDevices.forEach((device, index) => {
-                    const option = document.createElement("option");
-                    option.value = device.deviceId;
-                    option.textContent = device.label || `Kamera ${index + 1}`;
-                    cameraSelect.appendChild(option);
-                });
-    
-                // 🎯 **Vælg ikke automatisk det første kamera!**
-                selectedCameraId = null; 
+   function loadCameras(targetSelect) {
+    navigator.mediaDevices.enumerateDevices()
+        .then(devices => {
+            const videoDevices = devices.filter(device => device.kind === "videoinput");
+
+            console.log("📸 Fundne kameraer:", videoDevices);
+
+            targetSelect.innerHTML = ""; // Ryd dropdown
+
+            if (videoDevices.length === 0) {
+                console.warn("❌ Ingen kameraer fundet!");
+                targetSelect.innerHTML = "<option>Ingen kameraer fundet</option>";
+                return;
+            }
+
+            videoDevices.forEach((device, index) => {
+                const option = document.createElement("option");
+                option.value = device.deviceId;
+                option.textContent = device.label || `Kamera ${index + 1}`;
+                targetSelect.appendChild(option);
+            });
+
+            // 🎯 **Vælg automatisk det første kamera, hvis der kun er ét**
+            if (videoDevices.length === 1) {
+                targetSelect.selectedIndex = 0;
+                selectedCameraId = videoDevices[0].deviceId;
+                console.log("📸 Automatisk valgt kamera:", selectedCameraId);
+            } else {
+                selectedCameraId = null; // Brugeren skal vælge kamera
                 console.log("📸 Kameraer indlæst, men intet valgt endnu.");
-            })
-            .catch(err => console.error("⚠️ Fejl ved hentning af kameraer:", err));
-    }
+            }
+        })
+        .catch(err => console.error("⚠️ Fejl ved hentning af kameraer:", err));
+}
 
     // 🚀 **Funktion til at starte kamera til både spilleroprettelse & TrackSetup**
    function startCamera(videoElement) {
@@ -1147,6 +1153,30 @@ useSelectedCameraButton.addEventListener("click", () => {
     stopCamera(); // Luk eksisterende kamera først
     selectedCameraId = cameraSelect.value; // Gem det valgte kamera
     startSelectedCamera();
+});
+
+// 🎯 **Lytter på dropdown-menuen, når brugeren vælger et kamera**
+document.querySelectorAll(".cameraSelect").forEach(selectElement => {
+    selectElement.addEventListener("change", () => {
+        selectedCameraId = selectElement.value;
+        console.log("📷 Valgt kamera:", selectedCameraId);
+    });
+});
+
+// 🎯 **Start kamera, når brugeren trykker på "Brug kamera"-knappen**
+document.querySelectorAll(".useSelectedCameraButton").forEach(button => {
+    button.addEventListener("click", (event) => {
+        const targetVideo = event.target.getAttribute("data-target"); // Hent hvilket video-element der skal bruges
+        const videoElement = document.getElementById(targetVideo);
+
+        if (!selectedCameraId) {
+            alert("Vælg et kamera fra listen!");
+            return;
+        }
+
+        console.log("🎥 Starter kamera:", selectedCameraId);
+        startCamera(videoElement);
+    });
 });
 
 
