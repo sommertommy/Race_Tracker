@@ -5,6 +5,12 @@ let roundsInput;
 let timeLimitInput;
 let saveRaceButton;
 
+ let raceSettings = {
+        mode: "LapCounts", // Standard mode
+        rounds: 10,
+        timeLimit: 60
+    };
+
 document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ DOM er nu indlæst!");
 
@@ -18,11 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
     timeLimitInput = document.getElementById("timeLimit");
     saveRaceButton = document.getElementById("saveRace");
 
-    let raceSettings = {
-        mode: "LapCounts", // Standard mode
-        rounds: 10,
-        timeLimit: 60
-    };
+   
 
     const colorPickerOverlay = document.getElementById("colorPickerOverlay");
     const acceptColorSelectionButton = document.getElementById("acceptColorSelection");
