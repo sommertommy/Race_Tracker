@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 🎥 **Start det valgte kamera**
     function startSelectedCamera() {
         if (!selectedCameraId) {
-            alert("Vælg et kamera først!");
+            console.warn("⚠️ Intet kamera valgt endnu.");
             return;
         }
 
@@ -113,7 +113,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // 🎯 **Når man trykker på "Vælg bil via kamera"**
     openColorPickerButton.addEventListener("click", () => {
         console.log("📸 Åbner farvevalg-overlay...");
+        
+        // 🎯 **Gør overlay synligt korrekt**
+        colorPickerOverlay.classList.add("show");
         colorPickerOverlay.style.display = "flex";
+        setTimeout(() => {
+            colorPickerOverlay.style.opacity = "1"; // Sørg for, at det vises rigtigt
+        }, 10);
 
         if (selectedCameraId) {
             startSelectedCamera();
@@ -125,7 +131,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // 🎯 **Når man lukker farvevalg-overlayet**
     closeColorPickerButton.addEventListener("click", () => {
         console.log("❌ Lukker farvevalg-overlay...");
-        colorPickerOverlay.style.display = "none";
+        
+        // 🎯 **Gør overlay usynligt korrekt**
+        colorPickerOverlay.style.opacity = "0";
+        setTimeout(() => {
+            colorPickerOverlay.classList.remove("show");
+            colorPickerOverlay.style.display = "none";
+        }, 300);
+
         stopCamera();
     });
 
