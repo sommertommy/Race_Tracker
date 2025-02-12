@@ -88,6 +88,38 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("❌ Fejl: closeColorPickerButton ikke fundet!");
     }
 
+    // 🎯 **Hent elementer til tracking-justering**
+    const adjustCameraTrackingButton = document.getElementById("adjustCameraTracking");
+    const trackSetupOverlay = document.getElementById("trackSetupOverlay");
+    const closeTrackSetupButton = document.getElementById("closeTrackSetup");
+    const trackVideo = document.getElementById("trackVideo");
+    const trackingBox = document.getElementById("trackingBox");
+
+    // 🎥 **Åbn tracking-setup overlay**
+    adjustCameraTrackingButton.addEventListener("click", () => {
+        console.log("🔧 Åbner TrackSetup overlay...");
+        trackSetupOverlay.style.display = "flex";
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            trackVideo.srcObject = stream;
+        })
+        .catch(err => {
+            console.error("❌ Fejl ved adgang til kamera", err);
+        });
+    });
+
+    // ❌ **Luk tracking-setup overlay**
+    closeTrackSetupButton.addEventListener("click", () => {
+        console.log("❌ Lukker TrackSetup overlay...");
+        trackSetupOverlay.style.display = "none";
+
+        if (trackVideo.srcObject) {
+            trackVideo.srcObject.getTracks().forEach(track => track.stop());
+            trackVideo.srcObject = null;
+        }
+    });
+
     console.log("✅ DOM setup færdig!");
 });
 
