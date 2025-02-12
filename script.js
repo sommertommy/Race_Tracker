@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let selectedCameraId = localStorage.getItem("selectedCamera") || null;
     let activeStream = null;
 
-    acceptColorSelectionButton = document.getElementById("acceptColorSelection");
+    
 
     if (!acceptColorSelectionButton) {
         console.error("❌ acceptColorSelectionButton IKKE fundet i DOM!");
