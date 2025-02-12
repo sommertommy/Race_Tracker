@@ -19,6 +19,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let selectedCameraId = localStorage.getItem("selectedCamera") || null;
     let activeStream = null;
 
+    acceptColorSelectionButton = document.getElementById("acceptColorSelection");
+
     if (!acceptColorSelectionButton) {
         console.error("❌ acceptColorSelectionButton IKKE fundet i DOM!");
     } else {
@@ -221,7 +223,7 @@ let raceMode = "LapCounts"; // Standardmode
 let raceTimer = null; // Gem timer reference
 let selectedCameraId = null;
 let activeStream = null;
-
+let acceptColorSelectionButton; // Definer variablen globalt
 let colorCounts = {}; // Holder styr på hvor mange gange hver farve er fundet
 let editingPlayerIndex = null; // 🔥 Sporer om en spiller redigeres
 let selectedColor = null;
