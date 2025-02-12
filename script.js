@@ -781,7 +781,7 @@ function startRaceCamera() {
     }
 
     console.log("📸 Henter tilgængelige kameraer...");
-    
+
     navigator.mediaDevices.enumerateDevices()
     .then(devices => {
         const videoDevices = devices.filter(device => device.kind === "videoinput");
@@ -798,7 +798,7 @@ function startRaceCamera() {
         return navigator.mediaDevices.getUserMedia({
             video: { 
                 deviceId: { exact: cameraId },
-                width: { ideal: 1920 }, 
+                width: { ideal: 1920 },
                 height: { ideal: 1080 },
                 facingMode: "environment"
             }
@@ -812,13 +812,13 @@ function startRaceCamera() {
         }
 
         console.log("📷 Kamera stream modtaget!", stream);
-        
+
         // **Stop tidligere stream hvis den eksisterer**
         if (activeStream) {
             console.log("📸 Stopper tidligere kamera-stream...");
             activeStream.getTracks().forEach(track => track.stop());
         }
-        
+
         activeStream = stream;
 
         let hiddenVideo = document.getElementById("hiddenRaceVideo");
@@ -830,10 +830,16 @@ function startRaceCamera() {
         }
 
         hiddenVideo.srcObject = stream;
-        hiddenVideo.play();
 
         hiddenVideo.onloadedmetadata = () => {
             console.log("🎥 Race-video metadata indlæst!");
+
+            // **Tving browseren til at afspille videoen ordentligt**
+            setTimeout(() => {
+                hiddenVideo.play()
+                .then(() => console.log("✅ Video afspilles korrekt"))
+                .catch(err => console.error("❌ Fejl: Video kunne ikke afspilles", err));
+            }, 200);
         };
 
         hiddenVideo.oncanplay = () => {
@@ -842,7 +848,7 @@ function startRaceCamera() {
             setTimeout(() => {
                 if (hiddenVideo.videoWidth > 0 && hiddenVideo.videoHeight > 0) {
                     console.log("🏁 Race-video er fuldt indlæst, starter farvesporing!");
-                    
+
                     if (!trackingInterval) { 
                         detectColorInRace();
                     } else {
