@@ -11,6 +11,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const closeColorPickerButton = document.getElementById("closeColorPickerButton");
     const toleranceControls = document.getElementById("toleranceControls");
 
+    // 🎥 **Kameravalg overlay**
+    const openCameraOverlayButton = document.getElementById("openCameraSelectOverlay");
+    const cameraSelectOverlay = document.getElementById("cameraSelectOverlay");
+    const cameraList = document.getElementById("cameraList");
+    const confirmCameraButton = document.getElementById("confirmCameraSelection");
+    const closeCameraOverlayButton = document.getElementById("closeCameraOverlay");
+
+    let selectedCameraId = localStorage.getItem("selectedCamera") || null;
+    let activeStream = null;
+
     console.log("✅ Profilbilleder vises statisk uden slider!");
 
     // 🎯 **Funktion til at åbne farvevælger-overlay**
@@ -21,6 +31,9 @@ document.addEventListener("DOMContentLoaded", () => {
         cameraPlaceholder.style.display = "flex";
         videoElement.style.display = "none";
         overlayCanvas.style.display = "none";
+
+        // 🎥 Start kamera med det valgte kamera-ID
+        startSelectedCamera(videoElement);
     }
 
     // 🎯 **Funktion til at acceptere farvevalg**
@@ -55,23 +68,99 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // 🎯 **Stop kameraet og frigør stream**
-        if (videoElement) {
-            videoElement.pause();
-            videoElement.srcObject = null;
+        stopCamera();
+    }
+
+    // 🎥 **Funktion til at hente kameraer**
+    function getCameras() {
+        console.log("📸 Henter tilgængelige kameraer...");
+
+        navigator.mediaDevices.enumerateDevices()
+            .then(devices => {
+                const videoDevices = devices.filter(device => device.kind === "videoinput");
+
+                if (videoDevices.length === 0) {
+                    console.error("❌ Ingen kameraer fundet!");
+                    alert("Ingen kameraer fundet. Tjek din enhed.");
+                    return;
+                }
+
+                cameraList.innerHTML = ""; // Ryd dropdown før tilføjelse
+
+                videoDevices.forEach((device, index) => {
+                    let option = document.createElement("option");
+                    option.value = device.deviceId;
+                    option.textContent = device.label || `Kamera ${index + 1}`;
+                    cameraList.appendChild(option);
+                });
+
+                console.log(`🎥 Fundne kameraer:`, videoDevices);
+            })
+            .catch(err => {
+                console.error("⚠️ Fejl ved hentning af kameraer:", err);
+                alert("Kunne ikke hente kameraer. Tjek kameraindstillinger.");
+            });
+    }
+
+    // 🎥 **Start det valgte kamera**
+    function startSelectedCamera(videoElement) {
+        if (!selectedCameraId) {
+            console.warn("⚠️ Intet kamera valgt endnu.");
+            return;
         }
 
+        console.log("🎥 Starter valgte kamera:", selectedCameraId);
+
+        navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: selectedCameraId } } })
+            .then(stream => {
+                if (videoElement) {
+                    videoElement.srcObject = stream;
+                    videoElement.play();
+                }
+                activeStream = stream;
+            })
+            .catch(err => {
+                console.error("❌ Fejl ved start af kamera:", err);
+            });
+    }
+
+    // 🎥 **Stop kamera**
+    function stopCamera() {
         if (activeStream) {
             console.log("📸 Stopper aktiv kamera-stream...");
             activeStream.getTracks().forEach(track => track.stop());
             activeStream = null;
         }
-
-        // 🚫 **Sørg for at placeholder IKKE vises**
-        if (cameraPlaceholder) {
-            console.log("📷 Skjuler kamera-placeholder...");
-            cameraPlaceholder.style.display = "none";
+        if (videoElement) {
+            videoElement.pause();
+            videoElement.srcObject = null;
         }
     }
+
+    // 🎥 **Åbn kamera overlay**
+    openCameraOverlayButton.addEventListener("click", () => {
+        console.log("📸 Åbner kamera-valg overlay...");
+        cameraSelectOverlay.style.display = "flex";
+        getCameras(); // Hent kameraer
+    });
+
+    // 🎥 **Luk kamera overlay**
+    closeCameraOverlayButton.addEventListener("click", () => {
+        console.log("❌ Lukker kamera overlay...");
+        cameraSelectOverlay.style.display = "none";
+    });
+
+    // 🎥 **Bekræft valgte kamera**
+    confirmCameraButton.addEventListener("click", () => {
+        selectedCameraId = cameraList.value; // Gem valgte kamera ID
+        console.log(`🎥 Valgt kamera: ${selectedCameraId}`);
+
+        // Gem kamera i LocalStorage, så det kan bruges overalt
+        localStorage.setItem("selectedCamera", selectedCameraId);
+
+        // Luk overlay
+        cameraSelectOverlay.style.display = "none";
+    });
 
     // 🚀 **Event listeners**
     openColorPickerButton.addEventListener("click", openColorPickerHandler);
@@ -83,12 +172,20 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("❌ Lukker kamera-overlay...");
             colorPickerOverlay.classList.remove("show");
             colorPickerOverlay.style.display = "none";
+
+            // 🎥 Stop kameraet når overlay lukkes
+            stopCamera();
         });
     } else {
         console.error("❌ Fejl: closeColorPickerButton ikke fundet!");
     }
 
     console.log("✅ DOM setup færdig!");
+
+    // 🎥 **Start kamera i spilleroprettelse, hvis der allerede er valgt et kamera**
+    if (selectedCameraId) {
+        startSelectedCamera(videoElement);
+    }
 });
 
 // 🎯 **Hent DOM-elementer**
