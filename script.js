@@ -1195,36 +1195,36 @@ video.addEventListener("click", (event) => {
         return;
     }
 
-    // 🎯 Hent videoens reelle størrelse på skærmen
+    // 🎯 Hent videoens reelle størrelse i browseren (som den vises)
     const rect = video.getBoundingClientRect();
-    
-    // 🎯 Opret et midlertidigt canvas til at analysere pixeldata
-    const tempCanvas = document.createElement("canvas");
-    const tempCtx = tempCanvas.getContext("2d");
 
-    // 🎯 Sørg for at canvas matcher videoens dimensioner
+    // 🎯 Beregn korrekt skalering mellem videoens visning og dens interne opløsning
+    const scaleX = video.videoWidth / rect.width;  // Skalering i X-retning
+    const scaleY = video.videoHeight / rect.height; // Skalering i Y-retning
+
+    // 🎯 Juster klikkoordinaterne i forhold til videoens faktiske opløsning
+    const x = Math.floor((event.clientX - rect.left) * scaleX);
+    const y = Math.floor((event.clientY - rect.top) * scaleY);
+
+    // 🎯 Opret midlertidigt canvas for at hente farven
+    const tempCanvas = document.createElement("canvas");
     tempCanvas.width = video.videoWidth;
     tempCanvas.height = video.videoHeight;
-
-    // 🎯 Tegn videoens frame på canvas
+    const tempCtx = tempCanvas.getContext("2d");
     tempCtx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
 
-    // 🎯 Juster klikkoordinaterne i forhold til den reelle videostørrelse
-    const x = Math.floor((event.clientX - rect.left) * (video.videoWidth / rect.width));
-    const y = Math.floor((event.clientY - rect.top) * (video.videoHeight / rect.height));
-
-    // 🎯 Hent farven fra den valgte pixel
+    // 🎯 Hent farven fra den justerede pixel
     const pixel = tempCtx.getImageData(x, y, 1, 1).data;
     selectedColor = { r: pixel[0], g: pixel[1], b: pixel[2] };
 
-    // 🎯 Vis den valgte farve i interfacet
+    // 🎯 Opdater UI med den valgte farve
     if (colorDisplay) {
         colorDisplay.style.backgroundColor = `rgb(${selectedColor.r}, ${selectedColor.g}, ${selectedColor.b})`;
     } else {
         console.warn("⚠️ colorDisplay ikke fundet!");
     }
 
-    // 🛠 Debugging-log
+    // 🔍 Debugging-log for at tjekke præcisionen
     console.log(`📌 Klik: Skærmkoordinater = X:${event.clientX}, Y:${event.clientY}`);
     console.log(`🎯 Justerede videokoordinater = X:${x}, Y:${y}`);
     console.log(`🎨 Valgt farve: RGB(${selectedColor.r}, ${selectedColor.g}, ${selectedColor.b})`);
