@@ -19,19 +19,20 @@ document.addEventListener("DOMContentLoaded", () => {
     let selectedCameraId = localStorage.getItem("selectedCamera") || null;
     let activeStream = null;
 
-    
-
-    if (!acceptColorSelectionButton) {
-        console.error("❌ acceptColorSelectionButton IKKE fundet i DOM!");
-    } else {
-        console.log("✅ acceptColorSelectionButton fundet!");
-        acceptColorSelectionButton.addEventListener("click", acceptColorHandler);
+    // 🎯 **Vent på acceptColorSelectionButton før eventListener tilføjes**
+    function ensureAcceptButtonExists() {
+        let button = document.getElementById("acceptColorSelection");
+        if (!button) {
+            console.warn("⏳ Knappen 'acceptColorSelection' ikke fundet endnu... Prøver igen om 500ms.");
+            setTimeout(ensureAcceptButtonExists, 500);
+        } else {
+            console.log("✅ acceptColorSelectionButton fundet!");
+            button.addEventListener("click", acceptColorHandler);
+        }
     }
+    ensureAcceptButtonExists();
 
-    console.log("✅ Profilbilleder vises statisk uden slider!");
     console.log("✅ DOM setup færdig!");
-
-    
 
     // 🎯 **Åbn kameraoverlay og hent kameraer**
     openCameraOverlayButton.addEventListener("click", () => {
@@ -57,27 +58,22 @@ document.addEventListener("DOMContentLoaded", () => {
     // 🎥 **Hent tilgængelige kameraer**
     function getCameras() {
         console.log("📸 Henter tilgængelige kameraer...");
-
         navigator.mediaDevices.enumerateDevices()
             .then(devices => {
                 const videoDevices = devices.filter(device => device.kind === "videoinput");
-
                 if (videoDevices.length === 0) {
                     console.error("❌ Ingen kameraer fundet!");
                     alert("Ingen kameraer fundet. Tjek din enhed.");
                     return;
                 }
-
-                cameraList.innerHTML = ""; // Ryd dropdown før tilføjelse
-
+                cameraList.innerHTML = "";
                 videoDevices.forEach((device, index) => {
                     let option = document.createElement("option");
                     option.value = device.deviceId;
                     option.textContent = device.label || `Kamera ${index + 1}`;
                     cameraList.appendChild(option);
                 });
-
-                console.log(`🎥 Fundne kameraer:`, videoDevices);
+                console.log("🎥 Fundne kameraer:", videoDevices);
             })
             .catch(err => {
                 console.error("⚠️ Fejl ved hentning af kameraer:", err);
@@ -91,9 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.warn("⚠️ Intet kamera valgt endnu.");
             return;
         }
-
         console.log("🎥 Starter valgte kamera:", selectedCameraId);
-
         navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: selectedCameraId } } })
             .then(stream => {
                 videoElement.srcObject = stream;
@@ -104,7 +98,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         videoElement.style.display = "block";
                     })
                     .catch(err => console.error("❌ Fejl ved afspilning af video:", err));
-
                 activeStream = stream;
             })
             .catch(err => {
@@ -125,14 +118,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // 🎯 **Når man trykker på "Vælg bil via kamera"**
     openColorPickerButton.addEventListener("click", () => {
         console.log("📸 Åbner farvevalg-overlay...");
-        
-        // 🎯 **Gør overlay synligt korrekt**
         colorPickerOverlay.classList.add("show");
         colorPickerOverlay.style.display = "flex";
         setTimeout(() => {
-            colorPickerOverlay.style.opacity = "1"; // Sørg for, at det vises rigtigt
+            colorPickerOverlay.style.opacity = "1";
         }, 10);
-
         if (selectedCameraId) {
             startSelectedCamera();
         } else {
@@ -143,18 +133,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // 🎯 **Når man lukker farvevalg-overlayet**
     closeColorPickerButton.addEventListener("click", () => {
         console.log("❌ Lukker farvevalg-overlay...");
-        
-        // 🎯 **Gør overlay usynligt korrekt**
         colorPickerOverlay.style.opacity = "0";
         setTimeout(() => {
             colorPickerOverlay.classList.remove("show");
             colorPickerOverlay.style.display = "none";
         }, 300);
-
         stopCamera();
     });
-
-    console.log("✅ DOM setup færdig!");
 
     // 🚀 **Start kamera i spilleroprettelse, hvis der allerede er valgt et kamera**
     document.getElementById("addPlayer").addEventListener("click", () => {
@@ -164,7 +149,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
-
 
 
 // 🎯 **Hent DOM-elementer**
