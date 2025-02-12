@@ -29,45 +29,46 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ Profilbilleder vises statisk uden slider!");
 
     // 🚀 **Funktion til at hente kameraer for begge overlays**
-    function loadCameras() {
+   function loadCameras() {
         navigator.mediaDevices.enumerateDevices()
             .then(devices => {
                 const videoDevices = devices.filter(device => device.kind === "videoinput");
-                
-                // 📌 **Nulstil dropdowns**
+    
+                console.log("📸 Fundne kameraer:", videoDevices); // <-- Debugging
+    
                 cameraSelect.innerHTML = ""; 
                 if (videoDevices.length === 0) {
                     console.warn("❌ Ingen kameraer fundet!");
                     cameraSelect.innerHTML = "<option>Ingen kameraer fundet</option>";
                     return;
                 }
-
+    
                 videoDevices.forEach((device, index) => {
                     const option = document.createElement("option");
                     option.value = device.deviceId;
                     option.textContent = device.label || `Kamera ${index + 1}`;
                     cameraSelect.appendChild(option);
                 });
-
-                selectedCameraId = videoDevices[0].deviceId; // 📌 Default til første kamera
+    
+                selectedCameraId = videoDevices[0].deviceId; 
+                console.log("📸 Standard kamera sat til:", selectedCameraId); // <-- Debugging
             })
             .catch(err => console.error("⚠️ Fejl ved hentning af kameraer:", err));
     }
 
     // 🚀 **Funktion til at starte kamera til både spilleroprettelse & TrackSetup**
-    function startCamera(videoElement) {
+   function startCamera(videoElement) {
+        console.log("📸 Starter kamera:", selectedCameraId); // <-- Debugging
+    
         if (!selectedCameraId) {
             alert("Vælg et kamera først!");
             return;
         }
-
-        console.log(`🎥 Starter kamera: ${selectedCameraId}`);
-
-        // **Stop eksisterende stream**
+    
         if (activeStream) {
             activeStream.getTracks().forEach(track => track.stop());
         }
-
+    
         navigator.mediaDevices.getUserMedia({
             video: {
                 deviceId: { exact: selectedCameraId },
@@ -79,6 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
             activeStream = stream;
             videoElement.srcObject = stream;
             videoElement.play();
+            console.log("🎥 Kameraet er nu aktivt!");
         })
         .catch(err => console.error("❌ Fejl ved adgang til kamera:", err));
     }
@@ -129,6 +131,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 🎯 **Start valgt kamera i TrackSetup**
     useSelectedCameraButton.addEventListener("click", () => {
+        console.log("🎥 Forsøger at starte kamera:", selectedCameraId); // <-- Debugging
+        if (!selectedCameraId) {
+            alert("Vælg et kamera fra listen!");
+            return;
+        }
         startCamera(trackVideo);
     });
 
