@@ -281,6 +281,7 @@ body {
     width: 100%;
     max-width: 500px;
     margin: auto;
+    overflow: hidden; /* Sikrer, at ingen dele af videoen strækker sig ud */
 }
 
 video {
@@ -289,7 +290,8 @@ video {
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Sikrer, at videoen fylder boksen */
+    max-height: 500px; /* Begræns højde for at undgå overstræk */
+    object-fit: contain; /* Sikrer, at videoen fylder boksen */
     display: none; /* Skjult til at starte med */
 }
 
@@ -321,11 +323,12 @@ canvas {
 
 video, canvas {
     width: 100%;
-    height: auto;
+    height: 100%;
     border-radius: 10px;
     position: absolute;
     top: 0;
     left: 0;
+    object-fit: contain; /* Gør det ens for begge */
 }
 
 #selectedColor {
