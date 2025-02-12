@@ -28,58 +28,6 @@ body {
     color: #000; /* 🎨 Sørger for at tekst er synlig */
 }
 
-/* 🎯 TrackSetup Overlay */
-#trackSetupOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-
-/* 📸 Kamera-container */
-#trackCameraContainer {
-    position: relative;
-    width: 80vw;
-    max-width: 640px;
-    height: auto;
-}
-
-#trackVideo {
-    width: 100%;
-    height: auto;
-}
-
-/* 🎯 Tracking-boks */
-#trackingBox {
-    position: absolute;
-    width: 100px;
-    height: 50px;
-    background: rgba(255, 0, 0, 0.5);
-    border: 2px solid red;
-    cursor: move;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-}
-
-
-/* 📌 Greb til at ændre størrelse */
-.resize-handle {
-    width: 10px;
-    height: 10px;
-    background: red;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    cursor: nwse-resize;
-}
 
 .contentBox{
     background-color: #0000003b;
@@ -652,4 +600,44 @@ th, td {
     #profilePictureSelection {
         grid-template-columns: repeat(2, 1fr); /* 📌 2 billeder pr. række på mobil */
     }
+}
+
+/* 🎥 Knap i øverste højre hjørne */
+#openCameraSelectOverlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 10px 15px;
+    font-size: 16px;
+    background: #333;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+#openCameraSelectOverlay:hover {
+    background: #555;
+}
+
+/* 🎥 Kamera overlay */
+#cameraSelectOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+#cameraSelectOverlay .overlay-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
 }
