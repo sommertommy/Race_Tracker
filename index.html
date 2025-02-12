@@ -24,7 +24,6 @@
                 <option value="LapCounts">Lap Counts</option>
                 <option value="FastestLap">Fastest Lap</option>
                 </select>
-                <button id="openTrackSetup">Juster Kamera Tracking</button>
                 <button id="setupRace">Opsæt race</button>
                 <button id="startRace">Start Race</button>
             </div>
@@ -141,29 +140,21 @@
         <button id="acceptColorSelection" class="green-button">Accepter farvevalg</button>
     </div>
 </div>
-
     
-<!-- 🎯 TRACK SETUP OVERLAY -->
-<div id="trackSetupOverlay" style="display: none;">
+<!-- Knap i øverste højre hjørne -->
+<button id="openCameraSelectOverlay">🎥 Vælg Kamera</button>
+
+<!-- Kamera-valg overlay -->
+<div id="cameraSelectOverlay">
     <div class="overlay-content">
-        <h2>Juster Kamera Tracking</h2>
-
-        <!-- 🎥 Vælg kamera -->
-        <label for="cameraSelect">Vælg kamera fra listen:</label>
-        <select id="cameraSelect"></select>
-        <button id="useSelectedCamera">Brug kamera</button>
-
-        <!-- 📸 Kameravisning -->
-        <div class="camera-container">
-            <video id="trackVideo" autoplay playsinline></video>
-            <div id="trackingBox"></div> <!-- 🔴 Justerbar tracking-boks -->
-        </div>
-
-        <!-- 🎯 Knapper -->
-        <button id="saveTrackingArea">Gem Trackingområde</button>
-        <button id="closeTrackSetup">Luk</button>
+        <h2>Vælg Kamera</h2>
+        <select id="cameraList"></select>
+        <button id="confirmCameraSelection">Brug valgte kamera</button>
+        <button id="closeCameraOverlay">Luk</button>
     </div>
 </div>
+    
+
 
     
     
