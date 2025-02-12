@@ -2,125 +2,121 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ DOM er nu indlæst!");
 
     // 🎯 **Hent nødvendige DOM-elementer**
-    const colorPickerOverlay = document.getElementById("colorPickerOverlay");
-    const acceptColorSelectionButton = document.getElementById("acceptColorSelection");
-    const videoElement = document.getElementById("video");
-    const overlayCanvas = document.getElementById("overlayCanvas");
-    const cameraPlaceholder = document.getElementById("cameraPlaceholder");
-    const openColorPickerButton = document.getElementById("openColorPicker");
-    const closeColorPickerButton = document.getElementById("closeColorPickerButton");
-    const toleranceControls = document.getElementById("toleranceControls");
-
-    console.log("✅ Profilbilleder vises statisk uden slider!");
-
-    // 🎯 **Funktion til at åbne farvevælger-overlay**
-    function openColorPickerHandler() {
-        console.log("📸 Åbner kamera-overlay...");
-        colorPickerOverlay.classList.add("show");
-        colorPickerOverlay.style.display = "flex";
-        cameraPlaceholder.style.display = "flex";
-        videoElement.style.display = "none";
-        overlayCanvas.style.display = "none";
-    }
-
-    // 🎯 **Funktion til at acceptere farvevalg**
-    function acceptColorHandler() {
-        console.log("✅ Farvevalg accepteret:", selectedColor);
-
-        // 🎯 **Skjul hele colorPickerOverlay**
-        if (colorPickerOverlay) {
-            console.log("🛑 Lukker colorPickerOverlay...");
-            colorPickerOverlay.classList.remove("show");
-            colorPickerOverlay.style.display = "none";
-        }
-
-        // 🎯 **Skjul tolerance-justering og overlayCanvas**
-        if (toleranceControls) {
-            console.log("🎚 Skjuler tolerance-controls...");
-            toleranceControls.style.display = "none";
-        }
-
-        if (overlayCanvas) {
-            console.log("🖼️ Skjuler overlayCanvas...");
-            overlayCanvas.style.display = "none";
-        }
-
-        // 🚀 **Stop tracking, hvis det stadig kører**
-        isTracking = false;
-
-        // 🚀 **Stop trackColor-animationen**
-        if (typeof trackColor === "function") {
-            console.log("⏹ trackColor() stoppes!");
-            cancelAnimationFrame(trackColor);
-        }
-
-        // 🎯 **Stop kameraet og frigør stream**
-        if (videoElement) {
-            videoElement.pause();
-            videoElement.srcObject = null;
-        }
-
-        if (activeStream) {
-            console.log("📸 Stopper aktiv kamera-stream...");
-            activeStream.getTracks().forEach(track => track.stop());
-            activeStream = null;
-        }
-
-        // 🚫 **Sørg for at placeholder IKKE vises**
-        if (cameraPlaceholder) {
-            console.log("📷 Skjuler kamera-placeholder...");
-            cameraPlaceholder.style.display = "none";
-        }
-    }
-
-    // 🚀 **Event listeners**
-    openColorPickerButton.addEventListener("click", openColorPickerHandler);
-    acceptColorSelectionButton.addEventListener("click", acceptColorHandler);
-
-    // 🎯 **Event listener til lukning af farvevælgeren**
-    if (closeColorPickerButton) {
-        closeColorPickerButton.addEventListener("click", () => {
-            console.log("❌ Lukker kamera-overlay...");
-            colorPickerOverlay.classList.remove("show");
-            colorPickerOverlay.style.display = "none";
-        });
-    } else {
-        console.error("❌ Fejl: closeColorPickerButton ikke fundet!");
-    }
-
-    // 🎯 **Hent elementer til tracking-justering**
     const openTrackSetupButton = document.getElementById("openTrackSetup");
     const trackSetupOverlay = document.getElementById("trackSetupOverlay");
     const closeTrackSetupButton = document.getElementById("closeTrackSetup");
     const trackVideo = document.getElementById("trackVideo");
+    const cameraSelect = document.getElementById("cameraSelect");
+    const useSelectedCameraButton = document.getElementById("useSelectedCamera");
+    const saveTrackingButton = document.getElementById("saveTrackingArea");
     const trackingBox = document.getElementById("trackingBox");
 
-    // 🎥 **Åbn tracking-setup overlay**
+    let activeStream = null; // 🎥 Gemmer aktivt kamera-stream
+    let selectedCameraId = null;
+
+    // **🚀 Hent tilgængelige kameraer ved DOM load**
+    navigator.mediaDevices.enumerateDevices()
+        .then(devices => {
+            const videoDevices = devices.filter(device => device.kind === "videoinput");
+            cameraSelect.innerHTML = ""; // Nulstil listen
+
+            if (videoDevices.length === 0) {
+                console.warn("❌ Ingen kameraer fundet!");
+                cameraSelect.innerHTML = "<option>Ingen kameraer fundet</option>";
+                return;
+            }
+
+            videoDevices.forEach((device, index) => {
+                const option = document.createElement("option");
+                option.value = device.deviceId;
+                option.textContent = device.label || `Kamera ${index + 1}`;
+                cameraSelect.appendChild(option);
+            });
+
+            selectedCameraId = videoDevices[0].deviceId; // 📌 Vælg første kamera som default
+        })
+        .catch(err => console.error("⚠️ Fejl ved hentning af kameraer:", err));
+
+    // **🎯 Åbn TrackSetup-overlay**
     openTrackSetupButton.addEventListener("click", () => {
         console.log("🔧 Åbner TrackSetup overlay...");
         trackSetupOverlay.style.display = "flex";
-
-        navigator.mediaDevices.getUserMedia({ video: true })
-        .then(stream => {
-            trackVideo.srcObject = stream;
-        })
-        .catch(err => {
-            console.error("❌ Fejl ved adgang til kamera", err);
-        });
     });
 
-    // ❌ **Luk tracking-setup overlay**
+    // **🎥 Start valgt kamera**
+    useSelectedCameraButton.addEventListener("click", () => {
+        if (!selectedCameraId) {
+            alert("Vælg et kamera først!");
+            return;
+        }
+
+        console.log(`🎥 Starter kamera: ${selectedCameraId}`);
+
+        // **Stop eksisterende stream**
+        if (activeStream) {
+            activeStream.getTracks().forEach(track => track.stop());
+        }
+
+        navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: selectedCameraId } } })
+            .then(stream => {
+                activeStream = stream;
+                trackVideo.srcObject = stream;
+                trackVideo.play();
+            })
+            .catch(err => console.error("❌ Fejl ved adgang til kamera:", err));
+    });
+
+    // **📌 Opdater valgt kamera når der vælges fra dropdown**
+    cameraSelect.addEventListener("change", (event) => {
+        selectedCameraId = event.target.value;
+    });
+
+    // **📌 Justér tracking-boksen manuelt**
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    trackingBox.addEventListener("mousedown", (e) => {
+        isDragging = true;
+        offsetX = e.clientX - trackingBox.offsetLeft;
+        offsetY = e.clientY - trackingBox.offsetTop;
+    });
+
+    document.addEventListener("mousemove", (e) => {
+        if (isDragging) {
+            trackingBox.style.left = `${e.clientX - offsetX}px`;
+            trackingBox.style.top = `${e.clientY - offsetY}px`;
+        }
+    });
+
+    document.addEventListener("mouseup", () => {
+        isDragging = false;
+    });
+
+    // **✅ Gem trackingområde**
+    saveTrackingButton.addEventListener("click", () => {
+        console.log("✅ Trackingområde gemt:", {
+            x: trackingBox.offsetLeft,
+            y: trackingBox.offsetTop,
+            width: trackingBox.offsetWidth,
+            height: trackingBox.offsetHeight
+        });
+
+        alert("Trackingområde gemt!");
+    });
+
+    // **❌ Luk TrackSetup-overlay**
     closeTrackSetupButton.addEventListener("click", () => {
         console.log("❌ Lukker TrackSetup overlay...");
         trackSetupOverlay.style.display = "none";
 
-        if (trackVideo.srcObject) {
-            trackVideo.srcObject.getTracks().forEach(track => track.stop());
-            trackVideo.srcObject = null;
+        if (activeStream) {
+            activeStream.getTracks().forEach(track => track.stop());
+            activeStream = null;
         }
+        trackVideo.srcObject = null;
     });
 
-    console.log("✅ DOM setup færdig!");
+    console.log("✅ TrackSetup eventlisteners er klar!");
 });
 
 // 🎯 **Hent DOM-elementer**
