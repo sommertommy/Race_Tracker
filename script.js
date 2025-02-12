@@ -27,6 +27,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     console.log("✅ Profilbilleder vises statisk uden slider!");
+    console.log("✅ DOM setup færdig!");
+
+    
 
     // 🎯 **Åbn kameraoverlay og hent kameraer**
     openCameraOverlayButton.addEventListener("click", () => {
