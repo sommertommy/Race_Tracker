@@ -270,9 +270,6 @@ function acceptColorHandler() {
     console.log("✅ Farvevalg bekræftet og overlay lukket.");
 }
 
-// 🚀 **EventListener til knappen "Accepter farvevalg"**
-acceptColorSelectionButton.addEventListener("click", acceptColorHandler);
-
 
 function resetPlayerForm() {
     console.log("♻️ Nulstiller spilleroprettelse...");
