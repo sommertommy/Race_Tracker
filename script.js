@@ -21,43 +21,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
     console.log("✅ Profilbilleder vises statisk uden slider!");
 
-    // 🎯 **Funktion til at åbne farvevælger-overlay**
-    function openColorPickerHandler() {
-        console.log("📸 Åbner kamera-overlay...");
-        colorPickerOverlay.classList.add("show");
-        colorPickerOverlay.style.display = "flex";
-        cameraPlaceholder.style.display = "flex";
-        videoElement.style.display = "none";
+    // 🎯 **Åbn kameraoverlay og hent kameraer**
+    openCameraOverlayButton.addEventListener("click", () => {
+        console.log("📸 Åbner kamera-valg overlay...");
+        cameraSelectOverlay.style.display = "flex";
+        getCameras(); // Hent kameraer
+    });
 
-        // 🚀 Start det allerede valgte kamera, hvis der er et gemt kamera-ID
-        if (selectedCameraId) {
-            startSelectedCamera(videoElement);
-        } else {
-            console.warn("⚠️ Intet kamera valgt, skal vælge et først!");
-        }
-    }
+    // 🎯 **Luk kameraoverlay**
+    closeCameraOverlayButton.addEventListener("click", () => {
+        console.log("❌ Lukker kamera overlay...");
+        cameraSelectOverlay.style.display = "none";
+    });
 
-    // 🎯 **Funktion til at acceptere farvevalg**
-    function acceptColorHandler() {
-        console.log("✅ Farvevalg accepteret:", selectedColor);
+    // 🎯 **Bekræft valgte kamera**
+    confirmCameraButton.addEventListener("click", () => {
+        selectedCameraId = cameraList.value; // Gem valgte kamera ID
+        console.log(`🎥 Valgt kamera: ${selectedCameraId}`);
 
-        // 🎯 **Skjul hele colorPickerOverlay**
-        if (colorPickerOverlay) {
-            console.log("🛑 Lukker colorPickerOverlay...");
-            colorPickerOverlay.classList.remove("show");
-            colorPickerOverlay.style.display = "none";
-        }
+        // Gem kamera i LocalStorage, så det kan bruges overalt
+        localStorage.setItem("selectedCamera", selectedCameraId);
 
-        stopCamera();
-    }
+        // Luk overlay
+        cameraSelectOverlay.style.display = "none";
+    });
 
-    // 🎥 **Funktion til at hente kameraer (kun hvis intet kamera er valgt)**
+    // 🎥 **Hent tilgængelige kameraer**
     function getCameras() {
-        if (selectedCameraId) {
-            console.log("🎥 Kamera allerede valgt:", selectedCameraId);
-            return;
-        }
-
         console.log("📸 Henter tilgængelige kameraer...");
 
         navigator.mediaDevices.enumerateDevices()
@@ -87,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
 
-    // 🎥 **Start det valgte kamera**
+    // 🎥 **Start kameraet når nødvendigt**
     function startSelectedCamera(videoElement) {
         if (!selectedCameraId) {
             console.warn("⚠️ Intet kamera valgt endnu.");
@@ -109,6 +99,30 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
 
+    // 🎯 **Funktion til at åbne farvevælger-overlay**
+    function openColorPickerHandler() {
+        console.log("📸 Åbner kamera-overlay...");
+        colorPickerOverlay.classList.add("show");
+        colorPickerOverlay.style.display = "flex";
+        cameraPlaceholder.style.display = "flex";
+        videoElement.style.display = "none";
+
+        // 🚀 Start det allerede valgte kamera, hvis der er et gemt kamera-ID
+        if (selectedCameraId) {
+            startSelectedCamera(videoElement);
+        } else {
+            console.warn("⚠️ Intet kamera valgt, skal vælge et først!");
+        }
+    }
+
+    // 🎯 **Funktion til at acceptere farvevalg**
+    function acceptColorHandler() {
+        console.log("✅ Farvevalg accepteret:", selectedColor);
+        colorPickerOverlay.classList.remove("show");
+        colorPickerOverlay.style.display = "none";
+        stopCamera();
+    }
+
     // 🎥 **Stop kamera**
     function stopCamera() {
         if (activeStream) {
@@ -122,31 +136,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // 🎥 **Åbn kamera overlay**
-    openCameraOverlayButton.addEventListener("click", () => {
-        console.log("📸 Åbner kamera-valg overlay...");
-        cameraSelectOverlay.style.display = "flex";
-        getCameras(); // Hent kameraer
-    });
-
-    // 🎥 **Luk kamera overlay**
-    closeCameraOverlayButton.addEventListener("click", () => {
-        console.log("❌ Lukker kamera overlay...");
-        cameraSelectOverlay.style.display = "none";
-    });
-
-    // 🎥 **Bekræft valgte kamera**
-    confirmCameraButton.addEventListener("click", () => {
-        selectedCameraId = cameraList.value; // Gem valgte kamera ID
-        console.log(`🎥 Valgt kamera: ${selectedCameraId}`);
-
-        // Gem kamera i LocalStorage, så det kan bruges overalt
-        localStorage.setItem("selectedCamera", selectedCameraId);
-
-        // Luk overlay
-        cameraSelectOverlay.style.display = "none";
-    });
-
     // 🚀 **Event listeners**
     openColorPickerButton.addEventListener("click", openColorPickerHandler);
     acceptColorSelectionButton.addEventListener("click", acceptColorHandler);
@@ -157,7 +146,6 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("❌ Lukker kamera-overlay...");
             colorPickerOverlay.classList.remove("show");
             colorPickerOverlay.style.display = "none";
-
             stopCamera();
         });
     } else {
@@ -167,10 +155,13 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ DOM setup færdig!");
 
     // 🚀 **Start kamera i spilleroprettelse, hvis der allerede er valgt et kamera**
-    if (selectedCameraId) {
-        console.log("📸 Automatisk start af kamera i spilleroprettelse...");
-        startSelectedCamera(videoElement);
-    }
+    document.getElementById("addPlayer").addEventListener("click", () => {
+        console.log("➕ Tilføjer ny spiller...");
+        if (selectedCameraId) {
+            console.log("🎥 Starter automatisk det valgte kamera i spilleroprettelsen...");
+            startSelectedCamera(videoElement);
+        }
+    });
 });
 
 // 🎯 **Hent DOM-elementer**
