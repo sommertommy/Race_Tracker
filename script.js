@@ -29,14 +29,15 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ Profilbilleder vises statisk uden slider!");
 
     // 🚀 **Funktion til at hente kameraer for begge overlays**
-   function loadCameras() {
+    function loadCameras() {
         navigator.mediaDevices.enumerateDevices()
             .then(devices => {
                 const videoDevices = devices.filter(device => device.kind === "videoinput");
     
-                console.log("📸 Fundne kameraer:", videoDevices); // <-- Debugging
+                console.log("📸 Fundne kameraer:", videoDevices);
     
-                cameraSelect.innerHTML = ""; 
+                cameraSelect.innerHTML = ""; // Ryd dropdown
+    
                 if (videoDevices.length === 0) {
                     console.warn("❌ Ingen kameraer fundet!");
                     cameraSelect.innerHTML = "<option>Ingen kameraer fundet</option>";
@@ -50,8 +51,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     cameraSelect.appendChild(option);
                 });
     
-                selectedCameraId = videoDevices[0].deviceId; 
-                console.log("📸 Standard kamera sat til:", selectedCameraId); // <-- Debugging
+                // 🎯 **Vælg ikke automatisk det første kamera!**
+                selectedCameraId = null; 
+                console.log("📸 Kameraer indlæst, men intet valgt endnu.");
             })
             .catch(err => console.error("⚠️ Fejl ved hentning af kameraer:", err));
     }
@@ -129,13 +131,13 @@ document.addEventListener("DOMContentLoaded", () => {
         loadCameras();
     });
 
-    // 🎯 **Start valgt kamera i TrackSetup**
+   // 🎯 **Start kameraet, når brugeren trykker på "Brug kamera"-knappen**
     useSelectedCameraButton.addEventListener("click", () => {
-        console.log("🎥 Forsøger at starte kamera:", selectedCameraId); // <-- Debugging
         if (!selectedCameraId) {
             alert("Vælg et kamera fra listen!");
             return;
         }
+        console.log("🎥 Starter kamera:", selectedCameraId);
         startCamera(trackVideo);
     });
 
@@ -1127,7 +1129,11 @@ function startSelectedCamera() {
     });
 }
 
-
+// 🎯 **Opdater `selectedCameraId`, når brugeren vælger et kamera i dropdown**
+cameraSelect.addEventListener("change", () => {
+    selectedCameraId = cameraSelect.value;
+    console.log("📷 Valgt kamera:", selectedCameraId);
+});
 
 // 🎬 **Start valgte kamera**
 useSelectedCameraButton.addEventListener("click", () => {
