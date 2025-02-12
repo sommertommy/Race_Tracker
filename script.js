@@ -231,6 +231,53 @@ let editingPlayerId = null; // 🔥 Holder styr på den spiller, der redigeres
 let cameraStarted = false;
 
 
+// 🎯 **Funktion til at acceptere farvevalg**
+function acceptColorHandler() {
+    console.log("✅ Farvevalg accepteret:", selectedColor);
+
+    // 🎯 **Sikre, at en farve er valgt**
+    if (!selectedColor) {
+        alert("Vælg en farve først!");
+        return;
+    }
+
+    // 🎯 **Skjul farvevælger-overlayet korrekt**
+    console.log("🛑 Lukker farvevælger-overlay...");
+    colorPickerOverlay.classList.remove("show");
+    colorPickerOverlay.style.opacity = "0";
+
+    setTimeout(() => {
+        colorPickerOverlay.style.display = "none";
+    }, 300);
+
+    // 🎯 **Stop kameraet korrekt**
+    stopCamera();
+
+    // 🎯 **Sørg for at tolerance-justering og overlayCanvas bliver skjult**
+    if (toleranceControls) {
+        console.log("🎚 Skjuler tolerance-controls...");
+        toleranceControls.style.display = "none";
+    }
+
+    if (overlayCanvas) {
+        console.log("🖼️ Skjuler overlayCanvas...");
+        overlayCanvas.style.display = "none";
+    }
+
+    isTracking = false;
+
+    if (typeof trackColor === "function") {
+        console.log("⏹ Stopper trackColor()!");
+        cancelAnimationFrame(trackColor);
+    }
+
+    console.log("✅ Farvevalg bekræftet og overlay lukket.");
+}
+
+// 🚀 **EventListener til knappen "Accepter farvevalg"**
+acceptColorSelectionButton.addEventListener("click", acceptColorHandler);
+
+
 function resetPlayerForm() {
     console.log("♻️ Nulstiller spilleroprettelse...");
 
