@@ -64,14 +64,34 @@
            </div>
         </div>
 
+    
     <!-- Opsæt race skærm -->
     <div id="raceSetupScreen" style="display: none;">
         <h2>Opsæt Race</h2>
-        <label for="rounds">Antal runder:</label> 
-        <input type="number" id="rounds" min="1" value="10"> 
+    
+        <label for="raceModeSelect">Vælg ræs-type:</label>
+        <select id="raceModeSelect">
+            <option value="LapCounts">Lap Counts</option>
+            <option value="FastestLap">Fastest Lap</option>
+        </select>
+    
+        <!-- 🎯 Kun synlig hvis "Lap Counts" er valgt -->
+        <div id="lapCountSettings">
+            <label for="rounds">Antal runder:</label> 
+            <input type="number" id="rounds" min="1" value="10"> 
+        </div>
+    
+        <!-- 🎯 Kun synlig hvis "Fastest Lap" er valgt -->
+        <div id="fastestLapSettings" style="display: none;">
+            <label for="raceTime">Race tid (sekunder):</label>
+            <input type="number" id="raceTime" min="10" value="60"> 
+        </div>
+    
         <button id="saveRace">Gem race</button>
         <button id="backToStartRace">Tilbage</button>
     </div>
+
+
     
     <!-- Opsæt race Screen -->
     <div id="raceScreen" style="display: none;">
