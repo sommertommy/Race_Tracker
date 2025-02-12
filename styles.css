@@ -28,7 +28,6 @@ body {
     color: #000; /* 🎨 Sørger for at tekst er synlig */
 }
 
-/* 📌 Track Setup Overlay */
 /* 🎯 TrackSetup Overlay */
 #trackSetupOverlay {
     position: fixed;
@@ -57,7 +56,6 @@ body {
     height: auto;
 }
 
-/* 🔴 Justerbar trackingboks */
 /* 🎯 Tracking-boks */
 #trackingBox {
     position: absolute;
@@ -69,6 +67,18 @@ body {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+}
+
+
+/* 📌 Greb til at ændre størrelse */
+.resize-handle {
+    width: 10px;
+    height: 10px;
+    background: red;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    cursor: nwse-resize;
 }
 
 .contentBox{
