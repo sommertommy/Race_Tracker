@@ -11,39 +11,44 @@ document.addEventListener("DOMContentLoaded", () => {
     const saveTrackingButton = document.getElementById("saveTrackingArea");
     const trackingBox = document.getElementById("trackingBox");
 
-    let activeStream = null; // 🎥 Gemmer aktivt kamera-stream
+    let activeStream = null;
     let selectedCameraId = null;
+    let isDragging = false, isResizing = false;
+    let offsetX, offsetY, startX, startY, startWidth, startHeight;
 
-    // **🚀 Hent tilgængelige kameraer ved DOM load**
-    navigator.mediaDevices.enumerateDevices()
-        .then(devices => {
-            const videoDevices = devices.filter(device => device.kind === "videoinput");
-            cameraSelect.innerHTML = ""; // Nulstil listen
+    // 🎯 **Hent og vis tilgængelige kameraer**
+    function loadCameras() {
+        navigator.mediaDevices.enumerateDevices()
+            .then(devices => {
+                const videoDevices = devices.filter(device => device.kind === "videoinput");
+                cameraSelect.innerHTML = ""; // Nulstil listen
 
-            if (videoDevices.length === 0) {
-                console.warn("❌ Ingen kameraer fundet!");
-                cameraSelect.innerHTML = "<option>Ingen kameraer fundet</option>";
-                return;
-            }
+                if (videoDevices.length === 0) {
+                    console.warn("❌ Ingen kameraer fundet!");
+                    cameraSelect.innerHTML = "<option>Ingen kameraer fundet</option>";
+                    return;
+                }
 
-            videoDevices.forEach((device, index) => {
-                const option = document.createElement("option");
-                option.value = device.deviceId;
-                option.textContent = device.label || `Kamera ${index + 1}`;
-                cameraSelect.appendChild(option);
-            });
+                videoDevices.forEach((device, index) => {
+                    const option = document.createElement("option");
+                    option.value = device.deviceId;
+                    option.textContent = device.label || `Kamera ${index + 1}`;
+                    cameraSelect.appendChild(option);
+                });
 
-            selectedCameraId = videoDevices[0].deviceId; // 📌 Vælg første kamera som default
-        })
-        .catch(err => console.error("⚠️ Fejl ved hentning af kameraer:", err));
+                selectedCameraId = videoDevices[0].deviceId; // 📌 Vælg første kamera som default
+            })
+            .catch(err => console.error("⚠️ Fejl ved hentning af kameraer:", err));
+    }
 
-    // **🎯 Åbn TrackSetup-overlay**
+    // 🎯 **Åbn TrackSetup-overlay**
     openTrackSetupButton.addEventListener("click", () => {
         console.log("🔧 Åbner TrackSetup overlay...");
         trackSetupOverlay.style.display = "flex";
+        loadCameras();
     });
 
-    // **🎥 Start valgt kamera**
+    // 🎯 **Start valgt kamera**
     useSelectedCameraButton.addEventListener("click", () => {
         if (!selectedCameraId) {
             alert("Vælg et kamera først!");
@@ -57,7 +62,13 @@ document.addEventListener("DOMContentLoaded", () => {
             activeStream.getTracks().forEach(track => track.stop());
         }
 
-        navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: selectedCameraId } } })
+        navigator.mediaDevices.getUserMedia({
+            video: {
+                deviceId: { exact: selectedCameraId },
+                width: { ideal: 1920 },
+                height: { ideal: 1080 }
+            }
+        })
             .then(stream => {
                 activeStream = stream;
                 trackVideo.srcObject = stream;
@@ -66,33 +77,56 @@ document.addEventListener("DOMContentLoaded", () => {
             .catch(err => console.error("❌ Fejl ved adgang til kamera:", err));
     });
 
-    // **📌 Opdater valgt kamera når der vælges fra dropdown**
+    // 🎯 **Opdater valgt kamera når der vælges fra dropdown**
     cameraSelect.addEventListener("change", (event) => {
         selectedCameraId = event.target.value;
     });
 
-    // **📌 Justér tracking-boksen manuelt**
-    let isDragging = false;
-    let offsetX, offsetY;
-
+    // 🎯 **Gør tracking-boksen justerbar og flytbar**
     trackingBox.addEventListener("mousedown", (e) => {
-        isDragging = true;
-        offsetX = e.clientX - trackingBox.offsetLeft;
-        offsetY = e.clientY - trackingBox.offsetTop;
+        if (e.target.classList.contains("resize-handle")) {
+            isResizing = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            startWidth = trackingBox.offsetWidth;
+            startHeight = trackingBox.offsetHeight;
+        } else {
+            isDragging = true;
+            offsetX = e.clientX - trackingBox.offsetLeft;
+            offsetY = e.clientY - trackingBox.offsetTop;
+        }
     });
 
     document.addEventListener("mousemove", (e) => {
         if (isDragging) {
-            trackingBox.style.left = `${e.clientX - offsetX}px`;
-            trackingBox.style.top = `${e.clientY - offsetY}px`;
+            let newX = e.clientX - offsetX;
+            let newY = e.clientY - offsetY;
+
+            // **Sørg for, at boksen ikke går ud over kameraområdet**
+            const container = trackVideo.parentElement;
+            const maxX = container.offsetWidth - trackingBox.offsetWidth;
+            const maxY = container.offsetHeight - trackingBox.offsetHeight;
+
+            trackingBox.style.left = `${Math.max(0, Math.min(newX, maxX))}px`;
+            trackingBox.style.top = `${Math.max(0, Math.min(newY, maxY))}px`;
+        }
+
+        if (isResizing) {
+            let newWidth = startWidth + (e.clientX - startX);
+            let newHeight = startHeight + (e.clientY - startY);
+
+            // **Begræns størrelsen af boksen**
+            trackingBox.style.width = `${Math.max(20, Math.min(newWidth, trackVideo.offsetWidth))}px`;
+            trackingBox.style.height = `${Math.max(10, Math.min(newHeight, trackVideo.offsetHeight))}px`;
         }
     });
 
     document.addEventListener("mouseup", () => {
         isDragging = false;
+        isResizing = false;
     });
 
-    // **✅ Gem trackingområde**
+    // 🎯 **Gem trackingområde**
     saveTrackingButton.addEventListener("click", () => {
         console.log("✅ Trackingområde gemt:", {
             x: trackingBox.offsetLeft,
@@ -104,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("Trackingområde gemt!");
     });
 
-    // **❌ Luk TrackSetup-overlay**
+    // 🎯 **Luk TrackSetup-overlay**
     closeTrackSetupButton.addEventListener("click", () => {
         console.log("❌ Lukker TrackSetup overlay...");
         trackSetupOverlay.style.display = "none";
