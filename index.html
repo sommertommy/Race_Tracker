@@ -143,21 +143,24 @@
 </div>
 
     
-<!-- 📸 Track Setup Overlay -->
-<div id="trackSetupOverlay">
+<!-- 🎯 TRACK SETUP OVERLAY -->
+<div id="trackSetupOverlay" style="display: none;">
     <div class="overlay-content">
         <h2>Juster Kamera Tracking</h2>
 
-        <!-- 🎥 Kamera-feed -->
-        <div id="trackCameraContainer">
+        <!-- 🎥 Vælg kamera -->
+        <label for="cameraSelect">Vælg kamera fra listen:</label>
+        <select id="cameraSelect"></select>
+        <button id="useSelectedCamera">Brug kamera</button>
+
+        <!-- 📸 Kameravisning -->
+        <div class="camera-container">
             <video id="trackVideo" autoplay playsinline></video>
-            
-            <!-- 📌 Justerbar tracking-boks -->
-            <div id="trackingBox"></div>
+            <div id="trackingBox"></div> <!-- 🔴 Justerbar tracking-boks -->
         </div>
 
-        <!-- 🎯 Justeringsknapper -->
-        <button id="saveTracking">Gem Trackingområde</button>
+        <!-- 🎯 Knapper -->
+        <button id="saveTrackingArea">Gem Trackingområde</button>
         <button id="closeTrackSetup">Luk</button>
     </div>
 </div>
