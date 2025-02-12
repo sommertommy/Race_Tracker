@@ -5,11 +5,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const colorPickerOverlay = document.getElementById("colorPickerOverlay");
     const acceptColorSelectionButton = document.getElementById("acceptColorSelection");
     const videoElement = document.getElementById("video");
-    const overlayCanvas = document.getElementById("overlayCanvas");
     const cameraPlaceholder = document.getElementById("cameraPlaceholder");
     const openColorPickerButton = document.getElementById("openColorPicker");
     const closeColorPickerButton = document.getElementById("closeColorPickerButton");
-    const toleranceControls = document.getElementById("toleranceControls");
 
     // 🎥 **Kameravalg overlay**
     const openCameraOverlayButton = document.getElementById("openCameraSelectOverlay");
@@ -30,10 +28,13 @@ document.addEventListener("DOMContentLoaded", () => {
         colorPickerOverlay.style.display = "flex";
         cameraPlaceholder.style.display = "flex";
         videoElement.style.display = "none";
-        overlayCanvas.style.display = "none";
 
-        // 🎥 Start kamera med det valgte kamera-ID
-        startSelectedCamera(videoElement);
+        // 🚀 Start det allerede valgte kamera, hvis der er et gemt kamera-ID
+        if (selectedCameraId) {
+            startSelectedCamera(videoElement);
+        } else {
+            console.warn("⚠️ Intet kamera valgt, skal vælge et først!");
+        }
     }
 
     // 🎯 **Funktion til at acceptere farvevalg**
@@ -47,32 +48,16 @@ document.addEventListener("DOMContentLoaded", () => {
             colorPickerOverlay.style.display = "none";
         }
 
-        // 🎯 **Skjul tolerance-justering og overlayCanvas**
-        if (toleranceControls) {
-            console.log("🎚 Skjuler tolerance-controls...");
-            toleranceControls.style.display = "none";
-        }
-
-        if (overlayCanvas) {
-            console.log("🖼️ Skjuler overlayCanvas...");
-            overlayCanvas.style.display = "none";
-        }
-
-        // 🚀 **Stop tracking, hvis det stadig kører**
-        isTracking = false;
-
-        // 🚀 **Stop trackColor-animationen**
-        if (typeof trackColor === "function") {
-            console.log("⏹ trackColor() stoppes!");
-            cancelAnimationFrame(trackColor);
-        }
-
-        // 🎯 **Stop kameraet og frigør stream**
         stopCamera();
     }
 
-    // 🎥 **Funktion til at hente kameraer**
+    // 🎥 **Funktion til at hente kameraer (kun hvis intet kamera er valgt)**
     function getCameras() {
+        if (selectedCameraId) {
+            console.log("🎥 Kamera allerede valgt:", selectedCameraId);
+            return;
+        }
+
         console.log("📸 Henter tilgængelige kameraer...");
 
         navigator.mediaDevices.enumerateDevices()
@@ -173,7 +158,6 @@ document.addEventListener("DOMContentLoaded", () => {
             colorPickerOverlay.classList.remove("show");
             colorPickerOverlay.style.display = "none";
 
-            // 🎥 Stop kameraet når overlay lukkes
             stopCamera();
         });
     } else {
@@ -182,8 +166,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     console.log("✅ DOM setup færdig!");
 
-    // 🎥 **Start kamera i spilleroprettelse, hvis der allerede er valgt et kamera**
+    // 🚀 **Start kamera i spilleroprettelse, hvis der allerede er valgt et kamera**
     if (selectedCameraId) {
+        console.log("📸 Automatisk start af kamera i spilleroprettelse...");
         startSelectedCamera(videoElement);
     }
 });
