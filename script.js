@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
 
-       // 🎯 Skift mellem runder og tid baseret på race mode
+           // 🎯 **Skift mellem runder og tid baseret på race mode**
     raceModeSelector.addEventListener("change", function () {
         if (this.value === "LapCounts") {
             lapCountSettings.style.display = "block";
@@ -114,18 +114,35 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // 🎯 Gem race-indstillinger
-    document.getElementById("saveRace").addEventListener("click", () => {
+    // 🎯 **Gem race-indstillinger**
+    saveRaceButton.addEventListener("click", () => {
         if (raceModeSelector.value === "LapCounts") {
+            const selectedRounds = parseInt(roundsInput.value);
+
+            if (isNaN(selectedRounds) || selectedRounds < 1) {
+                alert("Indtast et gyldigt antal runder!");
+                return;
+            }
+
             raceSettings.mode = "LapCounts";
-            raceSettings.rounds = parseInt(roundsInput.value) || 10;
+            raceSettings.rounds = selectedRounds;
         } else {
+            const selectedTimeLimit = parseInt(timeLimitInput.value);
+
+            if (isNaN(selectedTimeLimit) || selectedTimeLimit < 10) {
+                alert("Indtast en gyldig tid (mindst 10 sek)!");
+                return;
+            }
+
             raceSettings.mode = "FastestLap";
-            raceSettings.timeLimit = parseInt(timeLimitInput.value) || 60;
+            raceSettings.timeLimit = selectedTimeLimit;
         }
 
         console.log("🏁 Race gemt:", raceSettings);
-        showScreen("startScreen"); // Tilbage til startskærm
+
+        // 🚀 Skift tilbage til startskærmen
+        document.getElementById("raceSetupScreen").style.display = "none";
+        document.getElementById("startScreen").style.display = "block";
     });
 
     // 🎥 **Start det valgte kamera**
