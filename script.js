@@ -1180,9 +1180,9 @@ video.addEventListener("click", (event) => {
         return;
     }
 
-    const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = video.videoWidth;
-    tempCanvas.height = video.videoHeight;
+    const rect = video.getBoundingClientRect(); // Få videoens reelle størrelse på skærmen
+    const x = Math.floor((event.clientX - rect.left) * (video.videoWidth / rect.width));
+    const y = Math.floor((event.clientY - rect.top) * (video.videoHeight / rect.height));
     const tempCtx = tempCanvas.getContext("2d");
     tempCtx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
 
