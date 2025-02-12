@@ -19,6 +19,13 @@ document.addEventListener("DOMContentLoaded", () => {
     let selectedCameraId = localStorage.getItem("selectedCamera") || null;
     let activeStream = null;
 
+    if (!acceptColorSelectionButton) {
+        console.error("❌ acceptColorSelectionButton IKKE fundet i DOM!");
+    } else {
+        console.log("✅ acceptColorSelectionButton fundet!");
+        acceptColorSelectionButton.addEventListener("click", acceptColorHandler);
+    }
+
     console.log("✅ Profilbilleder vises statisk uden slider!");
 
     // 🎯 **Åbn kameraoverlay og hent kameraer**
