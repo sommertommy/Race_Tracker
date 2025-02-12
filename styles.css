@@ -28,6 +28,55 @@ body {
     color: #000; /* 🎨 Sørger for at tekst er synlig */
 }
 
+/* 📌 Track Setup Overlay */
+#trackSetupOverlay {
+    display: none; /* Starter skjult */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7); /* Mørk baggrund */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.overlay-content {
+    position: relative;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+/* 📸 Kamera-container */
+#trackCameraContainer {
+    position: relative;
+    width: 80vw;
+    max-width: 640px;
+    height: auto;
+}
+
+#trackVideo {
+    width: 100%;
+    height: auto;
+}
+
+/* 🔴 Justerbar trackingboks */
+#trackingBox {
+    position: absolute;
+    top: 30%;
+    left: 25%;
+    width: 50%;
+    height: 15%;
+    border: 3px solid red;
+    background: rgba(255, 0, 0, 0.3);
+    cursor: move;
+    resize: both;
+    overflow: hidden;
+}
+
 .contentBox{
     background-color: #0000003b;
     padding: 60px 30px;
