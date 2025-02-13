@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 🎯 Kør funktionen ved start for at vise det korrekte felt fra begyndelsen
     updateRaceModeUI();
     
-    // 🎯 Gem race-indstillinger, når brugeren trykker på "Start Race"
+   // 🎯 Gem race-indstillinger, når brugeren trykker på "Start Race"
     startRaceButton.addEventListener("click", () => {
         const selectedValue = parseInt(raceModeInput.value);
     
@@ -66,8 +66,8 @@ document.addEventListener("DOMContentLoaded", () => {
     
         console.log("✅ Race gemt:", raceSettings);
     
-        // 🚀 Start racet her (kald den funktion, der starter racet)
-        startRace();
+        // 🎥 Start countdown video før racet starter
+        playCountdownVideo();
     });
     // RACING MODE SELECTOR
     // RACING MODE SELECTOR
@@ -848,7 +848,7 @@ function startRace() {
 function playCountdownVideo() {
     console.log("⏳ Starter 10 sekunders nedtælling...");
 
-    // Opret en video-container
+    // Opret video-overlay
     let countdownOverlay = document.createElement("div");
     countdownOverlay.id = "countdownOverlay";
     countdownOverlay.style.position = "fixed";
@@ -860,7 +860,7 @@ function playCountdownVideo() {
     countdownOverlay.style.display = "flex";
     countdownOverlay.style.alignItems = "center";
     countdownOverlay.style.justifyContent = "center";
-    countdownOverlay.style.zIndex = "1000"; // Sørg for, at den er øverst
+    countdownOverlay.style.zIndex = "1000";
 
     let countdownVideo = document.createElement("video");
     countdownVideo.id = "countdownVideo";
@@ -875,20 +875,20 @@ function playCountdownVideo() {
     countdownOverlay.appendChild(countdownVideo);
     document.body.appendChild(countdownOverlay);
 
-    // 🚀 Start video og vent til den er færdig
+    // 🎬 Start video og vent til den er færdig
     countdownVideo.play().then(() => {
         console.log("🎬 Countdown video startet!");
     }).catch(error => {
         console.error("⚠️ Kunne ikke afspille video:", error);
     });
 
-    // Når videoen slutter, start racet
+    // 🎯 Når videoen slutter, start racet
     countdownVideo.onended = () => {
         console.log("🏁 Countdown færdig – starter racet!");
-        document.body.removeChild(countdownOverlay); // Fjern videooverlay
-        startRace(); // Kald funktionen, der starter racet
+        document.body.removeChild(countdownOverlay);
+        startRace(); // 🚀 Start racet efter videoen
     };
-}
+};
 
 
 const observer = new MutationObserver(() => {
