@@ -681,7 +681,7 @@ function updateLeaderboard() {
 
     if (raceMode === "LapCounts") {
         sortedPlayers = [...players].sort((a, b) => b.laps - a.laps);
-    } else {
+    } else if (raceMode === "FastestLap") {
         sortedPlayers = [...players].sort((a, b) => {
             let bestLapA = a.lapTimes.length > 0 ? Math.min(...a.lapTimes) : Infinity;
             let bestLapB = b.lapTimes.length > 0 ? Math.min(...b.lapTimes) : Infinity;
@@ -695,25 +695,22 @@ function updateLeaderboard() {
 
         let medal = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : "";
 
-        // **Profilbillede**
-        let profilePicture = player.profilePicture || "default-avatar.png";
+        let profileImage = player.profilePicture ? player.profilePicture : "default.png";
 
-        // **FastestLap: Brug hurtigste tid**
-        let displayInfo;
-        if (raceMode === "FastestLap") {
+        // **Vis korrekt info afhængig af race mode**
+        let playerInfo;
+        if (raceMode === "LapCounts") {
+            playerInfo = `${player.laps}/${raceSettings.rounds || 0}`; // Sikrer at rounds aldrig er undefined
+        } else {
             let bestLap = player.lapTimes.length > 0 ? Math.min(...player.lapTimes) : null;
-            displayInfo = bestLap ? formatTime(bestLap) : "--:--"; // Bruger formatTime() fra tidligere kode
-        } 
-        // **LapCounts: Vis runder**
-        else {
-            displayInfo = `${player.laps}/${raceSettings.rounds || "?"}`;
+            playerInfo = bestLap !== null ? formatTime(bestLap) : "--:--";
         }
 
         playerEntry.innerHTML = `
             <div class="player-profile">
-                <img src="${profilePicture}" alt="${player.name}" class="leaderboard-avatar">
+                <img src="${profileImage}" alt="${player.name}" class="leaderboard-profile-pic">
                 <span class="player-name">${player.name}</span>
-                <span class="player-laps">${displayInfo}</span>
+                <span class="player-laps">${playerInfo}</span>
                 <span class="medal">${medal}</span>
             </div>
         `;
