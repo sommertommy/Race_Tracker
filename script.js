@@ -1113,19 +1113,14 @@ function detectColorInRace() {
             }
 
             if (!player.lastDetectionTime || now - player.lastDetectionTime > 2000) {
-                if (raceMode === "LapCounts" && player.laps < raceSettings.rounds) {
-                    updatePlayerLaps(player.id);
-                    player.lastDetectionTime = now;
-                    
-                    if (player.laps >= raceSettings.rounds && !player.finishTime) {
-                        player.finishTime = now;
-                        console.log(`🏁 ${player.name} har FULDFØRT racet! 🎉`);
-                        launchConfetti();
-                        playApplauseSound();
-                    }
-                } else if (raceMode === "FastestLap") {
-                    updatePlayerLaps(player.id);
-                    player.lastDetectionTime = now;
+                updatePlayerLaps(player.id);
+                player.lastDetectionTime = now;
+            
+                if (raceMode === "LapCounts" && player.laps >= raceSettings.rounds && !player.finishTime) {
+                    player.finishTime = now;
+                    console.log(`🏁 ${player.name} har FULDFØRT racet! 🎉`);
+                    launchConfetti();
+                    playApplauseSound();
                 }
             }
         });
