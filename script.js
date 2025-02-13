@@ -207,6 +207,7 @@ const backToStartButton = document.getElementById("backToStart");
 
 const playerList = document.getElementById("playerList");
 const roundsInput = document.getElementById("rounds");
+const timeLimitInput = document.getElementById("timeLimitInput");
 //const raceModeSelector = document.getElementById("raceMode");
 
 const cameraPlaceholder = document.getElementById("cameraPlaceholder");
@@ -747,9 +748,7 @@ backToStartRaceButton.addEventListener("click", () => {
 });
 
 
-// 🎯 Find inputfelterne (tjek om de findes!)
-const roundsInput = document.getElementById("roundsInput");
-const timeLimitInput = document.getElementById("timeLimitInput");
+
 
 startRaceButton.addEventListener("click", () => {
     if (players.length === 0) {
