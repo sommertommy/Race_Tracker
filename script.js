@@ -754,7 +754,26 @@ startRaceButton.addEventListener("click", () => {
         return;
     }
 
-    // 🎥 Start countdown video
+    // 🎯 Hent den aktuelle værdi fra inputfeltet, når racet starter
+    if (raceMode === "FastestLap") {
+        const selectedTimeLimit = parseInt(document.getElementById("timeLimitInput").value);
+        if (isNaN(selectedTimeLimit) || selectedTimeLimit < 10) {
+            alert("Indtast en gyldig tid (mindst 10 sek)!");
+            return;
+        }
+        raceSettings.timeLimit = selectedTimeLimit;
+    } else {
+        const selectedRounds = parseInt(document.getElementById("roundsInput").value);
+        if (isNaN(selectedRounds) || selectedRounds < 1) {
+            alert("Indtast et gyldigt antal runder!");
+            return;
+        }
+        raceSettings.rounds = selectedRounds;
+    }
+
+    console.log("🏁 Race starter med indstillinger:", raceSettings);
+
+    // 🎬 Start countdown video
     playCountdownVideo();
 });
 
@@ -774,11 +793,14 @@ function startRace() {
     startRaceCamera();
 
     // 🔥 Hvis Fastest Lap mode, start en timer
-    if (raceMode === "FastestLap") {
+        if (raceMode === "FastestLap") {
+        const selectedTimeLimit = raceSettings.timeLimit || 120; // Brug valgt tid eller fallback til 120 sek
+        console.log(`⏳ Race starter med en tidsgrænse på ${selectedTimeLimit} sekunder.`);
+        
         raceTimer = setTimeout(() => {
             console.log("⏳ Tid er gået! Race stoppes.");
             stopRace();
-        }, 2 * 60 * 1000); // 2 minutter (2 * 60 * 1000 ms)
+        }, selectedTimeLimit * 1000);
     }
 
     setTimeout(() => {
