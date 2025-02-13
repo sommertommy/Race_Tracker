@@ -669,6 +669,7 @@ function stopRace() {
 }
 
 function updateLeaderboard() {
+    console.log(`✅ Leaderboard opdateret fra: ${new Error().stack}`);
     const leaderboardDiv = document.getElementById("leaderboard");
 
     if (!leaderboardDiv) {
@@ -681,14 +682,12 @@ function updateLeaderboard() {
     let sortedPlayers = [];
 
     if (raceMode === "LapCounts") {
-        // 🎯 **Lap Counts mode: Sortér efter flest runder**
         sortedPlayers = [...players].sort((a, b) => b.laps - a.laps);
     } else {
-        // 🎯 **Fastest Lap mode: Sortér efter hurtigste omgangstid**
         sortedPlayers = [...players].sort((a, b) => {
             let bestLapA = a.lapTimes.length > 0 ? Math.min(...a.lapTimes) : Infinity;
             let bestLapB = b.lapTimes.length > 0 ? Math.min(...b.lapTimes) : Infinity;
-            return bestLapA - bestLapB; // Den laveste tid først
+            return bestLapA - bestLapB;
         });
     }
 
