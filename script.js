@@ -681,7 +681,7 @@ function updateLeaderboard() {
 
     if (raceMode === "LapCounts") {
         sortedPlayers = [...players].sort((a, b) => b.laps - a.laps);
-    } else {
+    } else if (raceMode === "FastestLap") {
         sortedPlayers = [...players].sort((a, b) => {
             let bestLapA = a.lapTimes.length > 0 ? Math.min(...a.lapTimes) : Infinity;
             let bestLapB = b.lapTimes.length > 0 ? Math.min(...b.lapTimes) : Infinity;
@@ -695,14 +695,18 @@ function updateLeaderboard() {
 
         let medal = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : "";
 
-        // ✅ **Sikre, at der er et profilbillede – ellers brug et default billede**
         let profileImage = player.profilePicture ? player.profilePicture : "default.png";
+
+        // **Vis korrekt info afhængig af race mode**
+        let playerInfo = raceMode === "LapCounts" 
+            ? `${player.laps}/${raceSettings.rounds}` 
+            : (player.lapTimes.length > 0 ? formatTime(Math.min(...player.lapTimes)) : "--:--");
 
         playerEntry.innerHTML = `
             <div class="player-profile">
                 <img src="${profileImage}" alt="${player.name}" class="leaderboard-profile-pic">
                 <span class="player-name">${player.name}</span>
-                <span class="player-laps">${raceMode === "LapCounts" ? `${player.laps}/${raceSettings.rounds}` : formatTime(player.lapTimes.length > 0 ? Math.min(...player.lapTimes) : 0)}</span>
+                <span class="player-laps">${playerInfo}</span>
                 <span class="medal">${medal}</span>
             </div>
         `;
