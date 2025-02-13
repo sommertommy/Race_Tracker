@@ -667,7 +667,7 @@ function stopRace() {
 }
 
 function updateLeaderboard() {
-    console.trace("✅ Leaderboard opdateret");
+    console.log("✅ Leaderboard opdateret");
     const leaderboardDiv = document.getElementById("leaderboard");
 
     if (!leaderboardDiv) {
