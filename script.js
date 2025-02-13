@@ -15,6 +15,38 @@ document.addEventListener("DOMContentLoaded", () => {
     const cameraList = document.getElementById("cameraList");
     const confirmCameraButton = document.getElementById("confirmCameraSelection");
     const closeCameraOverlayButton = document.getElementById("closeCameraOverlay");
+    
+    // RACING MODE SELECTOR   
+    // RACING MODE SELECTOR
+    // RACING MODE SELECTOR
+    const raceModeSelector = document.getElementById("raceMode");
+    const raceModeLabel = document.getElementById("raceModeLabel");
+    const raceModeInput = document.getElementById("raceModeInput");
+    
+    function updateRaceModeUI() {
+        if (raceModeSelector.value === "LapCounts") {
+            raceModeLabel.textContent = "Indtast antal runder:";
+            raceModeInput.setAttribute("min", "1");
+            raceModeInput.setAttribute("value", "10");
+        } else {
+            raceModeLabel.textContent = "Indtast tid i sekunder:";
+            raceModeInput.setAttribute("min", "10");
+            raceModeInput.setAttribute("value", "60");
+        }
+    }
+
+    // 🎯 Event listener for ændringer i dropdown-menuen
+    raceModeSelector.addEventListener("change", () => {
+        console.log(`🏁 Ræs-type ændret til: ${raceModeSelector.value}`);
+        updateRaceModeUI();
+    });
+
+    // 🎯 Kør funktionen ved start for at vise det korrekte felt fra begyndelsen
+    updateRaceModeUI();
+    
+    // RACING MODE SELECTOR
+    // RACING MODE SELECTOR
+    // RACING MODE SELECTOR
 
     let selectedCameraId = localStorage.getItem("selectedCamera") || null;
     let activeStream = null;
@@ -170,7 +202,7 @@ const backToStartButton = document.getElementById("backToStart");
 
 const playerList = document.getElementById("playerList");
 const roundsInput = document.getElementById("rounds");
-const raceModeSelector = document.getElementById("raceMode");
+//const raceModeSelector = document.getElementById("raceMode");
 
 const cameraPlaceholder = document.getElementById("cameraPlaceholder");
 const overlayCanvas = document.getElementById("overlayCanvas");
