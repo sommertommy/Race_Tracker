@@ -747,16 +747,15 @@ backToStartRaceButton.addEventListener("click", () => {
 });
 
 
+// 🎯 Find inputfelterne (tjek om de findes!)
+const roundsInput = document.getElementById("roundsInput");
+const timeLimitInput = document.getElementById("timeLimitInput");
 
 startRaceButton.addEventListener("click", () => {
     if (players.length === 0) {
         alert("Tilføj mindst én spiller før du starter racet!");
         return;
     }
-
-    // 🎯 Find inputfelterne (tjek om de findes!)
-    const roundsInput = document.getElementById("roundsInput");
-    const timeLimitInput = document.getElementById("timeLimitInput");
 
     if (raceMode === "FastestLap") {
         if (!timeLimitInput) {
