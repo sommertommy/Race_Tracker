@@ -1410,6 +1410,7 @@ savePlayerButton.onclick = function () {
     }
 
     editingPlayerId = null; // ✅ Nulstil redigeringstilstand
+    stopCamera();  // <--- 🔥 Sørg for at kameraet stoppes
 };
 
 
