@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // RACING MODE SELECTOR   
     // RACING MODE SELECTOR
     // RACING MODE SELECTOR
+    
     const raceModeSelector = document.getElementById("raceMode");
     const raceModeLabel = document.getElementById("raceModeLabel");
     const raceModeInput = document.getElementById("raceModeInput");
@@ -34,6 +35,10 @@ document.addEventListener("DOMContentLoaded", () => {
             raceModeInput.setAttribute("value", "60");
         }
     }
+
+    document.getElementById("raceMode").addEventListener("change", function () {
+        raceMode = this.value; // Gemmer værdien uden at logge
+    });
 
     // 🎯 Event listener for ændringer i dropdown-menuen
     raceModeSelector.addEventListener("change", () => {
@@ -338,7 +343,7 @@ function showScreen(targetScreen) {
 
 document.getElementById("raceMode").addEventListener("change", function () {
     raceMode = this.value;
-    console.log(`🏁 Ræs-type ændret til: ${raceMode}`);
+    
 });
 
 
