@@ -695,35 +695,32 @@ function updateLeaderboard() {
 
         let medal = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : "";
 
-        // **Brug korrekt profilbillede**
+        // **Profilbillede**
         let profilePicture = player.profilePicture || "default-avatar.png";
 
-        // **FastestLap: Vis hurtigste tid**
-        let displayInfo = "--:--";
+        // **FastestLap: Brug hurtigste tid**
+        let displayInfo;
         if (raceMode === "FastestLap") {
             let bestLap = player.lapTimes.length > 0 ? Math.min(...player.lapTimes) : null;
-            displayInfo = bestLap ? formatTime(bestLap) : "--:--";
+            displayInfo = bestLap ? formatTime(bestLap) : "--:--"; // Bruger formatTime() fra tidligere kode
         } 
-        // **LapCounts: Vis X/Y runder**
-        else if (raceMode === "LapCounts") {
+        // **LapCounts: Vis runder**
+        else {
             displayInfo = `${player.laps}/${raceSettings.rounds || "?"}`;
         }
 
         playerEntry.innerHTML = `
             <div class="player-profile">
                 <img src="${profilePicture}" alt="${player.name}" class="leaderboard-avatar">
-                <div class="player-info">
-                    <span class="player-name">${player.name}</span>
-                    <span class="player-laps">${displayInfo}</span>
-                    <span class="medal">${medal}</span>
-                </div>
+                <span class="player-name">${player.name}</span>
+                <span class="player-laps">${displayInfo}</span>
+                <span class="medal">${medal}</span>
             </div>
         `;
 
         leaderboardDiv.appendChild(playerEntry);
     });
 }
-
 
 
 function updateExcludedColors() {
