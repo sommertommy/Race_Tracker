@@ -26,29 +26,49 @@ document.addEventListener("DOMContentLoaded", () => {
     const raceModeInput = document.getElementById("raceModeInput");
     
     
+   // 🎯 Funktion til at opdatere UI baseret på valgt race-mode
     function updateRaceModeUI() {
         if (raceModeSelector.value === "LapCounts") {
             raceModeLabel.textContent = "Indtast antal runder:";
             raceModeInput.setAttribute("min", "1");
-            raceModeInput.setAttribute("value", "10");
+            raceModeInput.value = 10; // Standardværdi for runder
         } else {
-            raceModeLabel.textContent = "Indtast tid i sekunder:";
+            raceModeLabel.textContent = "Indtast tid (sekunder):";
             raceModeInput.setAttribute("min", "10");
-            raceModeInput.setAttribute("value", "60");
+            raceModeInput.value = 60; // Standardværdi for tid
         }
     }
-
-
-
+    
     // 🎯 Event listener for ændringer i dropdown-menuen
     raceModeSelector.addEventListener("change", () => {
         console.log(`🏁 Ræs-type ændret til: ${raceModeSelector.value}`);
         updateRaceModeUI();
     });
-
+    
     // 🎯 Kør funktionen ved start for at vise det korrekte felt fra begyndelsen
     updateRaceModeUI();
     
+    // 🎯 Gem race-indstillinger, når brugeren trykker på "Start Race"
+    startRaceButton.addEventListener("click", () => {
+        const selectedValue = parseInt(raceModeInput.value);
+    
+        if (isNaN(selectedValue) || (raceModeSelector.value === "LapCounts" && selectedValue < 1) || 
+            (raceModeSelector.value === "FastestLap" && selectedValue < 10)) {
+            alert("Indtast en gyldig værdi!");
+            return;
+        }
+    
+        if (raceModeSelector.value === "LapCounts") {
+            raceSettings = { mode: "LapCounts", rounds: selectedValue };
+        } else {
+            raceSettings = { mode: "FastestLap", timeLimit: selectedValue };
+        }
+    
+        console.log("✅ Race gemt:", raceSettings);
+    
+        // 🚀 Start racet her (kald den funktion, der starter racet)
+        startRace();
+    });
     // RACING MODE SELECTOR
     // RACING MODE SELECTOR
     // RACING MODE SELECTOR
