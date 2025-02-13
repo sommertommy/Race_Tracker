@@ -695,25 +695,28 @@ function updateLeaderboard() {
 
         let medal = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : "";
 
-        // **FastestLap: Vis hurtigste tid**
-        let displayInfo;
-        if (raceMode === "FastestLap") {
-            let bestLap = player.lapTimes.length > 0 ? Math.min(...player.lapTimes) : null;
-            displayInfo = bestLap ? formatTime(bestLap) : "--:--";
-        } else {
-            // **LapCounts: Vis X/Y runder**
-            displayInfo = `${player.laps}/${raceSettings.rounds || 0}`;
-        }
-
         // **Brug korrekt profilbillede**
         let profilePicture = player.profilePicture || "default-avatar.png";
 
+        // **FastestLap: Vis hurtigste tid**
+        let displayInfo = "--:--";
+        if (raceMode === "FastestLap") {
+            let bestLap = player.lapTimes.length > 0 ? Math.min(...player.lapTimes) : null;
+            displayInfo = bestLap ? formatTime(bestLap) : "--:--";
+        } 
+        // **LapCounts: Vis X/Y runder**
+        else if (raceMode === "LapCounts") {
+            displayInfo = `${player.laps}/${raceSettings.rounds || "?"}`;
+        }
+
         playerEntry.innerHTML = `
             <div class="player-profile">
-                <img src="${profilePicture}" alt="${player.name}" class="player-avatar">
-                <span class="player-name">${player.name}</span>
-                <span class="player-laps">${displayInfo}</span>
-                <span class="medal">${medal}</span>
+                <img src="${profilePicture}" alt="${player.name}" class="leaderboard-avatar">
+                <div class="player-info">
+                    <span class="player-name">${player.name}</span>
+                    <span class="player-laps">${displayInfo}</span>
+                    <span class="medal">${medal}</span>
+                </div>
             </div>
         `;
 
