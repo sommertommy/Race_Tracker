@@ -49,8 +49,8 @@ document.addEventListener("DOMContentLoaded", () => {
     updateRaceModeUI();
     
     // 🎯 Gem race-indstillinger, når brugeren trykker på "Start Race"
-    startRaceButton.addEventListener("click", () => {
-        const selectedValue = parseInt(raceModeInput.value);
+        startRaceButton.addEventListener("click", () => {
+        const selectedValue = parseInt(document.getElementById("raceModeInput").value);
     
         if (isNaN(selectedValue) || (raceModeSelector.value === "LapCounts" && selectedValue < 1) || 
             (raceModeSelector.value === "FastestLap" && selectedValue < 10)) {
@@ -66,8 +66,10 @@ document.addEventListener("DOMContentLoaded", () => {
     
         console.log("✅ Race gemt:", raceSettings);
     
-        // 🚀 Start racet her (kald den funktion, der starter racet)
-        startRace();
+        // 🎥 Start countdown video og vent til den er færdig før racet starter
+        playCountdownVideo().then(() => {
+            startRace();
+        });
     });
     // RACING MODE SELECTOR
     // RACING MODE SELECTOR
@@ -770,45 +772,6 @@ backToStartRaceButton.addEventListener("click", () => {
 
 
 
-startRaceButton.addEventListener("click", () => {
-    if (players.length === 0) {
-        alert("Tilføj mindst én spiller før du starter racet!");
-        return;
-    }
-
-    if (raceMode === "FastestLap") {
-        if (!timeLimitInput) {
-            console.error("❌ Fejl: timeLimitInput blev ikke fundet!");
-            alert("Fejl: Kunne ikke finde inputfeltet for tid!");
-            return;
-        }
-
-        const selectedTimeLimit = parseInt(timeLimitInput.value);
-        if (isNaN(selectedTimeLimit) || selectedTimeLimit < 10) {
-            alert("Indtast en gyldig tid (mindst 10 sek)!");
-            return;
-        }
-        raceSettings.timeLimit = selectedTimeLimit;
-    } else {
-        if (!roundsInput) {
-            console.error("❌ Fejl: roundsInput blev ikke fundet!");
-            alert("Fejl: Kunne ikke finde inputfeltet for runder!");
-            return;
-        }
-
-        const selectedRounds = parseInt(roundsInput.value);
-        if (isNaN(selectedRounds) || selectedRounds < 1) {
-            alert("Indtast et gyldigt antal runder!");
-            return;
-        }
-        raceSettings.rounds = selectedRounds;
-    }
-
-    console.log("🏁 Race starter med indstillinger:", raceSettings);
-
-    // 🎬 Start countdown video
-    playCountdownVideo();
-});
 
 function startRace() {
     resetRaceData();
@@ -846,48 +809,48 @@ function startRace() {
 }
 
 function playCountdownVideo() {
-    console.log("⏳ Starter 10 sekunders nedtælling...");
+    return new Promise((resolve) => {
+        console.log("⏳ Starter 10 sekunders nedtælling...");
 
-    // Opret en video-container
-    let countdownOverlay = document.createElement("div");
-    countdownOverlay.id = "countdownOverlay";
-    countdownOverlay.style.position = "fixed";
-    countdownOverlay.style.top = "0";
-    countdownOverlay.style.left = "0";
-    countdownOverlay.style.width = "100vw";
-    countdownOverlay.style.height = "100vh";
-    countdownOverlay.style.background = "black";
-    countdownOverlay.style.display = "flex";
-    countdownOverlay.style.alignItems = "center";
-    countdownOverlay.style.justifyContent = "center";
-    countdownOverlay.style.zIndex = "1000"; // Sørg for, at den er øverst
+        let countdownOverlay = document.createElement("div");
+        countdownOverlay.id = "countdownOverlay";
+        countdownOverlay.style.position = "fixed";
+        countdownOverlay.style.top = "0";
+        countdownOverlay.style.left = "0";
+        countdownOverlay.style.width = "100vw";
+        countdownOverlay.style.height = "100vh";
+        countdownOverlay.style.background = "black";
+        countdownOverlay.style.display = "flex";
+        countdownOverlay.style.alignItems = "center";
+        countdownOverlay.style.justifyContent = "center";
+        countdownOverlay.style.zIndex = "1000";
 
-    let countdownVideo = document.createElement("video");
-    countdownVideo.id = "countdownVideo";
-    countdownVideo.src = "countdownlight.mp4";
-    countdownVideo.style.width = "100%";
-    countdownVideo.style.height = "100%";
-    countdownVideo.style.objectFit = "cover";
-    countdownVideo.autoplay = true;
-    countdownVideo.muted = false;
-    countdownVideo.playsInline = true;
+        let countdownVideo = document.createElement("video");
+        countdownVideo.id = "countdownVideo";
+        countdownVideo.src = "countdownlight.mp4";
+        countdownVideo.style.width = "100%";
+        countdownVideo.style.height = "100%";
+        countdownVideo.style.objectFit = "cover";
+        countdownVideo.autoplay = true;
+        countdownVideo.muted = false;
+        countdownVideo.playsInline = true;
 
-    countdownOverlay.appendChild(countdownVideo);
-    document.body.appendChild(countdownOverlay);
+        countdownOverlay.appendChild(countdownVideo);
+        document.body.appendChild(countdownOverlay);
 
-    // 🚀 Start video og vent til den er færdig
-    countdownVideo.play().then(() => {
-        console.log("🎬 Countdown video startet!");
-    }).catch(error => {
-        console.error("⚠️ Kunne ikke afspille video:", error);
+        countdownVideo.play().then(() => {
+            console.log("🎬 Countdown video startet!");
+        }).catch(error => {
+            console.error("⚠️ Kunne ikke afspille video:", error);
+        });
+
+        // Når videoen slutter, fjern overlay og start racet
+        countdownVideo.onended = () => {
+            console.log("🏁 Countdown færdig – starter racet!");
+            document.body.removeChild(countdownOverlay);
+            resolve(); // 🚀 Sig til `startRace();`, at vi nu kan fortsætte!
+        };
     });
-
-    // Når videoen slutter, start racet
-    countdownVideo.onended = () => {
-        console.log("🏁 Countdown færdig – starter racet!");
-        document.body.removeChild(countdownOverlay); // Fjern videooverlay
-        startRace(); // Kald funktionen, der starter racet
-    };
 }
 
 
