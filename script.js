@@ -20,9 +20,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // RACING MODE SELECTOR
     // RACING MODE SELECTOR
     
+    raceMode = document.getElementById("raceMode").value; // Sæt initial værdi
     const raceModeSelector = document.getElementById("raceMode");
     const raceModeLabel = document.getElementById("raceModeLabel");
     const raceModeInput = document.getElementById("raceModeInput");
+    
     
     function updateRaceModeUI() {
         if (raceModeSelector.value === "LapCounts") {
@@ -36,9 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    document.getElementById("raceMode").addEventListener("change", function () {
-        raceMode = this.value; // Gemmer værdien uden at logge
-    });
+
 
     // 🎯 Event listener for ændringer i dropdown-menuen
     raceModeSelector.addEventListener("change", () => {
