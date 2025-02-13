@@ -666,7 +666,7 @@ function stopRace() {
     stopCamera(); // Stopper kameraet
 }
 
-unction updateLeaderboard() {
+function updateLeaderboard() {
     console.trace("✅ Leaderboard opdateret");
     const leaderboardDiv = document.getElementById("leaderboard");
 
