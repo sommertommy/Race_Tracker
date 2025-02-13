@@ -468,7 +468,7 @@ function updatePlayerLaps(playerId) {
 
     const now = Date.now();
 
-    // ✅ Sørg for, at `lapTimes` eksisterer
+    // ✅ Sikrer, at `lapTimes` eksisterer
     if (!player.lapTimes) {
         player.lapTimes = [];
         console.warn(`🔧 Oprettede lapTimes for ${player.name}`);
@@ -481,30 +481,30 @@ function updatePlayerLaps(playerId) {
     player.lapTimes.push(lapTime); // 🎯 GEM rundetiden!
     player.lastDetectionTime = now; // Opdater seneste omgang
 
+    console.log(`⏱ ${player.name} registrerede en omgang på ${lapTime}ms`);
+
     if (raceMode === "LapCounts") {
         player.laps++;
-
-        console.log(`⏱ ${player.name} rundetid: ${lapTime}ms`);
 
         if (player.laps === raceSettings.rounds) {
             player.finishTime = now;
             console.log(`🏁 ${player.name} har FULDFØRT racet! 🎉`);
-
-            console.log("🎉 Udløser konfetti!");
+            
             launchConfetti();
-
-            console.log("🔊 Afspiller applaus!");
             playApplauseSound();
         }
-    } else if (raceMode === "FastestLap") {
-        console.log(`⏱ ${player.name} registrerede en omgang på ${lapTime}ms`);
+    }
 
-        // 🎯 **Sortér leaderboard efter hurtigste runde**
+    // 🎯 Kun sorter, hvis vi er i FastestLap mode
+    if (raceMode === "FastestLap") {
         sortLeaderboardByFastestLap();
     }
 
+    // ✅ Kald kun updateLeaderboard() én gang
     updateLeaderboard();
-    updateLapTimesTable(); // 📌 Opdater tabellen, når der kommer en ny tid
+
+    // ✅ Opdater lap-tider
+    updateLapTimesTable();
 }
 
 function sortLeaderboardByFastestLap() {
@@ -668,8 +668,8 @@ function stopRace() {
     stopCamera(); // Stopper kameraet
 }
 
-function updateLeaderboard() {
-    console.log(`✅ Leaderboard opdateret fra: ${new Error().stack}`);
+unction updateLeaderboard() {
+    console.trace("✅ Leaderboard opdateret");
     const leaderboardDiv = document.getElementById("leaderboard");
 
     if (!leaderboardDiv) {
@@ -699,7 +699,6 @@ function updateLeaderboard() {
 
         playerEntry.innerHTML = `
             <div class="player-profile">
-                <img src="${player.profilePicture}" class="leaderboard-profile-pic">
                 <span class="player-name">${player.name}</span>
                 <span class="player-laps">${raceMode === "LapCounts" ? `${player.laps}/${raceSettings.rounds}` : formatTime(player.lapTimes.length > 0 ? Math.min(...player.lapTimes) : 0)}</span>
                 <span class="medal">${medal}</span>
@@ -708,8 +707,6 @@ function updateLeaderboard() {
 
         leaderboardDiv.appendChild(playerEntry);
     });
-
-    console.log("✅ Leaderboard opdateret:", sortedPlayers);
 }
 
 
