@@ -513,8 +513,6 @@ function sortLeaderboardByFastestLap() {
         let fastestLapB = b.lapTimes.length > 0 ? Math.min(...b.lapTimes) : Infinity;
         return fastestLapA - fastestLapB;
     });
-
-    updateLeaderboard();
 }
 
 function toggleLapTimes() {
