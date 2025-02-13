@@ -754,16 +754,31 @@ startRaceButton.addEventListener("click", () => {
         return;
     }
 
-    // 🎯 Hent den aktuelle værdi fra inputfeltet, når racet starter
+    // 🎯 Find inputfelterne (tjek om de findes!)
+    const roundsInput = document.getElementById("roundsInput");
+    const timeLimitInput = document.getElementById("timeLimitInput");
+
     if (raceMode === "FastestLap") {
-        const selectedTimeLimit = parseInt(document.getElementById("timeLimitInput").value);
+        if (!timeLimitInput) {
+            console.error("❌ Fejl: timeLimitInput blev ikke fundet!");
+            alert("Fejl: Kunne ikke finde inputfeltet for tid!");
+            return;
+        }
+
+        const selectedTimeLimit = parseInt(timeLimitInput.value);
         if (isNaN(selectedTimeLimit) || selectedTimeLimit < 10) {
             alert("Indtast en gyldig tid (mindst 10 sek)!");
             return;
         }
         raceSettings.timeLimit = selectedTimeLimit;
     } else {
-        const selectedRounds = parseInt(document.getElementById("roundsInput").value);
+        if (!roundsInput) {
+            console.error("❌ Fejl: roundsInput blev ikke fundet!");
+            alert("Fejl: Kunne ikke finde inputfeltet for runder!");
+            return;
+        }
+
+        const selectedRounds = parseInt(roundsInput.value);
         if (isNaN(selectedRounds) || selectedRounds < 1) {
             alert("Indtast et gyldigt antal runder!");
             return;
