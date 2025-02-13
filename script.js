@@ -142,27 +142,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 🎥 **Start det valgte kamera**
     function startSelectedCamera() {
-        if (!selectedCameraId) {
-            console.warn("⚠️ Intet kamera valgt endnu.");
-            return;
-        }
-        console.log("🎥 Starter valgte kamera:", selectedCameraId);
-        navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: selectedCameraId } } })
-            .then(stream => {
-                videoElement.srcObject = stream;
-                videoElement.play()
-                    .then(() => {
-                        console.log("🎥 Kameraet afspilles korrekt.");
-                        cameraPlaceholder.style.display = "none";
-                        videoElement.style.display = "block";
-                    })
-                    .catch(err => console.error("❌ Fejl ved afspilning af video:", err));
-                activeStream = stream;
-            })
-            .catch(err => {
-                console.error("❌ Fejl ved start af kamera:", err);
-            });
+    if (!selectedCameraId) {
+        console.warn("⚠️ Intet kamera valgt.");
+        return;
     }
+
+    console.log("🎥 Starter valgte kamera:", selectedCameraId);
+
+    navigator.mediaDevices.getUserMedia({
+        video: {
+            deviceId: { exact: selectedCameraId },
+            width: { ideal: 1920, min: 640 },  // Dynamisk opløsning
+            height: { ideal: 1080, min: 480 },
+            facingMode: "environment"
+        }
+    })
+    .then(stream => {
+        let videoElement = document.getElementById("video");
+        videoElement.srcObject = stream;
+
+        videoElement.onloadedmetadata = () => {
+            console.log("✅ Kamera metadata indlæst.");
+            videoElement.play();
+            updateCanvasSize(); // Opdater canvas til korrekt størrelse
+        };
+
+        activeStream = stream;
+    })
+    .catch(err => {
+        console.error("❌ Fejl ved start af kamera:", err);
+    });
+}
+
 
     // 🎥 **Stop kameraet**
     function stopCamera() {
@@ -1232,11 +1243,23 @@ function updateCanvasSize() {
     const video = document.getElementById("video");
     const canvas = document.getElementById("overlayCanvas");
 
-    if (video && canvas) {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        console.log(`📏 Canvas opdateret til: ${canvas.width}x${canvas.height}`);
+    if (!video || !canvas) {
+        console.warn("⚠️ Video eller canvas ikke fundet!");
+        return;
     }
+
+    // Vent på, at videoen er klar (metadata indlæst)
+    if (video.videoWidth === 0 || video.videoHeight === 0) {
+        console.warn("⏳ Video ikke klar, prøver igen...");
+        setTimeout(updateCanvasSize, 100);
+        return;
+    }
+
+    // **Sæt canvas til at matche videoens faktiske opløsning**
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    console.log(`📏 Canvas opdateret til: ${canvas.width}x${canvas.height}`);
 }
 
 // 🚀 **Kør funktionen, når videoen er klar**
