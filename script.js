@@ -361,13 +361,13 @@ function resetPlayerForm() {
 function showScreen(targetScreen) {
     const screens = [startScreen, colorSetupScreen, raceSetupScreen, raceScreen];
     screens.forEach(screen => screen.style.display = "none");
+
+    // 🚀 Stop kameraet, når vi skifter væk fra en skærm
+    stopCamera();
+
     targetScreen.style.display = "flex";
 }
 
-document.getElementById("raceMode").addEventListener("change", function () {
-    raceMode = this.value;
-    
-});
 
 
 
@@ -695,8 +695,12 @@ function updateLeaderboard() {
 
         let medal = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : "";
 
+        // ✅ **Sikre, at der er et profilbillede – ellers brug et default billede**
+        let profileImage = player.profilePicture ? player.profilePicture : "default.png";
+
         playerEntry.innerHTML = `
             <div class="player-profile">
+                <img src="${profileImage}" alt="${player.name}" class="leaderboard-profile-pic">
                 <span class="player-name">${player.name}</span>
                 <span class="player-laps">${raceMode === "LapCounts" ? `${player.laps}/${raceSettings.rounds}` : formatTime(player.lapTimes.length > 0 ? Math.min(...player.lapTimes) : 0)}</span>
                 <span class="medal">${medal}</span>
