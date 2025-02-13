@@ -682,36 +682,51 @@ function updateLeaderboard() {
     const leaderboardDiv = document.getElementById("leaderboard");
 
     if (!leaderboardDiv) {
-        console.error("Fejl: Leaderboard-div ikke fundet!");
+        console.error("❌ Fejl: Leaderboard-div ikke fundet!");
         return;
     }
 
     leaderboardDiv.innerHTML = "<h3>LEADERBOARD:</h3>";
 
-    let sortedPlayers = [];
+    let finishedPlayers = players.filter(player => player.finishTime !== null);
+    let ongoingPlayers = players.filter(player => player.finishTime === null);
 
+    // 🎯 **Sortér færdige spillere efter afslutningstid**
+    finishedPlayers.sort((a, b) => a.finishTime - b.finishTime);
+    
+    // 🎯 **Sortér spillere der stadig kører**
     if (raceMode === "LapCounts") {
-        sortedPlayers = [...players].sort((a, b) => b.laps - a.laps);
+        ongoingPlayers.sort((a, b) => b.laps - a.laps); // Flest runder først
     } else if (raceMode === "FastestLap") {
-        sortedPlayers = [...players].sort((a, b) => {
+        ongoingPlayers.sort((a, b) => {
             let bestLapA = a.lapTimes.length > 0 ? Math.min(...a.lapTimes) : Infinity;
             let bestLapB = b.lapTimes.length > 0 ? Math.min(...b.lapTimes) : Infinity;
             return bestLapA - bestLapB;
         });
     }
 
+    let sortedPlayers = [...finishedPlayers, ...ongoingPlayers];
+
+    // 🎖 **Medaljer gives kun til færdige spillere i rækkefølge**
+    let medalCount = 0;
+    let medals = ["🥇", "🥈", "🥉"];
+
     sortedPlayers.forEach((player, index) => {
         let playerEntry = document.createElement("div");
         playerEntry.classList.add("leaderboard-player");
 
-        let medal = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : "";
-
         let profileImage = player.profilePicture ? player.profilePicture : "default.png";
+
+        let medal = "";
+        if (player.finishTime !== null && medalCount < medals.length) {
+            medal = medals[medalCount];
+            medalCount++;
+        }
 
         // **Vis korrekt info afhængig af race mode**
         let playerInfo;
         if (raceMode === "LapCounts") {
-            playerInfo = `${player.laps}/${raceSettings.rounds || 0}`; // Sikrer at rounds aldrig er undefined
+            playerInfo = `${player.laps}/${raceSettings.rounds || 0}`;
         } else {
             let bestLap = player.lapTimes.length > 0 ? Math.min(...player.lapTimes) : null;
             playerInfo = bestLap !== null ? formatTime(bestLap) : "--:--";
