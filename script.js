@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
    // 🎯 Gem race-indstillinger, når brugeren trykker på "Start Race"
     startRaceButton.addEventListener("click", () => {
-        const selectedValue = parseInt(document.getElementById("raceModeInput").value);
+        const selectedValue = parseInt(raceModeInput.value);
     
         if (isNaN(selectedValue) || (raceModeSelector.value === "LapCounts" && selectedValue < 1) || 
             (raceModeSelector.value === "FastestLap" && selectedValue < 10)) {
