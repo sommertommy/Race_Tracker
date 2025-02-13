@@ -698,9 +698,13 @@ function updateLeaderboard() {
         let profileImage = player.profilePicture ? player.profilePicture : "default.png";
 
         // **Vis korrekt info afhængig af race mode**
-        let playerInfo = raceMode === "LapCounts" 
-            ? `${player.laps}/${raceSettings.rounds}` 
-            : (player.lapTimes.length > 0 ? formatTime(Math.min(...player.lapTimes)) : "--:--");
+        let playerInfo;
+        if (raceMode === "LapCounts") {
+            playerInfo = `${player.laps}/${raceSettings.rounds || 0}`; // Sikrer at rounds aldrig er undefined
+        } else {
+            let bestLap = player.lapTimes.length > 0 ? Math.min(...player.lapTimes) : null;
+            playerInfo = bestLap !== null ? formatTime(bestLap) : "--:--";
+        }
 
         playerEntry.innerHTML = `
             <div class="player-profile">
