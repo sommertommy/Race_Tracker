@@ -303,14 +303,13 @@ let editingPlayerId = null; // 🔥 Holder styr på den spiller, der redigeres
 let cameraStarted = false;
 
 // 🎥 **Tving kameraet til at stoppe**
-// 🎥 **Tving kameraet til at stoppe korrekt**
+// 🎥 **Tving kameraet til at stoppe kun hvis nødvendigt**
 function stopCamera() {
     return new Promise(resolve => {
         const videoElement = document.getElementById("video");
 
         if (!activeStream) {
-            console.warn("⚠️ Ingen aktiv stream at stoppe!");
-            resolve();
+            resolve(); // 🚀 Gør ingenting, hvis ingen aktiv stream
             return;
         }
 
