@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // RACING MODE SELECTOR
 
     let selectedCameraId = localStorage.getItem("selectedCamera") || null;
-    let activeStream = null;
+    
 
     // 🎯 **Vent på acceptColorSelectionButton før eventListener tilføjes**
     function ensureAcceptButtonExists() {
@@ -161,8 +161,7 @@ async function startSelectedCamera() {
         .then(stream => {
             console.log("📷 Kamera stream modtaget!", stream);
             
-            // 🚀 **GEMMER activeStream KORREKT!**
-            activeStream = stream;
+            activeStream = stream;  // ✅ **Nu bliver `activeStream` sat rigtigt!**
             console.log("✅ activeStream ER SAT:", activeStream);
 
             const videoElement = document.getElementById("video");
@@ -177,7 +176,6 @@ async function startSelectedCamera() {
         .then(() => {
             console.log("🎥 Kameraet er nu aktivt!");
 
-            // 🔥 Gør video synlig
             const videoElement = document.getElementById("video");
             if (videoElement) {
                 videoElement.style.display = "block";
@@ -185,13 +183,11 @@ async function startSelectedCamera() {
                 videoElement.style.visibility = "visible";
             }
 
-            // 🔥 Sørg for at colorPickerOverlay også er synligt
             const colorPickerOverlay = document.getElementById("colorPickerOverlay");
             if (colorPickerOverlay) {
                 colorPickerOverlay.style.display = "flex";
             }
 
-            // 🔥 Skjul cameraPlaceholder
             const cameraPlaceholder = document.getElementById("cameraPlaceholder");
             if (cameraPlaceholder) {
                 cameraPlaceholder.style.display = "none";
@@ -202,6 +198,8 @@ async function startSelectedCamera() {
             cameraActive = false;
         });
 }
+
+    
     // 🎯 **Når man trykker på "Vælg bil via kamera"**
     openColorPickerButton.addEventListener("click", () => {
         console.log("📸 Åbner farvevalg-overlay...");
@@ -343,6 +341,7 @@ function stopCamera() {
             videoElement.srcObject = null;
         }
 
+        console.log("🎥 activeStream-status EFTER stop:", activeStream);  // ✅ Tjek om den bliver nulstillet korrekt
         resolve();
     });
 }
