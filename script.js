@@ -680,8 +680,6 @@ function stopRace() {
 
 function updateLeaderboard() {
     console.log("✅ Leaderboard opdateret");
-    console.log("🎯 Aktuelt raceMode fra raceSettings:", raceSettings.mode);
-    
     const leaderboardDiv = document.getElementById("leaderboard");
 
     if (!leaderboardDiv) {
@@ -698,9 +696,9 @@ function updateLeaderboard() {
     finishedPlayers.sort((a, b) => a.finishTime - b.finishTime);
     
     // 🎯 **Sortér spillere der stadig kører**
-   if (raceSettings.mode === "LapCounts") {
-        ongoingPlayers.sort((a, b) => b.laps - a.laps); // Flest runder først
-    } else if (raceMode === "FastestLap") {
+    if (raceSettings.mode === "LapCounts") {
+        ongoingPlayers.sort((a, b) => b.laps - a.laps);
+    } else if (raceSettings.mode === "FastestLap") {
         ongoingPlayers.sort((a, b) => {
             let bestLapA = a.lapTimes.length > 0 ? Math.min(...a.lapTimes) : Infinity;
             let bestLapB = b.lapTimes.length > 0 ? Math.min(...b.lapTimes) : Infinity;
@@ -710,7 +708,6 @@ function updateLeaderboard() {
 
     let sortedPlayers = [...finishedPlayers, ...ongoingPlayers];
 
-    // 🎖 **Medaljer gives kun til færdige spillere i rækkefølge**
     let medalCount = 0;
     let medals = ["🥇", "🥈", "🥉"];
 
@@ -726,21 +723,22 @@ function updateLeaderboard() {
             medalCount++;
         }
 
-        // **🚀 Rettet: Vis kun runder i LapCounts, og kun tid i FastestLap!**
         let playerInfo;
         if (raceSettings.mode === "LapCounts") {
             playerInfo = `${player.laps}/${raceSettings.rounds || 0}`;
-        } else if (raceMode === "FastestLap") {
+        } else {
             let bestLap = player.lapTimes.length > 0 ? Math.min(...player.lapTimes) : null;
-            playerInfo = bestLap !== null ? formatTime(bestLap) : "--:--"; // **🚀 FastestLap viser tid nu!**
+            playerInfo = bestLap !== null ? formatTime(bestLap) : "--:--";
         }
 
         playerEntry.innerHTML = `
             <div class="player-profile">
                 <img src="${profileImage}" alt="${player.name}" class="leaderboard-profile-pic">
                 <span class="player-name">${player.name}</span>
-                <span class="player-laps">${playerInfo}</span> <!-- 🎯 Viser KUN det rigtige -->
-                <span class="medal">${medal}</span>
+                <div class="player-right">
+                    <span class="player-laps">${playerInfo}</span>
+                    <span class="medal">${medal}</span>
+                </div>
             </div>
         `;
 
