@@ -302,23 +302,42 @@ let selectedProfilePicture = "Reddriver.png"; // Standardbillede
 let editingPlayerId = null; // 🔥 Holder styr på den spiller, der redigeres
 let cameraStarted = false;
 
-// 🎥 **Stop kameraet korrekt globalt**
+// 🎥 **Tving kameraet til at stoppe**
 function stopCamera() {
     return new Promise(resolve => {
-        const videoElement = document.getElementById("video"); // 🔥 Sikrer at videoElement findes
+        const videoElement = document.getElementById("video");
+
+        console.log("🛑 stopCamera() kaldt!");
 
         if (activeStream) {
-            console.log("📸 Stopper kamera...");
-            activeStream.getTracks().forEach(track => track.stop());
-            activeStream = null;
+            console.log("📸 Stopper aktiv kamera-stream...");
+            activeStream.getTracks().forEach(track => {
+                console.log(`🚫 Stopper track: ${track.kind}`);
+                track.stop();
+            });
+
+            activeStream = null; // 🔥 Sørg for, at kameraet aldrig forbliver aktivt
+            cameraActive = false; 
+        } else {
+            console.warn("⚠️ Ingen aktiv stream fundet!");
         }
-        cameraActive = false;
-        
+
         if (videoElement) {
+            console.log("🔄 Nulstiller videoElement.srcObject...");
             videoElement.srcObject = null;
         }
 
-        resolve(); // 🚀 Sikrer, at vi kan vente på, at kameraet er slukket
+        // 🚀 **Tving browseren til at glemme tidligere stream**
+        navigator.mediaDevices.getUserMedia({ video: false })
+            .then(dummyStream => {
+                dummyStream.getTracks().forEach(track => track.stop());
+                console.log("✅ Dummy stream brugt for at sikre, at kameraet frigives!");
+                resolve();
+            })
+            .catch(err => {
+                console.warn("⚠️ Fejl ved dummy stream:", err);
+                resolve();
+            });
     });
 }
 
@@ -1206,63 +1225,6 @@ function ensureVideoReady(callback) {
 
 let cameraActive = false;
 
-function startSelectedCamera() {
-    if (!selectedCameraId) {
-        alert("Vælg et kamera først!");
-        return;
-    }
-
-    if (cameraActive) {
-        console.warn("⚠️ Kameraet kører allerede. Afbryder ekstra anmodning.");
-        return;
-    }
-
-    console.log("🎥 Prøver at starte kamera:", selectedCameraId);
-    cameraActive = true;
-
-    stopCamera().then(() => {
-        navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: selectedCameraId } } })
-            .then(stream => {
-                console.log("📷 Kamera stream modtaget!", stream);
-                activeStream = stream;
-
-                const videoElement = document.getElementById("video");
-                if (!videoElement) {
-                    console.error("❌ Fejl: videoElement blev ikke fundet!");
-                    return;
-                }
-
-                videoElement.srcObject = stream;
-                return videoElement.play(); // Afspil videoen
-            })
-            .then(() => {
-                console.log("🎥 Kameraet er nu aktivt!");
-
-                // 🔥 Gør video synlig
-                const videoElement = document.getElementById("video");
-                if (videoElement) {
-                    videoElement.style.display = "block"; 
-                    videoElement.style.opacity = "1";
-                    videoElement.style.visibility = "visible";
-                }
-
-                // 🔥 Sørg for at colorPickerOverlay også er synligt
-                const colorPickerOverlay = document.getElementById("colorPickerOverlay");
-                if (colorPickerOverlay) {
-                    colorPickerOverlay.style.display = "flex";
-                }
-                 // 🔥 Skjul cameraPlaceholder
-                const cameraPlaceholder = document.getElementById("cameraPlaceholder");
-                if (cameraPlaceholder) {
-                    cameraPlaceholder.style.display = "none";
-                }
-            })
-            .catch(err => {
-                console.error("❌ Fejl ved afspilning af video:", err);
-                cameraActive = false; 
-            });
-    });
-}
 
 
 
