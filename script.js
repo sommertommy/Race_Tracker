@@ -908,8 +908,7 @@ async function startRace() {
         console.log(`⏳ FastestLap mode med tidsgrænse: ${selectedTimeLimit} sekunder.`);
 
         countdownElement.style.display = "block"; // Vis countdown-boks
-        countdownElement.style.color = "white"; // Sørg for standardfarve
-        countdownElement.style.fontSize = "24px"; // Standardstørrelse
+        countdownElement.classList.remove("race-over"); // Fjern evt. "Race is over" styling
         updateCountdown(selectedTimeLimit);
 
         let timeRemaining = selectedTimeLimit;
@@ -918,15 +917,16 @@ async function startRace() {
         raceTimer = setInterval(() => {
             timeRemaining--;
 
-            if (timeRemaining > 0) {
+            if (timeRemaining >= 0) {
                 updateCountdown(timeRemaining);
             } else {
                 console.log("⏳ Tid er gået! Race stoppes.");
                 clearInterval(raceTimer);
-                countdownElement.innerText = "Race is over"; // 🔥 Skift tekst i stedet for at skjule
-                countdownElement.style.color = "red"; // (Valgfrit) Gør teksten rød
-                countdownElement.style.fontSize = "28px"; // (Valgfrit) Gør teksten større
                 stopRace();
+
+                // 🔥 Skift countdown-tekst til "Race is over"
+                countdownElement.innerText = "Race is over";
+                countdownElement.classList.add("race-over"); // Brug CSS til styling
             }
         }, 1000);
     } else {
