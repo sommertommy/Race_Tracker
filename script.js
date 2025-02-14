@@ -495,7 +495,7 @@ function updatePlayerLaps(playerId) {
     console.log(`⏱ ${player.name} registrerede en omgang på ${lapTime}ms`);
 
     if (raceMode === "LapCounts") {
-        player.laps++;
+        player.laps++; // ✅ Kun LapCounts øger runder
 
         if (player.laps === raceSettings.rounds) {
             player.finishTime = now;
@@ -505,12 +505,12 @@ function updatePlayerLaps(playerId) {
             playApplauseSound();
         }
     } else if (raceMode === "FastestLap") {
-        // 🎯 Opdater kun hvis den nye tid er den hurtigste
+        // 🎯 I FastestLap gem kun bedste tid, **uden at øge runder!**
         let bestLap = Math.min(...player.lapTimes);
         console.log(`🏁 ${player.name} har ny bedste tid: ${formatTime(bestLap)}`);
     }
 
-    // 🎯 Sorter kun leaderboardet i FastestLap mode
+    // 🎯 Sorter kun i FastestLap mode
     if (raceMode === "FastestLap") {
         sortLeaderboardByFastestLap();
     }
@@ -518,7 +518,6 @@ function updatePlayerLaps(playerId) {
     updateLeaderboard();
     updateLapTimesTable();
 }
-
 function sortLeaderboardByFastestLap() {
     players.sort((a, b) => {
         let fastestLapA = a.lapTimes.length > 0 ? Math.min(...a.lapTimes) : Infinity;
@@ -701,7 +700,7 @@ function updateLeaderboard() {
     } else if (raceMode === "FastestLap") {
         ongoingPlayers.sort((a, b) => {
             let bestLapA = a.lapTimes.length > 0 ? Math.min(...a.lapTimes) : Infinity;
-            let bestLapB = b.lapTimes.length > 0 ? Math.min(...a.lapTimes) : Infinity;
+            let bestLapB = b.lapTimes.length > 0 ? Math.min(...b.lapTimes) : Infinity;
             return bestLapA - bestLapB;
         });
     }
@@ -724,11 +723,11 @@ function updateLeaderboard() {
             medalCount++;
         }
 
-        // **Vis korrekt info afhængig af race mode**
+        // **🚀 Rettet: Vis kun runder i LapCounts, og kun tid i FastestLap!**
         let playerInfo;
         if (raceMode === "LapCounts") {
             playerInfo = `${player.laps}/${raceSettings.rounds || 0}`;
-        } else {
+        } else if (raceMode === "FastestLap") {
             let bestLap = player.lapTimes.length > 0 ? Math.min(...player.lapTimes) : null;
             playerInfo = bestLap !== null ? formatTime(bestLap) : "--:--"; // **🚀 FastestLap viser tid nu!**
         }
@@ -737,7 +736,7 @@ function updateLeaderboard() {
             <div class="player-profile">
                 <img src="${profileImage}" alt="${player.name}" class="leaderboard-profile-pic">
                 <span class="player-name">${player.name}</span>
-                <span class="player-laps">${playerInfo}</span>
+                <span class="player-laps">${playerInfo}</span> <!-- 🎯 Viser KUN det rigtige -->
                 <span class="medal">${medal}</span>
             </div>
         `;
@@ -745,7 +744,6 @@ function updateLeaderboard() {
         leaderboardDiv.appendChild(playerEntry);
     });
 }
-
 
 function updateExcludedColors() {
     players.forEach(player => {
