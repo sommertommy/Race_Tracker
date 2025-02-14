@@ -679,6 +679,8 @@ function stopRace() {
 
 function updateLeaderboard() {
     console.log("✅ Leaderboard opdateret");
+    console.log("🎯 Aktuelt raceMode:", raceMode);  // 🔥 Tjekker om raceMode er rigtigt
+    
     const leaderboardDiv = document.getElementById("leaderboard");
 
     if (!leaderboardDiv) {
