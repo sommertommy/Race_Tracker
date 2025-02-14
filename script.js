@@ -495,7 +495,7 @@ function updatePlayerLaps(playerId) {
 
     console.log(`⏱ ${player.name} registrerede en omgang på ${lapTime}ms`);
 
-    if (raceMode === "LapCounts") {
+    if (raceSettings.mode === "LapCounts") {
         player.laps++; // ✅ Kun LapCounts øger runder
 
         if (player.laps === raceSettings.rounds) {
@@ -680,7 +680,7 @@ function stopRace() {
 
 function updateLeaderboard() {
     console.log("✅ Leaderboard opdateret");
-    console.log("🎯 Aktuelt raceMode:", raceMode);  // 🔥 Tjekker om raceMode er rigtigt
+    console.log("🎯 Aktuelt raceMode fra raceSettings:", raceSettings.mode);
     
     const leaderboardDiv = document.getElementById("leaderboard");
 
@@ -698,7 +698,7 @@ function updateLeaderboard() {
     finishedPlayers.sort((a, b) => a.finishTime - b.finishTime);
     
     // 🎯 **Sortér spillere der stadig kører**
-    if (raceMode === "LapCounts") {
+   if (raceSettings.mode === "LapCounts") {
         ongoingPlayers.sort((a, b) => b.laps - a.laps); // Flest runder først
     } else if (raceMode === "FastestLap") {
         ongoingPlayers.sort((a, b) => {
@@ -728,7 +728,7 @@ function updateLeaderboard() {
 
         // **🚀 Rettet: Vis kun runder i LapCounts, og kun tid i FastestLap!**
         let playerInfo;
-        if (raceMode === "LapCounts") {
+        if (raceSettings.mode === "LapCounts") {
             playerInfo = `${player.laps}/${raceSettings.rounds || 0}`;
         } else if (raceMode === "FastestLap") {
             let bestLap = player.lapTimes.length > 0 ? Math.min(...player.lapTimes) : null;
@@ -809,8 +809,10 @@ backToStartRaceButton.addEventListener("click", () => {
 function startRace() {
     resetRaceData();
     raceStartTime = Date.now();
-    console.log("🚀 Start Race!");
-    console.log("🎯 Valgt raceMode:", raceMode);  // 🔥 Tjek om raceMode er korrekt fra start
+    
+    // 🔥 Korriger raceMode fra settings!
+    raceMode = raceSettings.mode;
+    console.log("🎯 Korrigeret raceMode fra settings:", raceMode);
 
     updateExcludedColors();
     showScreen(raceScreen);
@@ -822,15 +824,13 @@ function startRace() {
     updateLeaderboard();
     startRaceCamera();
 
-    // 🔥 Hvis Fastest Lap mode, start en timer
-        if (raceMode === "FastestLap") {
-        const selectedTimeLimit = raceSettings.timeLimit || 120; // Brug valgt tid eller fallback til 120 sek
-        console.log(`⏳ Race starter med en tidsgrænse på ${selectedTimeLimit} sekunder.`);
+    if (raceMode === "FastestLap") {
+        console.log(`⏳ Race starter med en tidsgrænse på ${raceSettings.timeLimit || 120} sekunder.`);
         
         raceTimer = setTimeout(() => {
             console.log("⏳ Tid er gået! Race stoppes.");
             stopRace();
-        }, selectedTimeLimit * 1000);
+        }, raceSettings.timeLimit * 1000);
     }
 
     setTimeout(() => {
