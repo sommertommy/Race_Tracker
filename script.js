@@ -476,6 +476,7 @@ function addPlayer(name) {
 function updatePlayerLaps(playerId) {
     let player = players.find(p => p.id === playerId);
     if (!player) return;
+    console.log("🏁 Aktuelt raceMode:", raceMode); // 🔥 Tjekker raceMode
 
     const now = Date.now();
 
@@ -809,6 +810,7 @@ function startRace() {
     resetRaceData();
     raceStartTime = Date.now();
     console.log("🚀 Start Race!");
+    console.log("🎯 Valgt raceMode:", raceMode);  // 🔥 Tjek om raceMode er korrekt fra start
 
     updateExcludedColors();
     showScreen(raceScreen);
