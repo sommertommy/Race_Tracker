@@ -503,13 +503,18 @@ function selectProfilePicture(imagePath) {
     document.querySelector(`img[src='${imagePath}']`).classList.add("selected-profile");
 }
 
-function updateCountdown(seconds) {
+function updateCountdown(secondsRemaining) {
     const countdownElement = document.getElementById("countdownTimer");
-    if (!countdownElement) return;
 
-    const minutes = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    countdownElement.textContent = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    if (!countdownElement) {
+        console.warn("⚠️ Countdown element ikke fundet!");
+        return;
+    }
+
+    let minutes = Math.floor(secondsRemaining / 60);
+    let seconds = secondsRemaining % 60;
+
+    countdownElement.innerText = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
 function addPlayer(name) {
@@ -725,6 +730,7 @@ async function stopRace() {
     raceActive = false;
     console.log("🏁 Race afsluttet!");
 
+    // Stop timer hvis aktiv
     if (raceTimer) {
         clearInterval(raceTimer);
         raceTimer = null;
@@ -878,10 +884,12 @@ backToStartRaceButton.addEventListener("click", () => {
 
 
 
-function startRace() {
+async function startRace() {
     resetRaceData();
     raceStartTime = Date.now();
+    
     console.log("🚀 Start Race!");
+    console.log(`🚀 RaceMode ved start: ${raceMode}`);
 
     updateExcludedColors();
     showScreen(raceScreen);
@@ -895,23 +903,24 @@ function startRace() {
 
     const countdownElement = document.getElementById("countdownTimer");
 
+    // **FASTEST LAP MODE - START COUNTDOWN**
     if (raceMode === "FastestLap") {
-        const selectedTimeLimit = raceSettings.timeLimit || 120; // Standard 120 sekunder
-        console.log(`⏳ Race starter med en tidsgrænse på ${selectedTimeLimit} sekunder.`);
+        const selectedTimeLimit = raceSettings.timeLimit || 120; // Default 120 sek
+        console.log(`⏳ FastestLap mode med tidsgrænse: ${selectedTimeLimit} sekunder.`);
 
-        countdownElement.style.display = "block"; // Vis timeren
-        updateCountdown(selectedTimeLimit); // Start countdown
+        countdownElement.style.display = "block"; // Vis countdown-boks
+        updateCountdown(selectedTimeLimit);
 
         let timeRemaining = selectedTimeLimit;
 
-        // ⏳ **Start nedtællingen** 
+        // **Start nedtælling**
         raceTimer = setInterval(() => {
             timeRemaining--;
 
             if (timeRemaining >= 0) {
                 updateCountdown(timeRemaining);
             } 
-
+            
             if (timeRemaining <= 0) {
                 console.log("⏳ Tid er gået! Race stoppes.");
                 clearInterval(raceTimer);
@@ -919,14 +928,15 @@ function startRace() {
             }
         }, 1000);
     } else {
-        countdownElement.style.display = "none"; // Skjul countdown hvis ikke FastestLap
+        countdownElement.style.display = "none"; // Skjul countdown i LapCounts
     }
 
+    // **Start farvesporing kun hvis ikke allerede aktiv**
     setTimeout(() => {
-        if (!trackingInterval) {
+        if (!trackingInterval && raceActive) {
             detectColorInRace();
         } else {
-            console.warn("⚠️ detectColorInRace kører allerede.");
+            console.warn("⚠️ detectColorInRace kører allerede eller race er stoppet.");
         }
     }, 1000);
 }
