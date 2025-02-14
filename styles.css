@@ -549,7 +549,13 @@ th, td {
     cursor: pointer;
     transition: transform 0.2s ease-in-out;
 }
-
+/* 🎯 Flex-container for spilleropdeling */
+.player-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
 
 
 /* 🎭 Ensrettet spillerindstillinger */
@@ -596,6 +602,13 @@ th, td {
 }
 
 .player-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-align: right;
+}
+
+.player-left {
     display: flex;
     align-items: center;
     gap: 10px;
