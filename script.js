@@ -927,7 +927,8 @@ async function startRace() {
             }
         }, 1000);
     } else {
-        countdownElement.style.display = "block"; // Skjul countdown i LapCounts
+        return;
+        //countdownElement.style.display = "block"; // Skjul countdown i LapCounts
     }
 
     // **Start farvesporing kun hvis ikke allerede aktiv**
