@@ -157,46 +157,60 @@ async function startSelectedCamera() {
 
     await stopCamera(); // 🔥 **Vent på, at kameraet stopper først**
 
-    navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: selectedCameraId } } })
-        .then(stream => {
-            console.log("📷 Kamera stream modtaget!", stream);
-            
-            activeStream = stream;  // ✅ **Nu bliver `activeStream` sat rigtigt!**
-            console.log("✅ activeStream ER SAT:", activeStream);
+    navigator.mediaDevices.getUserMedia({
+        video: {
+            deviceId: { exact: selectedCameraId },
+            width: { ideal: 1920 }, // Prøver at få høj opløsning
+            height: { ideal: 1080 },
+            facingMode: "environment" // 📷 Foretrækker bagkamera på mobilen
+        }
+    })
+    .then(stream => {
+        console.log("📷 Kamera stream modtaget!", stream);
+        
+        activeStream = stream;  // ✅ **Nu bliver `activeStream` sat rigtigt!**
+        console.log("✅ activeStream ER SAT:", activeStream);
 
-            const videoElement = document.getElementById("video");
-            if (!videoElement) {
-                console.error("❌ Fejl: videoElement blev ikke fundet!");
-                return;
-            }
+        const videoElement = document.getElementById("video");
+        if (!videoElement) {
+            console.error("❌ Fejl: videoElement blev ikke fundet!");
+            return;
+        }
 
-            videoElement.srcObject = stream;
-            return videoElement.play();
-        })
-        .then(() => {
+        videoElement.srcObject = stream;
+
+        return videoElement.play().then(() => {
             console.log("🎥 Kameraet er nu aktivt!");
 
-            const videoElement = document.getElementById("video");
-            if (videoElement) {
-                videoElement.style.display = "block";
-                videoElement.style.opacity = "1";
-                videoElement.style.visibility = "visible";
-            }
+            videoElement.style.display = "block";
+            videoElement.style.opacity = "1";
+            videoElement.style.visibility = "visible";
 
+            // 📌 **Sikrer at kameraet vises i den rigtige opløsning**
+            setTimeout(() => {
+                videoElement.width = videoElement.videoWidth;
+                videoElement.height = videoElement.videoHeight;
+                console.log(`📏 Kameraopløsning sat til: ${videoElement.width}x${videoElement.height}`);
+            }, 500);
+
+            // 🎨 **Vis farvevælger-overlay**
             const colorPickerOverlay = document.getElementById("colorPickerOverlay");
             if (colorPickerOverlay) {
                 colorPickerOverlay.style.display = "flex";
             }
 
+            // 🚀 **Skjul pladsholder**
             const cameraPlaceholder = document.getElementById("cameraPlaceholder");
             if (cameraPlaceholder) {
                 cameraPlaceholder.style.display = "none";
             }
-        })
-        .catch(err => {
-            console.error("❌ Fejl ved afspilning af video:", err);
-            cameraActive = false;
         });
+    })
+    .catch(err => {
+        console.error("❌ Fejl ved afspilning af video:", err);
+        alert("Kameraet kunne ikke startes. Tjek kameraindstillinger eller giv browseren tilladelse.");
+        cameraActive = false;
+    });
 }
 
     
