@@ -859,10 +859,7 @@ backToStartRaceButton.addEventListener("click", () => {
 function startRace() {
     resetRaceData();
     raceStartTime = Date.now();
-    
-    // 🔥 Korriger raceMode fra settings!
-    raceMode = raceSettings.mode;
-    console.log("🎯 Korrigeret raceMode fra settings:", raceMode);
+    console.log("🚀 Start Race!");
 
     updateExcludedColors();
     showScreen(raceScreen);
@@ -874,13 +871,29 @@ function startRace() {
     updateLeaderboard();
     startRaceCamera();
 
+    const countdownElement = document.getElementById("countdownTimer");
+
+    // 🔥 Hvis Fastest Lap mode, start en timer
     if (raceMode === "FastestLap") {
-        console.log(`⏳ Race starter med en tidsgrænse på ${raceSettings.timeLimit || 120} sekunder.`);
-        
-        raceTimer = setTimeout(() => {
-            console.log("⏳ Tid er gået! Race stoppes.");
-            stopRace();
-        }, raceSettings.timeLimit * 1000);
+        const selectedTimeLimit = raceSettings.timeLimit || 120; // Brug valgt tid eller fallback til 120 sek
+        console.log(`⏳ Race starter med en tidsgrænse på ${selectedTimeLimit} sekunder.`);
+
+        countdownElement.style.display = "block"; // Vis timeren
+        updateCountdown(selectedTimeLimit); // Start countdown-funktion
+
+        raceTimer = setInterval(() => {
+            const elapsedTime = Math.floor((Date.now() - raceStartTime) / 1000);
+            const remainingTime = selectedTimeLimit - elapsedTime;
+            updateCountdown(remainingTime);
+
+            if (remainingTime <= 0) {
+                console.log("⏳ Tid er gået! Race stoppes.");
+                clearInterval(raceTimer);
+                stopRace();
+            }
+        }, 1000);
+    } else {
+        countdownElement.style.display = "none"; // Skjul countdown hvis ikke FastestLap
     }
 
     setTimeout(() => {
