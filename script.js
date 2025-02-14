@@ -160,7 +160,9 @@ async function startSelectedCamera() {
     navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: selectedCameraId } } })
         .then(stream => {
             console.log("📷 Kamera stream modtaget!", stream);
-            activeStream = stream;
+            
+            // 🚀 **GEMMER activeStream KORREKT!**
+            activeStream = stream; 
 
             const videoElement = document.getElementById("video");
             if (!videoElement) {
@@ -169,24 +171,36 @@ async function startSelectedCamera() {
             }
 
             videoElement.srcObject = stream;
-            return videoElement.play(); // Afspil videoen
+            return videoElement.play();
         })
         .then(() => {
             console.log("🎥 Kameraet er nu aktivt!");
 
-            videoElement.style.display = "block";
-            videoElement.style.opacity = "1";
-            videoElement.style.visibility = "visible";
+            // 🔥 Gør video synlig
+            const videoElement = document.getElementById("video");
+            if (videoElement) {
+                videoElement.style.display = "block";
+                videoElement.style.opacity = "1";
+                videoElement.style.visibility = "visible";
+            }
 
-            colorPickerOverlay.style.display = "flex";
-            cameraPlaceholder.style.display = "none";
+            // 🔥 Sørg for at colorPickerOverlay også er synligt
+            const colorPickerOverlay = document.getElementById("colorPickerOverlay");
+            if (colorPickerOverlay) {
+                colorPickerOverlay.style.display = "flex";
+            }
+
+            // 🔥 Skjul cameraPlaceholder
+            const cameraPlaceholder = document.getElementById("cameraPlaceholder");
+            if (cameraPlaceholder) {
+                cameraPlaceholder.style.display = "none";
+            }
         })
         .catch(err => {
             console.error("❌ Fejl ved afspilning af video:", err);
             cameraActive = false;
         });
 }
-
 
     // 🎯 **Når man trykker på "Vælg bil via kamera"**
     openColorPickerButton.addEventListener("click", () => {
