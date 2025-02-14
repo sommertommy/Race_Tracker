@@ -504,17 +504,18 @@ function updatePlayerLaps(playerId) {
             launchConfetti();
             playApplauseSound();
         }
+    } else if (raceMode === "FastestLap") {
+        // 🎯 Opdater kun hvis den nye tid er den hurtigste
+        let bestLap = Math.min(...player.lapTimes);
+        console.log(`🏁 ${player.name} har ny bedste tid: ${formatTime(bestLap)}`);
     }
 
-    // 🎯 Kun sorter, hvis vi er i FastestLap mode
+    // 🎯 Sorter kun leaderboardet i FastestLap mode
     if (raceMode === "FastestLap") {
         sortLeaderboardByFastestLap();
     }
 
-    // ✅ Kald kun updateLeaderboard() én gang
     updateLeaderboard();
-
-    // ✅ Opdater lap-tider
     updateLapTimesTable();
 }
 
@@ -700,7 +701,7 @@ function updateLeaderboard() {
     } else if (raceMode === "FastestLap") {
         ongoingPlayers.sort((a, b) => {
             let bestLapA = a.lapTimes.length > 0 ? Math.min(...a.lapTimes) : Infinity;
-            let bestLapB = b.lapTimes.length > 0 ? Math.min(...b.lapTimes) : Infinity;
+            let bestLapB = b.lapTimes.length > 0 ? Math.min(...a.lapTimes) : Infinity;
             return bestLapA - bestLapB;
         });
     }
@@ -729,7 +730,7 @@ function updateLeaderboard() {
             playerInfo = `${player.laps}/${raceSettings.rounds || 0}`;
         } else {
             let bestLap = player.lapTimes.length > 0 ? Math.min(...player.lapTimes) : null;
-            playerInfo = bestLap !== null ? formatTime(bestLap) : "--:--";
+            playerInfo = bestLap !== null ? formatTime(bestLap) : "--:--"; // **🚀 FastestLap viser tid nu!**
         }
 
         playerEntry.innerHTML = `
