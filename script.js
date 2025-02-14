@@ -67,11 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("✅ Race gemt:", raceSettings);
     
         // 🎥 Start countdown video og vent til den er færdig før racet starter
-        startCountdownAnimation(() => {
-            console.log("🏁 Countdown færdig – starter racet!");
-            raceActive = true;
-            detectColorInRace();
-        });
+        playCountdownVideo().then(() => {
             startRace();
         });
     });
@@ -348,38 +344,6 @@ function stopCamera() {
         console.log("🎥 activeStream-status EFTER stop:", activeStream);  // ✅ Tjek om den bliver nulstillet korrekt
         resolve();
     });
-}
-
-
-function startCountdownAnimation(callback) {
-    const circles = document.querySelectorAll("#countdownBar .circle");
-    let index = 0;
-
-    function updateCircles() {
-        if (index < circles.length) {
-            circles[index].classList.add("red"); // Skifter til rød
-            index++;
-            setTimeout(updateCircles, 1000);
-        } else {
-            // Alle bliver grønne
-            circles.forEach(circle => {
-                circle.classList.remove("red");
-                circle.classList.add("green");
-            });
-
-            // Vent 3 sekunder, fade ud og start løbet
-            setTimeout(() => {
-                document.getElementById("countdownBar").classList.add("fade-out");
-
-                setTimeout(() => {
-                    document.getElementById("countdownBar").style.display = "none";
-                    callback(); // Start race efter countdown
-                }, 2000);
-            }, 3000);
-        }
-    }
-
-    updateCircles();
 }
 
 
