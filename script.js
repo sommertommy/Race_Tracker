@@ -305,20 +305,19 @@ let cameraStarted = false;
 // 🎥 **Tving kameraet til at stoppe**
 // 🎥 **Tving kameraet til at stoppe kun hvis nødvendigt**
 function stopCamera() {
+    console.log("🛑 stopCamera() FUNKTIONEN BLEV KALDT!");
     return new Promise(resolve => {
         const videoElement = document.getElementById("video");
-
-        if (!activeStream) {
-            resolve(); // 🚀 Gør ingenting, hvis ingen aktiv stream
-            return;
+        console.log("🎥 activeStream-status før stop:", activeStream);
+        if (activeStream) {
+            console.log("📸 Stopper aktiv kamera-stream...");
+            activeStream.getTracks().forEach(track => {
+                console.log(`🚫 Stopper track: ${track.kind}`);
+                track.stop();
+            });
+            activeStream = null;
+            console.log("✅ Kamera er nu deaktiveret");
         }
-
-        console.log("🛑 stopCamera() kaldt!");
-
-        activeStream.getTracks().forEach(track => {
-            console.log(`🚫 Stopper track: ${track.kind}`);
-            track.stop();
-        });
 
         activeStream = null;
         cameraActive = false;
