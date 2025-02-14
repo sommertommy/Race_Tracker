@@ -14,6 +14,13 @@ body {
     border-radius: 10px;
 } 
 
+@font-face {
+    font-family: 'Digital-7';
+    src: url('digital-7.regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 #raceScreen{
     background-image: url("raceday.jpg"); /* 🖼️ Brug din billedfil */
     background-size: cover;  /* 📌 Dækker hele skærmen */
