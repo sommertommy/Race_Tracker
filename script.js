@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // RACING MODE SELECTOR
     // RACING MODE SELECTOR
     
-    raceMode = document.getElementById("raceMode").value; // Sæt initial værdi
+    raceSettings.mode = document.getElementById("raceMode").value;
     const raceModeSelector = document.getElementById("raceMode");
     const raceModeLabel = document.getElementById("raceModeLabel");
     const raceModeInput = document.getElementById("raceModeInput");
@@ -291,7 +291,7 @@ const colorPickerOverlay = document.getElementById("colorPickerOverlay");
 const cameraSelect = document.getElementById("cameraSelect");
 
 // 🎯 **Globale variabler**
-let raceMode = "LapCounts"; // Standardmode
+
 let raceTimer = null; // Gem timer reference
 let selectedCameraId = null;
 let activeStream = null;
@@ -537,27 +537,27 @@ function addPlayer(name) {
 function updatePlayerLaps(playerId) {
     let player = players.find(p => p.id === playerId);
     if (!player) return;
-    console.log("🏁 Aktuelt raceMode:", raceMode); // 🔥 Tjekker raceMode
+
+    console.log("🏁 Aktuelt raceMode:", raceSettings.mode); // 🔥 Debug log
 
     const now = Date.now();
 
-    // ✅ Sikrer, at `lapTimes` eksisterer
     if (!player.lapTimes) {
         player.lapTimes = [];
         console.warn(`🔧 Oprettede lapTimes for ${player.name}`);
     }
 
     let lapTime = player.lapTimes.length === 0 
-        ? now - raceStartTime  // Første omgang starter fra race start
-        : now - player.lastDetectionTime; // Tid siden sidste omgang
+        ? now - raceStartTime  
+        : now - player.lastDetectionTime;
 
-    player.lapTimes.push(lapTime); // 🎯 GEM rundetiden!
-    player.lastDetectionTime = now; // Opdater seneste omgang
+    player.lapTimes.push(lapTime);
+    player.lastDetectionTime = now;
 
     console.log(`⏱ ${player.name} registrerede en omgang på ${lapTime}ms`);
 
     if (raceSettings.mode === "LapCounts") {
-        player.laps++; // ✅ Kun LapCounts øger runder
+        player.laps++;
 
         if (player.laps === raceSettings.rounds) {
             player.finishTime = now;
@@ -566,20 +566,19 @@ function updatePlayerLaps(playerId) {
             launchConfetti();
             playApplauseSound();
         }
-    } else if (raceMode === "FastestLap") {
-        // 🎯 I FastestLap gem kun bedste tid, **uden at øge runder!**
+    } else if (raceSettings.mode === "FastestLap") {
         let bestLap = Math.min(...player.lapTimes);
         console.log(`🏁 ${player.name} har ny bedste tid: ${formatTime(bestLap)}`);
     }
 
-    // 🎯 Sorter kun i FastestLap mode
-    if (raceMode === "FastestLap") {
+    if (raceSettings.mode === "FastestLap") {
         sortLeaderboardByFastestLap();
     }
 
     updateLeaderboard();
     updateLapTimesTable();
 }
+
 function sortLeaderboardByFastestLap() {
     players.sort((a, b) => {
         let fastestLapA = a.lapTimes.length > 0 ? Math.min(...a.lapTimes) : Infinity;
@@ -889,14 +888,14 @@ async function startRace() {
     raceStartTime = Date.now();
     
     console.log("🚀 Start Race!");
-    console.log(`🚀 RaceMode ved start: ${raceMode}`);
+    console.log(`🚀 RaceMode ved start: ${raceSettings.mode}`);
 
     updateExcludedColors();
     showScreen(raceScreen);
     console.log("🔍 raceScreen vist!");
 
     raceActive = true;
-    console.log(`🏁 Race er nu aktiv i mode: ${raceMode}`);
+    console.log(`🏁 Race er nu aktiv i mode: ${raceSettings.mode}`);
 
     updateLeaderboard();
     startRaceCamera();
@@ -904,7 +903,7 @@ async function startRace() {
     const countdownElement = document.getElementById("countdownTimer");
 
     // **FASTEST LAP MODE - START COUNTDOWN**
-    if (raceMode === "FastestLap") {
+    if (raceSettings.mode === "FastestLap") {
         const selectedTimeLimit = raceSettings.timeLimit || 120; // Default 120 sek
         console.log(`⏳ FastestLap mode med tidsgrænse: ${selectedTimeLimit} sekunder.`);
 
@@ -1248,7 +1247,7 @@ function detectColorInRace() {
                 updatePlayerLaps(player.id);
                 player.lastDetectionTime = now;
             
-                if (raceMode === "LapCounts" && player.laps >= raceSettings.rounds && !player.finishTime) {
+                if (raceSettings.mode === "LapCounts" && player.laps >= raceSettings.rounds && !player.finishTime) {
                     player.finishTime = now;
                     console.log(`🏁 ${player.name} har FULDFØRT racet! 🎉`);
                     launchConfetti();
