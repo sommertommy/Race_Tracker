@@ -51,6 +51,37 @@ body {
     top: 0;
 }
 
+#countdownBar {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 999;
+}
+
+.circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: gray; /* Startfarve */
+    transition: background-color 0.5s ease-in-out;
+}
+
+.green {
+    background-color: green !important;
+}
+
+.red {
+    background-color: red;
+}
+
+.fade-out {
+    opacity: 0;
+    transition: opacity 2s ease-out;
+}
+
 .contentBox{
     background-color: #0000003b;
     padding: 60px 30px;
