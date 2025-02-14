@@ -503,7 +503,12 @@ function selectProfilePicture(imagePath) {
     document.querySelector(`img[src='${imagePath}']`).classList.add("selected-profile");
 }
 
-
+function updateCountdown(seconds) {
+    const countdownElement = document.getElementById("countdownTimer");
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    countdownElement.textContent = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
 
 function addPlayer(name) {
     const newPlayer = {
