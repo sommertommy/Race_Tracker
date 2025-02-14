@@ -162,7 +162,8 @@ async function startSelectedCamera() {
             console.log("📷 Kamera stream modtaget!", stream);
             
             // 🚀 **GEMMER activeStream KORREKT!**
-            activeStream = stream; 
+            activeStream = stream;
+            console.log("✅ activeStream ER SAT:", activeStream);
 
             const videoElement = document.getElementById("video");
             if (!videoElement) {
@@ -201,7 +202,6 @@ async function startSelectedCamera() {
             cameraActive = false;
         });
 }
-
     // 🎯 **Når man trykker på "Vælg bil via kamera"**
     openColorPickerButton.addEventListener("click", () => {
         console.log("📸 Åbner farvevalg-overlay...");
@@ -317,35 +317,35 @@ let editingPlayerId = null; // 🔥 Holder styr på den spiller, der redigeres
 let cameraStarted = false;
 
 // 🎥 **Tving kameraet til at stoppe**
-    function stopCamera() {
-        return new Promise(resolve => {
-            const videoElement = document.getElementById("video");
-    
-            console.log("🛑 stopCamera() FUNKTIONEN BLEV KALDT!");
-            console.log("🎥 activeStream-status før stop:", activeStream);
-    
-            if (activeStream) {
-                console.log("📸 Stopper aktiv kamera-stream...");
-                activeStream.getTracks().forEach(track => {
-                    console.log(`🚫 Stopper track: ${track.kind}`);
-                    track.stop();
-                });
-    
-                activeStream = null; // 🔥 **Nulstil stream, så vi ikke mister referencen**
-                cameraActive = false;
-                console.log("✅ Kamera er nu deaktiveret!");
-            } else {
-                console.warn("⚠️ Ingen aktiv stream at stoppe!");
-            }
-    
-            if (videoElement) {
-                console.log("🔄 Nulstiller videoElement.srcObject...");
-                videoElement.srcObject = null;
-            }
-    
-            resolve();
-        });
-    }
+function stopCamera() {
+    return new Promise(resolve => {
+        const videoElement = document.getElementById("video");
+
+        console.log("🛑 stopCamera() FUNKTIONEN BLEV KALDT!");
+        console.log("🎥 activeStream-status før stop:", activeStream);
+
+        if (activeStream) {
+            console.log("📸 Stopper aktiv kamera-stream...");
+            activeStream.getTracks().forEach(track => {
+                console.log(`🚫 Stopper track: ${track.kind}`);
+                track.stop();
+            });
+
+            activeStream = null; // 🔥 **Nulstil stream korrekt**
+            cameraActive = false;
+            console.log("✅ Kamera er nu deaktiveret!");
+        } else {
+            console.warn("⚠️ Ingen aktiv stream at stoppe!");
+        }
+
+        if (videoElement) {
+            console.log("🔄 Nulstiller videoElement.srcObject...");
+            videoElement.srcObject = null;
+        }
+
+        resolve();
+    });
+}
 
 
 // 🎯 **Funktion til at acceptere farvevalg**
