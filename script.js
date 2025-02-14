@@ -305,13 +305,19 @@ let cameraStarted = false;
 // 🎥 **Stop kameraet korrekt globalt**
 function stopCamera() {
     return new Promise(resolve => {
+        const videoElement = document.getElementById("video"); // 🔥 Sikrer at videoElement findes
+
         if (activeStream) {
             console.log("📸 Stopper kamera...");
             activeStream.getTracks().forEach(track => track.stop());
             activeStream = null;
         }
         cameraActive = false;
-        if (videoElement) videoElement.srcObject = null;
+        
+        if (videoElement) {
+            videoElement.srcObject = null;
+        }
+
         resolve(); // 🚀 Sikrer, at vi kan vente på, at kameraet er slukket
     });
 }
