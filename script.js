@@ -317,33 +317,35 @@ let editingPlayerId = null; // 🔥 Holder styr på den spiller, der redigeres
 let cameraStarted = false;
 
 // 🎥 **Tving kameraet til at stoppe**
-// 🎥 **Tving kameraet til at stoppe kun hvis nødvendigt**
-function stopCamera() {
-    console.log("🛑 stopCamera() FUNKTIONEN BLEV KALDT!");
-    return new Promise(resolve => {
-        const videoElement = document.getElementById("video");
-        console.log("🎥 activeStream-status før stop:", activeStream);
-        if (activeStream) {
-            console.log("📸 Stopper aktiv kamera-stream...");
-            activeStream.getTracks().forEach(track => {
-                console.log(`🚫 Stopper track: ${track.kind}`);
-                track.stop();
-            });
-            activeStream = null;
-            console.log("✅ Kamera er nu deaktiveret");
-        }
-
-        activeStream = null;
-        cameraActive = false;
-
-        if (videoElement) {
-            console.log("🔄 Nulstiller videoElement.srcObject...");
-            videoElement.srcObject = null;
-        }
-
-        resolve();
-    });
-}
+    function stopCamera() {
+        return new Promise(resolve => {
+            const videoElement = document.getElementById("video");
+    
+            console.log("🛑 stopCamera() FUNKTIONEN BLEV KALDT!");
+            console.log("🎥 activeStream-status før stop:", activeStream);
+    
+            if (activeStream) {
+                console.log("📸 Stopper aktiv kamera-stream...");
+                activeStream.getTracks().forEach(track => {
+                    console.log(`🚫 Stopper track: ${track.kind}`);
+                    track.stop();
+                });
+    
+                activeStream = null; // 🔥 **Nulstil stream, så vi ikke mister referencen**
+                cameraActive = false;
+                console.log("✅ Kamera er nu deaktiveret!");
+            } else {
+                console.warn("⚠️ Ingen aktiv stream at stoppe!");
+            }
+    
+            if (videoElement) {
+                console.log("🔄 Nulstiller videoElement.srcObject...");
+                videoElement.srcObject = null;
+            }
+    
+            resolve();
+        });
+    }
 
 
 // 🎯 **Funktion til at acceptere farvevalg**
