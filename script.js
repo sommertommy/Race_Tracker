@@ -155,19 +155,19 @@ async function startSelectedCamera() {
     console.log("🎥 Prøver at starte kamera:", selectedCameraId);
     cameraActive = true;
 
-    await stopCamera(); // 🔥 **Vent på, at kameraet stopper først**
+    await stopCamera(); // 🔥 Vent på, at kameraet stoppes korrekt
 
-    navigator.mediaDevices.getUserMedia({
-        video: {
-            deviceId: { exact: selectedCameraId },
-            width: { ideal: 1920 }, // Prøver at få høj opløsning
-            height: { ideal: 1080 },
-            facingMode: "environment" // 📷 Foretrækker bagkamera på mobilen
-        }
-    })
-    .then(stream => {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                deviceId: { exact: selectedCameraId },
+                width: { ideal: 1920 },
+                height: { ideal: 1080 },
+                facingMode: "environment"
+            }
+        });
+
         console.log("📷 Kamera stream modtaget!", stream);
-        
         activeStream = stream;  // ✅ **Nu bliver `activeStream` sat rigtigt!**
         console.log("✅ activeStream ER SAT:", activeStream);
 
@@ -179,39 +179,48 @@ async function startSelectedCamera() {
 
         videoElement.srcObject = stream;
 
-        return videoElement.play().then(() => {
-            console.log("🎥 Kameraet er nu aktivt!");
+        // 🚀 **Vent lidt før afspilning for at undgå race condition**
+        setTimeout(() => {
+            videoElement.play()
+                .then(() => {
+                    console.log("🎥 Kameraet er nu aktivt!");
 
-            videoElement.style.display = "block";
-            videoElement.style.opacity = "1";
-            videoElement.style.visibility = "visible";
+                    videoElement.style.display = "block";
+                    videoElement.style.opacity = "1";
+                    videoElement.style.visibility = "visible";
 
-            // 📌 **Sikrer at kameraet vises i den rigtige opløsning**
-            setTimeout(() => {
-                videoElement.width = videoElement.videoWidth;
-                videoElement.height = videoElement.videoHeight;
-                console.log(`📏 Kameraopløsning sat til: ${videoElement.width}x${videoElement.height}`);
-            }, 500);
+                    // 📏 **Sørg for at opløsningen er sat korrekt**
+                    setTimeout(() => {
+                        videoElement.width = videoElement.videoWidth;
+                        videoElement.height = videoElement.videoHeight;
+                        console.log(`📏 Kameraopløsning sat til: ${videoElement.width}x${videoElement.height}`);
+                    }, 500);
+                })
+                .catch(err => {
+                    console.error("❌ Fejl ved afspilning af video:", err);
+                    alert("Kameraet kunne ikke afspilles. Tjek kameraindstillinger.");
+                });
+        }, 200); // 🔥 Lidt forsinkelse før afspilning
 
-            // 🎨 **Vis farvevælger-overlay**
-            const colorPickerOverlay = document.getElementById("colorPickerOverlay");
-            if (colorPickerOverlay) {
-                colorPickerOverlay.style.display = "flex";
-            }
+        // 🎨 **Vis farvevælger-overlay**
+        const colorPickerOverlay = document.getElementById("colorPickerOverlay");
+        if (colorPickerOverlay) {
+            colorPickerOverlay.style.display = "flex";
+        }
 
-            // 🚀 **Skjul pladsholder**
-            const cameraPlaceholder = document.getElementById("cameraPlaceholder");
-            if (cameraPlaceholder) {
-                cameraPlaceholder.style.display = "none";
-            }
-        });
-    })
-    .catch(err => {
-        console.error("❌ Fejl ved afspilning af video:", err);
-        alert("Kameraet kunne ikke startes. Tjek kameraindstillinger eller giv browseren tilladelse.");
+        // 🚀 **Skjul pladsholder**
+        const cameraPlaceholder = document.getElementById("cameraPlaceholder");
+        if (cameraPlaceholder) {
+            cameraPlaceholder.style.display = "none";
+        }
+
+    } catch (err) {
+        console.error("❌ Fejl ved start af kamera:", err);
+        alert("Kameraet kunne ikke startes. Tjek kameraindstillinger.");
         cameraActive = false;
-    });
+    }
 }
+
 
     
     // 🎯 **Når man trykker på "Vælg bil via kamera"**
