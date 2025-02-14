@@ -505,6 +505,8 @@ function selectProfilePicture(imagePath) {
 
 function updateCountdown(seconds) {
     const countdownElement = document.getElementById("countdownTimer");
+    if (!countdownElement) return;
+
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
     countdownElement.textContent = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
@@ -723,13 +725,28 @@ async function stopRace() {
     raceActive = false;
     console.log("🏁 Race afsluttet!");
 
+    if (raceTimer) {
+        clearInterval(raceTimer);
+        raceTimer = null;
+        console.log("⏹ Timer stoppet!");
+    }
+
     if (trackingInterval) {
         clearInterval(trackingInterval);
         trackingInterval = null;
     }
 
     isTracking = false;
-    await stopCamera();  // 🔥 Lukker kameraet korrekt
+
+    // 🚀 **Sluk kameraet korrekt**
+    await stopCamera();
+
+    // 🎯 **Skjul countdown-timer**
+    const countdownElement = document.getElementById("countdownTimer");
+    if (countdownElement) {
+        countdownElement.style.display = "none";
+        console.log("⏳ Countdown skjult!");
+    }
 }
 
 function updateLeaderboard() {
@@ -871,27 +888,31 @@ function startRace() {
     console.log("🔍 raceScreen vist!");
 
     raceActive = true;
-    console.log("🏁 Race er nu aktiv:", raceActive);
+    console.log(`🏁 Race er nu aktiv i mode: ${raceMode}`);
 
     updateLeaderboard();
     startRaceCamera();
 
     const countdownElement = document.getElementById("countdownTimer");
 
-    // 🔥 Hvis Fastest Lap mode, start en timer
     if (raceMode === "FastestLap") {
-        const selectedTimeLimit = raceSettings.timeLimit || 120; // Brug valgt tid eller fallback til 120 sek
+        const selectedTimeLimit = raceSettings.timeLimit || 120; // Standard 120 sekunder
         console.log(`⏳ Race starter med en tidsgrænse på ${selectedTimeLimit} sekunder.`);
 
         countdownElement.style.display = "block"; // Vis timeren
-        updateCountdown(selectedTimeLimit); // Start countdown-funktion
+        updateCountdown(selectedTimeLimit); // Start countdown
 
+        let timeRemaining = selectedTimeLimit;
+
+        // ⏳ **Start nedtællingen** 
         raceTimer = setInterval(() => {
-            const elapsedTime = Math.floor((Date.now() - raceStartTime) / 1000);
-            const remainingTime = selectedTimeLimit - elapsedTime;
-            updateCountdown(remainingTime);
+            timeRemaining--;
 
-            if (remainingTime <= 0) {
+            if (timeRemaining >= 0) {
+                updateCountdown(timeRemaining);
+            } 
+
+            if (timeRemaining <= 0) {
                 console.log("⏳ Tid er gået! Race stoppes.");
                 clearInterval(raceTimer);
                 stopRace();
