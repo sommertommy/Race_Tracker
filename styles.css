@@ -12,7 +12,7 @@ body {
     align-items: center;
     padding: 20px;
     border-radius: 10px;
-}
+} 
 
 #raceScreen{
     background-image: url("raceday.jpg"); /* 🖼️ Brug din billedfil */
