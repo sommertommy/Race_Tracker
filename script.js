@@ -731,10 +731,13 @@ function updateLeaderboard() {
             playerInfo = bestLap !== null ? formatTime(bestLap) : "--:--";
         }
 
+        // 💡 **NY STRUKTUR FOR BEDRE CSS**
         playerEntry.innerHTML = `
-            <div class="player-profile">
-                <img src="${profileImage}" alt="${player.name}" class="leaderboard-profile-pic">
-                <span class="player-name">${player.name}</span>
+            <div class="player-container">
+                <div class="player-left">
+                    <img src="${profileImage}" alt="${player.name}" class="leaderboard-profile-pic">
+                    <span class="player-name">${player.name}</span>
+                </div>
                 <div class="player-right">
                     <span class="player-laps">${playerInfo}</span>
                     <span class="medal">${medal}</span>
