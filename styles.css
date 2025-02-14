@@ -595,6 +595,12 @@ th, td {
     border: 2px solid white;
 }
 
+.player-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 @media (max-width: 768px) {
     #profilePictureSelection {
         grid-template-columns: repeat(3, 1fr); /* 📌 3 billeder pr. række på mindre skærme */
