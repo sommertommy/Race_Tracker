@@ -303,45 +303,33 @@ let editingPlayerId = null; // 🔥 Holder styr på den spiller, der redigeres
 let cameraStarted = false;
 
 // 🎥 **Tving kameraet til at stoppe**
+// 🎥 **Tving kameraet til at stoppe korrekt**
 function stopCamera() {
     return new Promise(resolve => {
         const videoElement = document.getElementById("video");
 
+        if (!activeStream) {
+            console.warn("⚠️ Ingen aktiv stream at stoppe!");
+            resolve();
+            return;
+        }
+
         console.log("🛑 stopCamera() kaldt!");
 
-        if (activeStream) {
-            console.log("📸 Stopper aktiv kamera-stream...");
-            activeStream.getTracks().forEach(track => {
-                console.log(`🚫 Stopper track: ${track.kind}`);
-                track.stop();
-            });
+        activeStream.getTracks().forEach(track => {
+            console.log(`🚫 Stopper track: ${track.kind}`);
+            track.stop();
+        });
 
-            activeStream = null;
-            cameraActive = false;
-        } else {
-            console.warn("⚠️ Ingen aktiv stream fundet!");
-        }
+        activeStream = null;
+        cameraActive = false;
 
         if (videoElement) {
             console.log("🔄 Nulstiller videoElement.srcObject...");
             videoElement.srcObject = null;
         }
 
-        // ✅ **Dummy stream KUN hvis der var en aktiv stream**
-        if (activeStream !== null) {
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(dummyStream => {
-                    dummyStream.getTracks().forEach(track => track.stop());
-                    console.log("✅ Dummy stream brugt for at sikre, at kameraet frigives!");
-                    resolve();
-                })
-                .catch(err => {
-                    console.warn("⚠️ Fejl ved dummy stream:", err);
-                    resolve();
-                });
-        } else {
-            resolve(); // 🚀 Hvis ingen aktiv stream, fortsæt uden dummy stream
-        }
+        resolve();
     });
 }
 
