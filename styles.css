@@ -37,15 +37,18 @@ body {
 
 .countdown-box {
     font-family: 'Digital-7', sans-serif;
-    font-size: 48px;
-    color: #ff3b30; /* Rød farve for dramatisk effekt */
+    font-size: 100px;
+    color: #ff3b30;
     text-align: center;
-    background: black;
+    background: #000000;
     border-radius: 10px;
     padding: 10px 20px;
     width: 120px;
-    margin: 10px auto;
-    display: none; /* Skjules, indtil FastestLap starter */
+    display: none;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    top: 0;
 }
 
 .contentBox{
@@ -265,6 +268,8 @@ body {
 .player-name {
     flex-grow: 1;
     text-align: left;
+    font-family: 'Digital-7', sans-serif;
+    font-size: 30px;
 }
 
 .player-info {
@@ -274,8 +279,10 @@ body {
 }
 .player-laps {
     font-weight: bold;
-    text-align: right;
+    text-align: left;
     width: 50px;
+    font-family: 'Digital-7', sans-serif;
+    font-size: 42px;
 }
 .laps {
     font-size: 1.2em;
@@ -573,7 +580,7 @@ th, td {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
+    width: 90%;
 }
 
 
