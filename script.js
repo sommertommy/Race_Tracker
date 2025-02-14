@@ -316,8 +316,8 @@ function stopCamera() {
                 track.stop();
             });
 
-            activeStream = null; // 🔥 Sørg for, at kameraet aldrig forbliver aktivt
-            cameraActive = false; 
+            activeStream = null;
+            cameraActive = false;
         } else {
             console.warn("⚠️ Ingen aktiv stream fundet!");
         }
@@ -327,17 +327,21 @@ function stopCamera() {
             videoElement.srcObject = null;
         }
 
-        // 🚀 **Tving browseren til at glemme tidligere stream**
-        navigator.mediaDevices.getUserMedia({ video: false })
-            .then(dummyStream => {
-                dummyStream.getTracks().forEach(track => track.stop());
-                console.log("✅ Dummy stream brugt for at sikre, at kameraet frigives!");
-                resolve();
-            })
-            .catch(err => {
-                console.warn("⚠️ Fejl ved dummy stream:", err);
-                resolve();
-            });
+        // ✅ **Dummy stream KUN hvis der var en aktiv stream**
+        if (activeStream !== null) {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(dummyStream => {
+                    dummyStream.getTracks().forEach(track => track.stop());
+                    console.log("✅ Dummy stream brugt for at sikre, at kameraet frigives!");
+                    resolve();
+                })
+                .catch(err => {
+                    console.warn("⚠️ Fejl ved dummy stream:", err);
+                    resolve();
+                });
+        } else {
+            resolve(); // 🚀 Hvis ingen aktiv stream, fortsæt uden dummy stream
+        }
     });
 }
 
