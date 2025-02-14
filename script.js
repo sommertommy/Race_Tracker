@@ -746,11 +746,17 @@ async function stopRace() {
     // 🚀 **Sluk kameraet korrekt**
     await stopCamera();
 
-    // 🎯 **Skjul countdown-timer**
+    // 🎯 **Opdater countdown-timer korrekt**
     const countdownElement = document.getElementById("countdownTimer");
     if (countdownElement) {
-        countdownElement.style.display = "none";
-        console.log("⏳ Countdown skjult!");
+        if (raceSettings.mode === "FastestLap") {
+            countdownElement.innerText = "Race is over"; // ❗ Skriv "Race is over"
+            countdownElement.classList.add("race-over"); // Tilføj styling
+            console.log("⏳ Countdown opdateret til 'Race is over'");
+        } else {
+            countdownElement.style.display = "none"; // ❗ Skjul kun i LapCounts mode
+            console.log("⏳ Countdown skjult!");
+        }
     }
 }
 
