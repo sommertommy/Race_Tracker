@@ -28,6 +28,18 @@ body {
     color: #000; /* 🎨 Sørger for at tekst er synlig */
 }
 
+.countdown-box {
+    font-family: 'Digital-7', sans-serif;
+    font-size: 48px;
+    color: #ff3b30; /* Rød farve for dramatisk effekt */
+    text-align: center;
+    background: black;
+    border-radius: 10px;
+    padding: 10px 20px;
+    width: 120px;
+    margin: 10px auto;
+    display: none; /* Skjules, indtil FastestLap starter */
+}
 
 .contentBox{
     background-color: #0000003b;
