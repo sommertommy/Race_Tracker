@@ -346,35 +346,34 @@ let cameraStarted = false;
 // 🎥 **Tving kameraet til at stoppe**
 function stopCamera() {
     return new Promise(resolve => {
-        const videoElement = document.getElementById("video");
+        if (!activeStream) {
+            console.warn("⚠️ Ingen aktiv stream at stoppe!");
+            resolve();
+            return;
+        }
 
         console.log("🛑 stopCamera() FUNKTIONEN BLEV KALDT!");
         console.log("🎥 activeStream-status før stop:", activeStream);
 
-        if (activeStream) {
-            console.log("📸 Stopper aktiv kamera-stream...");
-            activeStream.getTracks().forEach(track => {
-                console.log(`🚫 Stopper track: ${track.kind}`);
-                track.stop();
-            });
+        activeStream.getTracks().forEach(track => {
+            console.log(`🚫 Stopper track: ${track.kind}`);
+            track.stop();
+        });
 
-            activeStream = null; // 🔥 **Nulstil stream korrekt**
-            cameraActive = false;
-            console.log("✅ Kamera er nu deaktiveret!");
-        } else {
-            console.warn("⚠️ Ingen aktiv stream at stoppe!");
-        }
+        activeStream = null;
+        cameraActive = false;
+        console.log("✅ Kamera er nu deaktiveret!");
 
+        const videoElement = document.getElementById("video");
         if (videoElement) {
             console.log("🔄 Nulstiller videoElement.srcObject...");
             videoElement.srcObject = null;
         }
 
-        console.log("🎥 activeStream-status EFTER stop:", activeStream);  // ✅ Tjek om den bliver nulstillet korrekt
+        console.log("🎥 activeStream-status EFTER stop:", activeStream);
         resolve();
     });
 }
-
 
 // 🎯 **Funktion til at acceptere farvevalg**
 function acceptColorHandler() {
@@ -1215,6 +1214,12 @@ function detectColorInRace() {
         return;
     }
 
+    if (hiddenVideo.videoWidth === 0 || hiddenVideo.videoHeight === 0) {
+        console.error("❌ Fejl: Video ikke klar – prøver igen om 100ms...");
+        setTimeout(detectColorInRace, 100);
+        return;
+    }
+
     trackingInterval = setInterval(() => {
         if (!raceActive) {
             console.warn("⏸ detectColorInRace stoppet, da raceActive er false.");
@@ -1234,12 +1239,12 @@ function detectColorInRace() {
         raceCanvas.height = hiddenVideo.videoHeight;
         const raceCtx = raceCanvas.getContext("2d");
 
-        // **Drej billedet korrekt**
-        raceCtx.save();
-        raceCtx.translate(raceCanvas.width / 2, raceCanvas.height / 2);
-        raceCtx.rotate(Math.PI / 2); // 🔄 Roter 90 grader
-        raceCtx.drawImage(hiddenVideo, -raceCanvas.width / 2, -raceCanvas.height / 2, raceCanvas.width, raceCanvas.height);
-        raceCtx.restore();
+        if (raceCanvas.width === 0 || raceCanvas.height === 0) {
+            console.error("🚨 Kameraet er ikke klar – prøver igen...");
+            return;
+        }
+
+        raceCtx.drawImage(hiddenVideo, 0, 0, raceCanvas.width, raceCanvas.height);
 
         const imageData = raceCtx.getImageData(0, 0, raceCanvas.width, raceCanvas.height);
         const data = imageData.data;
@@ -1261,11 +1266,6 @@ function detectColorInRace() {
             });
         }
 
-        if (raceCanvas.width === 0 || raceCanvas.height === 0) {
-            console.error("🚨 Kameraet er ikke klar – prøver igen...");
-            return;
-        }
-
         Object.keys(colorCounts).forEach(playerId => {
             let player = players.find(p => p.id == playerId);
             let percentage = (colorCounts[playerId] / totalPixels) * 100;
@@ -1273,13 +1273,6 @@ function detectColorInRace() {
             if (percentage < 0.1) return; 
 
             const now = Date.now();
-
-            if (!player.firstDetectionSkipped) {
-                player.firstDetectionSkipped = true;
-                player.lastDetectionTime = now;
-                console.log(`✅ Første registrering ignoreret for ${player.name}`);
-                return;
-            }
 
             if (!player.lastDetectionTime || now - player.lastDetectionTime > 2000) {
                 updatePlayerLaps(player.id);
