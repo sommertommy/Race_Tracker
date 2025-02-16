@@ -132,7 +132,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     option.textContent = device.label || `Kamera ${index + 1}`;
                     cameraList.appendChild(option);
                 });
+
                 console.log("🎥 Fundne kameraer:", videoDevices);
+
+                // 🔥 **Vælg automatisk det tidligere valgte kamera, hvis det findes**
+                if (selectedCameraId && videoDevices.some(device => device.deviceId === selectedCameraId)) {
+                    cameraList.value = selectedCameraId;
+                }
             })
             .catch(err => {
                 console.error("⚠️ Fejl ved hentning af kameraer:", err);
@@ -227,18 +233,22 @@ async function startSelectedCamera() {
 
     
     // 🎯 **Når man trykker på "Vælg bil via kamera"**
-    openColorPickerButton.addEventListener("click", () => {
+     openColorPickerButton.addEventListener("click", () => {
         console.log("📸 Åbner farvevalg-overlay...");
         colorPickerOverlay.classList.add("show");
         colorPickerOverlay.style.display = "flex";
         setTimeout(() => {
             colorPickerOverlay.style.opacity = "1";
         }, 10);
-        if (selectedCameraId) {
-            startSelectedCamera();
-        } else {
+
+        // 🚀 **Tving genstart af kamera, hvis nødvendigt**
+        if (!selectedCameraId) {
             console.warn("⚠️ Intet kamera valgt – brugeren skal vælge et.");
+            alert("Vælg et kamera først!");
+            return;
         }
+
+        startSelectedCamera();
     });
 
     // 🎯 **Når man lukker farvevalg-overlayet**
@@ -258,9 +268,12 @@ async function startSelectedCamera() {
     document.getElementById("addPlayer").addEventListener("click", () => {
         console.log("➕ Tilføjer ny spiller...");
         if (selectedCameraId) {
-            console.log("🎥 Kamera er allerede valgt, men starter ikke automatisk.");
+            console.log("🎥 Starter automatisk tidligere valgte kamera:", selectedCameraId);
+            startSelectedCamera();
         }
     });
+
+    
 });
 
 
@@ -1316,7 +1329,6 @@ let cameraActive = false;
 
 
 
-// 🎬 **Start valgte kamera**
 useSelectedCameraButton.addEventListener("click", () => {
     if (!cameraSelect.value) {
         alert("Vælg et kamera fra listen!");
@@ -1327,6 +1339,7 @@ useSelectedCameraButton.addEventListener("click", () => {
 
     stopCamera(); // Luk eksisterende kamera først
     selectedCameraId = cameraSelect.value; // Gem det valgte kamera
+    localStorage.setItem("selectedCamera", selectedCameraId); // 🔥 GEM ID PERMANENT
     startSelectedCamera();
 });
 
