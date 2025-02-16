@@ -161,7 +161,7 @@ async function startSelectedCamera() {
     console.log("🎥 Prøver at starte kamera:", selectedCameraId);
     cameraActive = true;
 
-    await stopCamera(); // 🔥 Vent på at kameraet stopper korrekt
+    await stopCamera(); // 🔥 Sørg for, at kameraet stopper korrekt, hvis nødvendigt
 
     try {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -175,7 +175,6 @@ async function startSelectedCamera() {
 
         console.log("📷 Kamera stream modtaget!", stream);
         activeStream = stream;
-        console.log("✅ activeStream ER SAT:", activeStream);
 
         const videoElement = document.getElementById("video");
         if (!videoElement) {
@@ -183,10 +182,9 @@ async function startSelectedCamera() {
             return;
         }
 
-        // 🔄 **Tving nulstilling af videoelement**
         videoElement.pause();
         videoElement.srcObject = null;
-        videoElement.load(); 
+        videoElement.load();
 
         setTimeout(() => {
             videoElement.srcObject = stream;
@@ -198,7 +196,7 @@ async function startSelectedCamera() {
                     videoElement.style.opacity = "1";
                     videoElement.style.visibility = "visible";
 
-                    // 📏 **Justér videoens bredde/højde**
+                    // 📏 Opdater videoens opløsning
                     setTimeout(() => {
                         videoElement.width = videoElement.videoWidth;
                         videoElement.height = videoElement.videoHeight;
@@ -207,26 +205,18 @@ async function startSelectedCamera() {
                 })
                 .catch(err => {
                     console.error("❌ Fejl ved afspilning af video:", err);
-                    alert("Kameraet kunne ikke afspilles. Tjek kameraindstillinger.");
                 });
 
-        }, 200); // 🔥 Forsinkelse før afspilning for at undgå fejl
+        }, 200);
 
-        // 🎨 **Vis farvevælger-overlay**
-        const colorPickerOverlay = document.getElementById("colorPickerOverlay");
-        if (colorPickerOverlay) {
-            colorPickerOverlay.style.display = "flex";
-        }
+        // 🎨 Vis farvevælger-overlay
+        document.getElementById("colorPickerOverlay").style.display = "flex";
 
-        // 🚀 **Skjul pladsholder**
-        const cameraPlaceholder = document.getElementById("cameraPlaceholder");
-        if (cameraPlaceholder) {
-            cameraPlaceholder.style.display = "none";
-        }
+        // 🚀 Skjul pladsholder
+        document.getElementById("cameraPlaceholder").style.display = "none";
 
     } catch (err) {
         console.error("❌ Fejl ved start af kamera:", err);
-        alert("Kameraet kunne ikke startes. Tjek kameraindstillinger.");
         cameraActive = false;
     }
 }
