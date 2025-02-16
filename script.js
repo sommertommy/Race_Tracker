@@ -155,7 +155,7 @@ async function startSelectedCamera() {
     console.log("🎥 Prøver at starte kamera:", selectedCameraId);
     cameraActive = true;
 
-    await stopCamera(); // 🔥 Vent på, at kameraet stoppes korrekt
+    await stopCamera(); // 🔥 **Vent på at kameraet stopper korrekt**
 
     try {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -168,7 +168,7 @@ async function startSelectedCamera() {
         });
 
         console.log("📷 Kamera stream modtaget!", stream);
-        activeStream = stream;  // ✅ **Nu bliver `activeStream` sat rigtigt!**
+        activeStream = stream;
         console.log("✅ activeStream ER SAT:", activeStream);
 
         const videoElement = document.getElementById("video");
@@ -177,19 +177,22 @@ async function startSelectedCamera() {
             return;
         }
 
-        videoElement.srcObject = stream;
+        // 🔄 **Tving nulstilling af videoelement**
+        videoElement.pause();
+        videoElement.srcObject = null;
+        videoElement.load(); 
 
-        // 🚀 **Vent lidt før afspilning for at undgå race condition**
         setTimeout(() => {
+            videoElement.srcObject = stream;
+
             videoElement.play()
                 .then(() => {
                     console.log("🎥 Kameraet er nu aktivt!");
-
                     videoElement.style.display = "block";
                     videoElement.style.opacity = "1";
                     videoElement.style.visibility = "visible";
 
-                    // 📏 **Sørg for at opløsningen er sat korrekt**
+                    // 📏 **Justér videoens bredde/højde**
                     setTimeout(() => {
                         videoElement.width = videoElement.videoWidth;
                         videoElement.height = videoElement.videoHeight;
@@ -200,7 +203,8 @@ async function startSelectedCamera() {
                     console.error("❌ Fejl ved afspilning af video:", err);
                     alert("Kameraet kunne ikke afspilles. Tjek kameraindstillinger.");
                 });
-        }, 200); // 🔥 Lidt forsinkelse før afspilning
+
+        }, 200); // 🔥 Forsinkelse før afspilning for at undgå fejl
 
         // 🎨 **Vis farvevælger-overlay**
         const colorPickerOverlay = document.getElementById("colorPickerOverlay");
