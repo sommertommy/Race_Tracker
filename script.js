@@ -155,7 +155,7 @@ async function startSelectedCamera() {
     console.log("🎥 Prøver at starte kamera:", selectedCameraId);
     cameraActive = true;
 
-    await stopCamera(); // 🔥 **Vent på at kameraet stopper korrekt**
+    await stopCamera(); // 🔥 Vent på at kameraet stopper korrekt
 
     try {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -224,7 +224,6 @@ async function startSelectedCamera() {
         cameraActive = false;
     }
 }
-
 
     
     // 🎯 **Når man trykker på "Vælg bil via kamera"**
