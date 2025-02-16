@@ -161,7 +161,8 @@ async function startSelectedCamera() {
     console.log("🎥 Prøver at starte kamera:", selectedCameraId);
     cameraActive = true;
 
-    await stopCamera(); // 🔥 Sørg for, at kameraet stopper korrekt, hvis nødvendigt
+    // 🔥 **Vent på at stopCamera() er færdig**
+    await stopCamera();
 
     try {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -186,6 +187,7 @@ async function startSelectedCamera() {
         videoElement.srcObject = null;
         videoElement.load();
 
+        // 🔥 **Vent 300ms, før videoen sættes**
         setTimeout(() => {
             videoElement.srcObject = stream;
 
@@ -207,7 +209,7 @@ async function startSelectedCamera() {
                     console.error("❌ Fejl ved afspilning af video:", err);
                 });
 
-        }, 200);
+        }, 300); // **Lidt længere forsinkelse**
 
         // 🎨 Vis farvevælger-overlay
         document.getElementById("colorPickerOverlay").style.display = "flex";
@@ -371,7 +373,7 @@ function stopCamera() {
         }
 
         console.log("🎥 activeStream-status EFTER stop:", activeStream);
-        resolve();
+        setTimeout(resolve, 300); // **Sørg for, at kameraet er HELT deaktiveret**
     });
 }
 
