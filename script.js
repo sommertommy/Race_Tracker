@@ -122,6 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     
 // 🎯 **Åbn kamera-overlay og hent kameraer**
+// 🎯 **Åbn kamera-overlay og hent kameraer**
 openColorPickerButton.addEventListener("click", async () => {
     console.log("📸 Åbner farvevalg-overlay...");
 
@@ -144,12 +145,14 @@ openColorPickerButton.addEventListener("click", async () => {
         document.getElementById("cameraSelect").value = selectedCameraId; // Opdater dropdown
     }
 
-    // ✅ **Start kameraet automatisk, hvis der er et valgt kamera**
-    if (selectedCameraId) {
-        startSelectedCamera();
-    } else {
-        console.warn("⚠️ Intet kamera valgt – brugeren skal vælge et manuelt.");
-    }
+    // ✅ **Vent kort tid, og start kameraet**
+    setTimeout(() => {
+        if (selectedCameraId) {
+            startSelectedCamera();
+        } else {
+            console.warn("⚠️ Intet kamera valgt – brugeren skal vælge et manuelt.");
+        }
+    }, 100); // 💡 Vent 100ms for at sikre korrekt værdi
 });
 
 
