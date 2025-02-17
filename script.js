@@ -121,40 +121,48 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     
-    // 🎯 **Når man trykker på "Vælg bil via kamera"**
-    openColorPickerButton.addEventListener("click", () => {
-        console.log("📸 Åbner farvevalg-overlay...");
-        colorPickerOverlay.classList.add("show");
-        colorPickerOverlay.style.display = "flex";
-    
-        // 🎯 Hvis ingen kameraer er valgt, vælg det første
-        if (!selectedCameraId || selectedCameraId === "") {
-            if (cameraSelect.options.length > 0) {
-                selectedCameraId = cameraSelect.options[0].value;
-                console.log(`✅ Automatisk valgt første kamera: ${selectedCameraId}`);
-            } else {
-                console.warn("⚠️ Ingen kameraer tilgængelige.");
-                alert("Der er ingen kameraer tilgængelige. Tjek din enhed.");
-                return;
-            }
-        }
-    
-        // 🎥 Start kameraet
-        startSelectedCamera();
-    });
+  // 🎯 **Åbn kamera-overlay og hent kameraer**
+openColorPickerButton.addEventListener("click", () => {
+    console.log("📸 Åbner farvevalg-overlay...");
 
-    // 🎯 **Når man lukker farvevalg-overlayet**
-    closeColorPickerButton.addEventListener("click", async () => {
-        console.log("❌ Lukker farvevalg-overlay...");
-        colorPickerOverlay.style.opacity = "0";
-    
-        setTimeout(() => {
-            colorPickerOverlay.classList.remove("show");
-            colorPickerOverlay.style.display = "none";
-        }, 300);
-    
-        await stopCamera(); // 🔥 Sørg for, at kameraet 100% er stoppet
+    // 🚀 Sørg for at overlay nulstilles korrekt
+    colorPickerOverlay.style.display = "flex";
+    colorPickerOverlay.classList.add("show");
+    setTimeout(() => {
+        colorPickerOverlay.style.opacity = "1";
+    }, 10);
+
+    // ✅ **Tving stop af tidligere kamera** 
+    stopCamera().then(() => {
+        console.log("🎥 Genstarter kamera efter lukning...");
+        if (selectedCameraId) {
+            startSelectedCamera();
+        } else {
+            console.warn("⚠️ Intet kamera valgt – brugeren skal vælge et.");
+        }
     });
+});
+
+   // 🎯 **Luk farvevælger-overlay**
+closeColorPickerButton.addEventListener("click", async () => {
+    console.log("❌ Lukker farvevalg-overlay...");
+    colorPickerOverlay.style.opacity = "0";
+
+    setTimeout(() => {
+        colorPickerOverlay.classList.remove("show");
+        colorPickerOverlay.style.display = "none";
+    }, 300);
+
+    // 🔥 **Tving stop af kamera**
+    await stopCamera(); 
+
+    // 🔄 **Nulstil video-element**
+    const videoElement = document.getElementById("video");
+    if (videoElement) {
+        videoElement.srcObject = null;
+        console.log("🔄 Video-element nulstillet!");
+    }
+});
 
     // 🚀 **Start kamera i spilleroprettelse, hvis der allerede er valgt et kamera**
     document.getElementById("addPlayer").addEventListener("click", () => {
