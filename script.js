@@ -117,11 +117,33 @@ document.addEventListener("DOMContentLoaded", () => {
     // 🎥 **Hent tilgængelige kameraer**
     async function getCameras() {
     try {
-        // 🔥 Tvinger adgang først
-        await navigator.mediaDevices.getUserMedia({ video: true });
+        // 🔥 Tjek om moderne API'er findes
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            console.warn("⚠️ Din browser understøtter ikke moderne WebRTC API'er. Prøver fallback...");
+            
+            // Fallback til gammel getUserMedia API (kun hvis tilgængelig)
+            navigator.getUserMedia = navigator.getUserMedia || 
+                                     navigator.webkitGetUserMedia || 
+                                     navigator.mozGetUserMedia;
+
+            if (!navigator.getUserMedia) {
+                console.error("🚨 Denne browser understøtter ikke webcam-adgang!");
+                return;
+            }
+
+            navigator.getUserMedia({ video: true }, 
+                (stream) => console.log("✅ Fallback: Kamera virker!", stream),
+                (err) => console.error("🚨 Fallback-fejl ved kameraadgang:", err)
+            );
+            return;
+        }
+
+        // 🔥 Tving adgang til kamera for at sikre, at enheder registreres
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+
         console.log("✅ Kamera adgang givet!");
 
-        // 🎥 Hent tilgængelige kameraer
+        // 🎥 Hent tilgængelige enheder
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices.filter(device => device.kind === "videoinput");
 
@@ -131,6 +153,22 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         console.log("🎥 Fundne kameraer:", videoDevices);
+
+        // 🔄 Vælg et gyldigt kamera-id
+        let selectedDeviceId = videoDevices.find(d => d.deviceId && d.deviceId !== "")?.deviceId || videoDevices[0]?.deviceId;
+
+        if (!selectedDeviceId) {
+            console.warn("🚨 Kunne ikke finde et gyldigt kamera-id!");
+            return;
+        }
+
+        console.log("✅ Bruger kamera:", selectedDeviceId);
+
+        // 🔄 Stopper stream igen for at frigøre ressourcer
+        stream.getTracks().forEach(track => track.stop());
+
+        return selectedDeviceId;
+
     } catch (err) {
         console.error("🚨 Fejl ved kameraadgang:", err);
     }
@@ -1015,38 +1053,6 @@ saveRaceButton.addEventListener("click", () => {
     raceSetupScreen.style.display = "none";
     startScreen.style.display = "block";
 });
-
-// 🎥 **Hent kameraer dynamisk**
-function getCameras() {
-    console.log("📸 Henter tilgængelige kameraer...");
-
-    navigator.mediaDevices.enumerateDevices()
-        .then(devices => {
-            const videoDevices = devices.filter(device => device.kind === "videoinput");
-
-            if (videoDevices.length === 0) {
-                console.error("❌ Ingen kameraer fundet!");
-                alert("Ingen kameraer fundet. Tjek din enhed.");
-                return;
-            }
-
-            cameraSelect.innerHTML = ""; // Ryd dropdown før tilføjelse
-
-            videoDevices.forEach((device, index) => {
-                let option = document.createElement("option");
-                option.value = device.deviceId;
-                option.textContent = device.label || `Kamera ${index + 1}`;
-                cameraSelect.appendChild(option);
-            });
-
-            console.log(`🎥 Fundne kameraer:`, videoDevices);
-        })
-        .catch(err => {
-            console.error("⚠️ Fejl ved hentning af kameraer:", err);
-            alert("Kunne ikke hente kameraer. Tjek kameraindstillinger.");
-        });
-}
-
 
 
 
