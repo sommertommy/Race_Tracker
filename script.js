@@ -307,14 +307,15 @@ function stopCamera() {
     });
 }
 
-// 🎥 **Hent tilgængelige kameraer**
-    async function getCameras() {
+// 🎥 **Hent tilgængelige kameraer - optimeret version**
+async function getCameras() {
     try {
-        // 🔥 Tjek om moderne API'er findes
+        console.log("📸 Prøver at få adgang til kameraerne...");
+
+        // 🔥 Fallback til ældre browsere
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             console.warn("⚠️ Din browser understøtter ikke moderne WebRTC API'er. Prøver fallback...");
-            
-            // Fallback til gammel getUserMedia API (kun hvis tilgængelig)
+
             navigator.getUserMedia = navigator.getUserMedia || 
                                      navigator.webkitGetUserMedia || 
                                      navigator.mozGetUserMedia;
@@ -325,18 +326,27 @@ function stopCamera() {
             }
 
             navigator.getUserMedia({ video: true }, 
-                (stream) => console.log("✅ Fallback: Kamera virker!", stream),
+                (stream) => {
+                    console.log("✅ Fallback: Kamera virker!", stream);
+                    stream.getTracks().forEach(track => track.stop()); // Stop stream igen
+                },
                 (err) => console.error("🚨 Fallback-fejl ved kameraadgang:", err)
             );
             return;
         }
 
-        // 🔥 Tving adgang til kamera for at sikre, at enheder registreres
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        // 🎥 **Start en stream for at registrere skjulte kameraer**
+        let tempStream;
+        try {
+            tempStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        } catch (err) {
+            console.error("🚨 Fejl ved at starte kamera-stream:", err);
+            return;
+        }
 
         console.log("✅ Kamera adgang givet!");
 
-        // 🎥 Hent tilgængelige enheder
+        // 🎥 **Hent enhedsliste**
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices.filter(device => device.kind === "videoinput");
 
@@ -347,7 +357,12 @@ function stopCamera() {
 
         console.log("🎥 Fundne kameraer:", videoDevices);
 
-        // 🔄 Vælg et gyldigt kamera-id
+        // 🚀 **Log detaljer for debugging**
+        videoDevices.forEach((device, index) => {
+            console.log(`🎥 Kamera ${index + 1}: ID = ${device.deviceId}, Label = "${device.label}"`);
+        });
+
+        // ✅ **Vælg det første tilgængelige kamera med et gyldigt `deviceId`**
         let selectedDeviceId = videoDevices.find(d => d.deviceId && d.deviceId !== "")?.deviceId || videoDevices[0]?.deviceId;
 
         if (!selectedDeviceId) {
@@ -357,8 +372,8 @@ function stopCamera() {
 
         console.log("✅ Bruger kamera:", selectedDeviceId);
 
-        // 🔄 Stopper stream igen for at frigøre ressourcer
-        stream.getTracks().forEach(track => track.stop());
+        // 🔄 **Luk test-stream for at frigøre ressourcer**
+        tempStream.getTracks().forEach(track => track.stop());
 
         return selectedDeviceId;
 
