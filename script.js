@@ -121,26 +121,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     
-  // 🎯 **Åbn kamera-overlay og hent kameraer**
-openColorPickerButton.addEventListener("click", () => {
+// 🎯 **Åbn kamera-overlay og hent kameraer**
+openColorPickerButton.addEventListener("click", async () => {
     console.log("📸 Åbner farvevalg-overlay...");
 
-    // 🚀 Sørg for at overlay nulstilles korrekt
     colorPickerOverlay.style.display = "flex";
     colorPickerOverlay.classList.add("show");
     setTimeout(() => {
         colorPickerOverlay.style.opacity = "1";
     }, 10);
 
-    // ✅ **Tving stop af tidligere kamera** 
-    stopCamera().then(() => {
-        console.log("🎥 Genstarter kamera efter lukning...");
-        if (selectedCameraId) {
-            startSelectedCamera();
+    // ✅ **Stop eksisterende kamera først**
+    await stopCamera();
+
+    // ✅ **Sikre, at vi har et gyldigt kamera valgt**
+    if (!selectedCameraId) {
+        console.warn("⚠️ Intet kamera valgt – vælger første kamera automatisk...");
+        const availableCameras = await getCameras(); // Hent kameraer
+        if (availableCameras && availableCameras.length > 0) {
+            selectedCameraId = availableCameras[0].deviceId;
+            console.log(`✅ Automatisk valgt første kamera: ${selectedCameraId}`);
         } else {
-            console.warn("⚠️ Intet kamera valgt – brugeren skal vælge et.");
+            console.error("❌ Ingen kameraer fundet!");
+            return;
         }
-    });
+    }
+
+    // ✅ **Start kameraet automatisk, når overlay åbnes**
+    startSelectedCamera();
 });
 
    // 🎯 **Luk farvevælger-overlay**
