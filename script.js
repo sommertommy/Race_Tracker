@@ -149,7 +149,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // 🎥 **Start det valgte kamera**
 // 🎥 **Start det valgte kamera**
-// 🎥 **Start det valgte kamera**
 async function startSelectedCamera() {
     if (!selectedCameraId) {
         alert("Vælg et kamera først!");
@@ -161,13 +160,13 @@ async function startSelectedCamera() {
         return;
     }
 
-    // 🚨 Sørg for, at `colorSelectionActive` er defineret
+    // 🚨 Tjek om colorSelectionActive er defineret
     if (typeof colorSelectionActive === "undefined") {
         console.error("❌ Fejl: colorSelectionActive er ikke defineret!");
         colorSelectionActive = false;
     }
 
-    // 🛑 Hvis race ikke er aktivt OG farvevælger heller ikke er aktiv -> Stop
+    // 🛑 Hvis race ikke er aktivt **og** farvevælger heller ikke er aktiv, stop
     if (!raceActive && !colorSelectionActive) {
         console.warn("🚫 Race er stoppet – starter ikke kamera.");
         return;
@@ -176,13 +175,9 @@ async function startSelectedCamera() {
     console.log("🎥 Prøver at starte kamera:", selectedCameraId);
     cameraActive = true;
 
-    try {
-        // 🛑 Stopper eksisterende kamera, hvis det ikke er farvevælger-mode
-        if (!colorSelectionActive) {
-            await stopCamera();
-        }
+    await stopCamera(); // 🔥 **Vent på, at kameraet stopper først**
 
-        // 📸 **Hent kamerastream**
+    try {
         const stream = await navigator.mediaDevices.getUserMedia({
             video: {
                 deviceId: { exact: selectedCameraId },
@@ -219,6 +214,8 @@ async function startSelectedCamera() {
         cameraActive = false;
     }
 }
+
+// **Sørg for at funktionen kan kaldes globalt**
 window.startSelectedCamera = startSelectedCamera;
     
     // 🎯 **Når man trykker på "Vælg bil via kamera"**
