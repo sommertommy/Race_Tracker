@@ -116,12 +116,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     
 
-    // 🎥 **Start det valgte kamera**
 // 🎥 **Start det valgte kamera**
 async function startSelectedCamera() {
     if (!selectedCameraId) {
         console.warn("⚠️ Ingen `selectedCameraId` sat – forsøger at hente kamera igen...");
-        await getCameras(); // Prøv igen at hente kameraer
+        await getCameras(); // Prøv at hente kamera igen
     }
 
     if (!selectedCameraId) {
@@ -168,27 +167,37 @@ async function startSelectedCamera() {
         cameraActive = false;
     }
 }
-
     
     // 🎯 **Når man trykker på "Vælg bil via kamera"**
-      openColorPickerButton.addEventListener("click", async () => {
-        console.log("📸 Åbner farvevalg-overlay...");
-        colorPickerOverlay.classList.add("show");
-        colorPickerOverlay.style.display = "flex";
-        setTimeout(() => {
-            colorPickerOverlay.style.opacity = "1";
-        }, 10);
-    
-        // 🔥 **Vent på, at kameraerne bliver registreret!**
-        await getCameras();
-    
-        if (selectedCameraId) {
-            console.log("🎥 Starter kamera:", selectedCameraId);
-            startSelectedCamera();
-        } else {
-            console.warn("⚠️ Intet kamera valgt – brugeren skal vælge et.");
+     openColorPickerButton.addEventListener("click", async () => {
+    console.log("📸 Åbner farvevalg-overlay...");
+    colorPickerOverlay.classList.add("show");
+    colorPickerOverlay.style.display = "flex";
+    setTimeout(() => {
+        colorPickerOverlay.style.opacity = "1";
+    }, 10);
+
+    // 🔥 **Vent på at kameraerne bliver fundet først!**
+    await getCameras();
+
+    if (!selectedCameraId) {
+        console.warn("⚠️ Intet kamera valgt – forsøger at vælge et automatisk...");
+        const videoDevices = await navigator.mediaDevices.enumerateDevices();
+        const availableCameras = videoDevices.filter(device => device.kind === "videoinput");
+        
+        if (availableCameras.length > 0) {
+            selectedCameraId = availableCameras[0].deviceId;
+            console.log("✅ Automatisk valgt kamera:", selectedCameraId);
         }
-    });
+    }
+
+    if (selectedCameraId) {
+        console.log("🎥 Starter kamera:", selectedCameraId);
+        startSelectedCamera();
+    } else {
+        console.warn("⚠️ Intet kamera valgt – brugeren skal vælge et.");
+    }
+});
 
     // 🎯 **Når man lukker farvevalg-overlayet**
     closeColorPickerButton.addEventListener("click", async () => {
@@ -328,7 +337,7 @@ async function getCameras() {
             return;
         }
 
-        // 🚀 Midlertidig adgang til kamera for at sikre registrering
+        // 🚀 Få midlertidig adgang til kamera for at registrere enheder
         let tempStream = await navigator.mediaDevices.getUserMedia({ video: true });
         console.log("✅ Kamera adgang givet!");
 
@@ -348,8 +357,8 @@ async function getCameras() {
             console.log(`🎥 Kamera ${index + 1}: ID = ${device.deviceId}, Label = "${device.label}"`);
         });
 
-        // ✅ **Sæt global `selectedCameraId`** 
-        if (!selectedCameraId) { // Kun hvis den ikke allerede er sat
+        // ✅ **Sæt global `selectedCameraId`** (hvis den ikke allerede er valgt)
+        if (!selectedCameraId) {
             selectedCameraId = videoDevices[0].deviceId;
             console.log("✅ Bruger kamera:", selectedCameraId);
         }
