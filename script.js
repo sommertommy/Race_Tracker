@@ -117,7 +117,13 @@ document.addEventListener("DOMContentLoaded", () => {
     
 
     // 🎥 **Start det valgte kamera**
+// 🎥 **Start det valgte kamera**
 async function startSelectedCamera() {
+    if (!selectedCameraId) {
+        console.warn("⚠️ Ingen `selectedCameraId` sat – forsøger at hente kamera igen...");
+        await getCameras(); // Prøv igen at hente kameraer
+    }
+
     if (!selectedCameraId) {
         alert("Vælg et kamera først!");
         return;
@@ -131,7 +137,7 @@ async function startSelectedCamera() {
     console.log("🎥 Prøver at starte kamera:", selectedCameraId);
     cameraActive = true;
 
-    await stopCamera(); 
+    await stopCamera();
 
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: selectedCameraId } } });
@@ -165,23 +171,24 @@ async function startSelectedCamera() {
 
     
     // 🎯 **Når man trykker på "Vælg bil via kamera"**
-   openColorPickerButton.addEventListener("click", async () => {
-    console.log("📸 Åbner farvevalg-overlay...");
-    colorPickerOverlay.classList.add("show");
-    colorPickerOverlay.style.display = "flex";
-    setTimeout(() => {
-        colorPickerOverlay.style.opacity = "1";
-    }, 10);
-
-    // 🔥 Sørg for, at kameraerne er fundet først!
-    await getCameras();
-
-    if (selectedCameraId) {
-        startSelectedCamera();
-    } else {
-        console.warn("⚠️ Intet kamera valgt – brugeren skal vælge et.");
-    }
-});
+      openColorPickerButton.addEventListener("click", async () => {
+        console.log("📸 Åbner farvevalg-overlay...");
+        colorPickerOverlay.classList.add("show");
+        colorPickerOverlay.style.display = "flex";
+        setTimeout(() => {
+            colorPickerOverlay.style.opacity = "1";
+        }, 10);
+    
+        // 🔥 **Vent på, at kameraerne bliver registreret!**
+        await getCameras();
+    
+        if (selectedCameraId) {
+            console.log("🎥 Starter kamera:", selectedCameraId);
+            startSelectedCamera();
+        } else {
+            console.warn("⚠️ Intet kamera valgt – brugeren skal vælge et.");
+        }
+    });
 
     // 🎯 **Når man lukker farvevalg-overlayet**
     closeColorPickerButton.addEventListener("click", async () => {
