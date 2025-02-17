@@ -311,46 +311,21 @@ function stopCamera() {
     });
 }
 
-// 🎥 **Hent tilgængelige kameraer - optimeret version**
+// 🎥 **Hent tilgængelige kameraer**
 async function getCameras() {
     try {
         console.log("📸 Prøver at få adgang til kameraerne...");
 
-        // 🔥 Fallback til ældre browsere
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            console.warn("⚠️ Din browser understøtter ikke moderne WebRTC API'er. Prøver fallback...");
-
-            navigator.getUserMedia = navigator.getUserMedia || 
-                                     navigator.webkitGetUserMedia || 
-                                     navigator.mozGetUserMedia;
-
-            if (!navigator.getUserMedia) {
-                console.error("🚨 Denne browser understøtter ikke webcam-adgang!");
-                return;
-            }
-
-            navigator.getUserMedia({ video: true }, 
-                (stream) => {
-                    console.log("✅ Fallback: Kamera virker!", stream);
-                    stream.getTracks().forEach(track => track.stop()); // Stop stream igen
-                },
-                (err) => console.error("🚨 Fallback-fejl ved kameraadgang:", err)
-            );
+            console.warn("⚠️ Din browser understøtter ikke moderne WebRTC API'er.");
             return;
         }
 
-        // 🎥 **Start en stream for at registrere skjulte kameraer**
-        let tempStream;
-        try {
-            tempStream = await navigator.mediaDevices.getUserMedia({ video: true });
-        } catch (err) {
-            console.error("🚨 Fejl ved at starte kamera-stream:", err);
-            return;
-        }
-
+        // 🚀 Midlertidig adgang til kamera for at sikre registrering
+        let tempStream = await navigator.mediaDevices.getUserMedia({ video: true });
         console.log("✅ Kamera adgang givet!");
 
-        // 🎥 **Hent enhedsliste**
+        // 🎥 Hent enhedsliste
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices.filter(device => device.kind === "videoinput");
 
@@ -361,25 +336,19 @@ async function getCameras() {
 
         console.log("🎥 Fundne kameraer:", videoDevices);
 
-        // 🚀 **Log detaljer for debugging**
+        // 🚀 Log detaljer
         videoDevices.forEach((device, index) => {
             console.log(`🎥 Kamera ${index + 1}: ID = ${device.deviceId}, Label = "${device.label}"`);
         });
 
-        // ✅ **Vælg det første tilgængelige kamera med et gyldigt `deviceId`**
-        let selectedDeviceId = videoDevices.find(d => d.deviceId && d.deviceId !== "")?.deviceId || videoDevices[0]?.deviceId;
-
-        if (!selectedDeviceId) {
-            console.warn("🚨 Kunne ikke finde et gyldigt kamera-id!");
-            return;
+        // ✅ **Sæt global `selectedCameraId`** 
+        if (!selectedCameraId) { // Kun hvis den ikke allerede er sat
+            selectedCameraId = videoDevices[0].deviceId;
+            console.log("✅ Bruger kamera:", selectedCameraId);
         }
 
-        console.log("✅ Bruger kamera:", selectedDeviceId);
-
-        // 🔄 **Luk test-stream for at frigøre ressourcer**
+        // 🎥 Luk test-stream
         tempStream.getTracks().forEach(track => track.stop());
-
-        return selectedDeviceId;
 
     } catch (err) {
         console.error("🚨 Fejl ved kameraadgang:", err);
