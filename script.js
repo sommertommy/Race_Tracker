@@ -328,6 +328,7 @@ function stopCamera() {
 }
 
 // 🎥 **Hent tilgængelige kameraer**
+// 🎥 **Hent tilgængelige kameraer**
 async function getCameras() {
     try {
         console.log("📸 Prøver at få adgang til kameraerne...");
@@ -352,9 +353,17 @@ async function getCameras() {
 
         console.log("🎥 Fundne kameraer:", videoDevices);
 
-        // 🚀 Log detaljer
+        // 🎯 **Opdater dropdown-menuen**
+        const cameraDropdown = document.getElementById("cameraDropdown"); // Sørg for at ID'et matcher dit dropdown-element
+        cameraDropdown.innerHTML = ""; // Rens dropdown
+
         videoDevices.forEach((device, index) => {
             console.log(`🎥 Kamera ${index + 1}: ID = ${device.deviceId}, Label = "${device.label}"`);
+
+            let option = document.createElement("option");
+            option.value = device.deviceId;
+            option.textContent = device.label || `Kamera ${index + 1}`;
+            cameraDropdown.appendChild(option);
         });
 
         // ✅ **Sæt global `selectedCameraId`** (hvis den ikke allerede er valgt)
@@ -440,6 +449,14 @@ function resetPlayerForm() {
     tolerance = 50;
     threshold = 100;
 }
+
+
+// 🎥 **Lyt efter valg af kamera i dropdown-menuen**
+document.getElementById("cameraDropdown").addEventListener("change", (event) => {
+    selectedCameraId = event.target.value;
+    console.log("🎥 Kamera skiftet til:", selectedCameraId);
+    startSelectedCamera(); // Start kameraet igen med det nye valg
+});
 
 
 // 🎯 **Funktion til at styre skærmene**
