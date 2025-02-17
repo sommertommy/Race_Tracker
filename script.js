@@ -747,6 +747,7 @@ function resetRaceData() {
 async function stopRace() {
     raceActive = false;
     console.log("🏁 Race afsluttet!");
+    console.log("🛑 stopRace() kaldt fra:", new Error().stack);
 
     // Stop timer hvis aktiv
     if (raceTimer) {
@@ -1181,7 +1182,7 @@ function detectColorInRace() {
             return;
         }
 
-        if (players.every(p => p.laps >= raceSettings.rounds)) {
+        if (raceSettings.mode === "LapCounts" && players.every(p => p.laps >= raceSettings.rounds)) {
             console.log("🏁 Alle spillere er færdige! Stopper tracking.");
             stopRace();
             return;
