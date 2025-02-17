@@ -102,13 +102,13 @@ document.addEventListener("DOMContentLoaded", () => {
        getCameras();
    });
 
-     🎯 **Luk kameraoverlay**
+     //🎯 **Luk kameraoverlay**
      closeCameraOverlayButton.addEventListener("click", () => {
         console.log("❌ Lukker kamera overlay...");
        cameraSelectOverlay.style.display = "none";
      });
 
-   🎯 **Bekræft valgte kamera**
+  // 🎯 **Bekræft valgte kamera**
     confirmCameraButton.addEventListener("click", () => {
       selectedCameraId = cameraList.value;
        console.log(`🎥 Valgt kamera: ${selectedCameraId}`);
