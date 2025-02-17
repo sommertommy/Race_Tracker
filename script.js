@@ -732,9 +732,10 @@ function resetRaceData() {
     console.log("♻️ Nulstiller race-data...");
     raceActive = false;
     
-    // 🔄 Sikrer at tracking kan starte rent igen
+    // 🔄 Sikrer at tracking starter rent i nyt løb
+    clearInterval(trackingInterval);
     trackingInterval = null;
-    isTracking = true; 
+    isTracking = false; 
 
     players.forEach(player => {
         player.laps = 0;
@@ -965,7 +966,10 @@ async function startRace() {
 
     // **Start farvesporing kun hvis ikke allerede aktiv**
     setTimeout(() => {
-        if (!trackingInterval && raceActive) {
+        if (!trackingInterval) {
+            console.log("🚀 Genstarter detectColorInRace...");
+            trackingInterval = null; // Sikrer at variablen er nulstillet
+            isTracking = true;
             detectColorInRace();
         } else {
             console.warn("⚠️ detectColorInRace kører allerede eller race er stoppet.");
