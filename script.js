@@ -29,7 +29,28 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!cameraSelect) {
         console.error("❌ FEJL: Kamera-dropdown (`cameraSelect`) ikke fundet i DOM'en!");
     }
+
+    if (confirmCameraButton) {
+        confirmCameraButton.addEventListener("click", () => {
+            const cameraSelect = document.getElementById("cameraSelect");
+            if (!cameraSelect) {
+                console.error("❌ Kamera-dropdown (`cameraSelect`) ikke fundet!");
+                return;
+            }
     
+            selectedCameraId = cameraSelect.value;
+            console.log(`🎥 Valgt kamera: ${selectedCameraId}`);
+            localStorage.setItem("selectedCamera", selectedCameraId);
+    
+            const cameraOverlay = document.getElementById("cameraSelectOverlay");
+            if (cameraOverlay) cameraOverlay.style.display = "none";
+        });
+    }
+
+    document.getElementById("openCameraOverlayButton").addEventListener("click", () => {
+    console.log("📸 Åbner kamera-overlay...");
+    getCameras();
+});
     
    // 🎯 Funktion til at opdatere UI baseret på valgt race-mode
     function updateRaceModeUI() {
@@ -100,10 +121,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 🎯 **Åbn kameraoverlay og hent kameraer**
     openCameraOverlayButton.addEventListener("click", () => {
-        console.log("📸 Åbner kamera-valg overlay...");
-        cameraSelectOverlay.style.display = "flex";
-        getCameras();
-    });
+    console.log("📸 Åbner kamera-valg overlay...");
+    const cameraOverlay = document.getElementById("cameraSelectOverlay");
+    if (!cameraOverlay) {
+        console.error("❌ Kamera-overlayet (`cameraSelectOverlay`) ikke fundet!");
+        return;
+    }
+    cameraOverlay.style.display = "flex";
+    getCameras();
+});
 
     // 🎯 **Luk kameraoverlay**
     closeCameraOverlayButton.addEventListener("click", () => {
@@ -334,7 +360,6 @@ function stopCamera() {
 }
 
 // 🎥 **Hent tilgængelige kameraer**
-// 🎥 **Hent tilgængelige kameraer**
 async function getCameras() {
     try {
         console.log("📸 Prøver at få adgang til kameraerne...");
@@ -344,24 +369,31 @@ async function getCameras() {
             return;
         }
 
-        // 🚀 Få midlertidig adgang til kamera for at registrere enheder
+        // 🚀 Midlertidig adgang til kamera for at sikre, at enheder registreres
         let tempStream = await navigator.mediaDevices.getUserMedia({ video: true });
         console.log("✅ Kamera adgang givet!");
 
-        // 🎥 Hent enhedsliste
+        // 🎥 Hent liste over enheder
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices.filter(device => device.kind === "videoinput");
 
         if (videoDevices.length === 0) {
             console.warn("🚨 Ingen kameraer fundet!");
+            alert("❌ Ingen kameraer fundet! Tjek dine enhedsindstillinger.");
             return;
         }
 
         console.log("🎥 Fundne kameraer:", videoDevices);
 
-        // 🎯 **Opdater dropdown-menuen**
-        const cameraDropdown = document.getElementById("cameraDropdown"); // Sørg for at ID'et matcher dit dropdown-element
-        cameraDropdown.innerHTML = ""; // Rens dropdown
+        // 🎯 **Hent dropdown-elementet**
+        const cameraDropdown = document.getElementById("cameraDropdown");
+        if (!cameraDropdown) {
+            console.error("❌ FEJL: Kamera-dropdown (`cameraDropdown`) ikke fundet i DOM'en!");
+            return;
+        }
+
+        // 🔥 **Ryd dropdown og opdater med nye kameraer**
+        cameraDropdown.innerHTML = ""; 
 
         videoDevices.forEach((device, index) => {
             console.log(`🎥 Kamera ${index + 1}: ID = ${device.deviceId}, Label = "${device.label}"`);
@@ -372,17 +404,25 @@ async function getCameras() {
             cameraDropdown.appendChild(option);
         });
 
-        // ✅ **Sæt global `selectedCameraId`** (hvis den ikke allerede er valgt)
-        if (!selectedCameraId) {
+        // ✅ **Sæt `selectedCameraId`, hvis ikke allerede valgt**
+        if (!selectedCameraId || !videoDevices.some(device => device.deviceId === selectedCameraId)) {
             selectedCameraId = videoDevices[0].deviceId;
-            console.log("✅ Bruger kamera:", selectedCameraId);
+            console.log("✅ Automatisk valgt kamera:", selectedCameraId);
         }
 
         // 🎥 Luk test-stream
         tempStream.getTracks().forEach(track => track.stop());
 
+        // 🎯 **Vis kamera-overlayet, hvis det er skjult**
+        const cameraOverlay = document.getElementById("cameraSelectOverlay");
+        if (cameraOverlay && cameraOverlay.style.display === "none") {
+            cameraOverlay.style.display = "flex";
+            console.log("📸 Kamera-overlay vist.");
+        }
+
     } catch (err) {
         console.error("🚨 Fejl ved kameraadgang:", err);
+        alert("❌ Fejl ved adgang til kamera! Tjek dine enhedsindstillinger.");
     }
 }
 
