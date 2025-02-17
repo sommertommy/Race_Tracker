@@ -351,9 +351,14 @@ async function startSelectedCamera() {
 
 let selectedCameraId = null;
 
-// 🎥 **Hent tilgængelige kameraer og opdater dropdown**
+// 🎥 **Forbedret kamera-detektion til ældre browsere**
 async function getCameras() {
     try {
+        // 🔥 **Tving adgang til kamera for at sikre, at enheder registreres**
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        console.log("✅ Kamera adgang givet!");
+
+        // 🎥 **Hent tilgængelige enheder**
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices.filter(device => device.kind === "videoinput");
 
@@ -385,10 +390,12 @@ async function getCameras() {
             console.log(`✅ Automatisk valgt første kamera: ${selectedCameraId}`);
         }
 
+        // 🔄 **Stop streamen igen for at frigøre ressourcer**
+        stream.getTracks().forEach(track => track.stop());
+
         return videoDevices;
     } catch (err) {
-        console.error("❌ Fejl ved hentning af kameraer:", err);
-        return [];
+        console.error("🚨 Fejl ved kameraadgang:", err);
     }
 }
 
