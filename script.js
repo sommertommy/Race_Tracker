@@ -134,22 +134,24 @@ openColorPickerButton.addEventListener("click", async () => {
     // ✅ **Stop eksisterende kamera først**
     await stopCamera();
 
-    // ✅ **Sikre, at vi har et gyldigt kamera valgt**
-    if (!selectedCameraId) {
-        console.warn("⚠️ Intet kamera valgt – vælger første kamera automatisk...");
-        const availableCameras = await getCameras(); // Hent kameraer
-        if (availableCameras && availableCameras.length > 0) {
-            selectedCameraId = availableCameras[0].deviceId;
-            console.log(`✅ Automatisk valgt første kamera: ${selectedCameraId}`);
-        } else {
-            console.error("❌ Ingen kameraer fundet!");
-            return;
-        }
+    // ✅ **Hent kameraer og opdater dropdown**
+    const availableCameras = await getCameras(); 
+
+    // ✅ **Vælg et kamera, hvis ingen er valgt**
+    if (!selectedCameraId && availableCameras.length > 0) {
+        selectedCameraId = availableCameras[0].deviceId;
+        console.log(`✅ Automatisk valgt første kamera: ${selectedCameraId}`);
+        document.getElementById("cameraSelect").value = selectedCameraId; // Opdater dropdown
     }
 
-    // ✅ **Start kameraet automatisk, når overlay åbnes**
-    startSelectedCamera();
+    // ✅ **Start kameraet automatisk, hvis der er et valgt kamera**
+    if (selectedCameraId) {
+        startSelectedCamera();
+    } else {
+        console.warn("⚠️ Intet kamera valgt – brugeren skal vælge et manuelt.");
+    }
 });
+
 
    // 🎯 **Luk farvevælger-overlay**
 closeColorPickerButton.addEventListener("click", async () => {
@@ -340,8 +342,7 @@ async function startSelectedCamera() {
 }
 let selectedCameraId = null;
 
-// 🎥 **Hent tilgængelige kameraer**
-// 🎯 **Hent tilgængelige kameraer**
+// 🎯 **Hent tilgængelige kameraer og opdater dropdown**
 async function getCameras() {
     try {
         const devices = await navigator.mediaDevices.enumerateDevices();
@@ -373,6 +374,11 @@ async function getCameras() {
     }
 }
 
+// 🎯 **Opdater selectedCameraId, når brugeren vælger et nyt kamera i dropdown**
+document.getElementById("cameraSelect").addEventListener("change", (event) => {
+    selectedCameraId = event.target.value;
+    console.log(`🎥 Valgt kamera ændret til: ${selectedCameraId}`);
+});
 
 // 🎯 **Funktion til at acceptere farvevalg**
 function acceptColorHandler() {
