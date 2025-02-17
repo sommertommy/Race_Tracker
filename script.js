@@ -148,6 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // 🎥 **Start det valgte kamera**
 // 🎥 **Start det valgte kamera**
+// 🎥 **Start det valgte kamera**
 async function startSelectedCamera() {
     if (!selectedCameraId) {
         alert("Vælg et kamera først!");
@@ -156,6 +157,12 @@ async function startSelectedCamera() {
 
     if (cameraActive) {
         console.warn("⚠️ Kameraet kører allerede. Afbryder ekstra anmodning.");
+        return;
+    }
+
+    // 🚨 **Sørg for at `colorSelectionActive` er defineret**
+    if (typeof colorSelectionActive === "undefined") {
+        console.error("❌ Fejl: colorSelectionActive er ikke defineret!");
         return;
     }
 
@@ -327,6 +334,7 @@ const cameraSelect = document.getElementById("cameraSelect");
 
 // 🎯 **Globale variabler**
 
+let colorSelectionActive = false;
 let raceTimer = null; // Gem timer reference
 let selectedCameraId = null;
 let activeStream = null;
@@ -656,6 +664,17 @@ function formatTime(ms) {
     }
 }
 
+// Når farvevælgeren åbnes
+function openColorPicker() {
+    colorSelectionActive = true; 
+    document.getElementById("colorPickerOverlay").style.display = "flex";
+}
+
+// Når farvevælgeren lukkes
+function closeColorPicker() {
+    colorSelectionActive = false;
+    document.getElementById("colorPickerOverlay").style.display = "none";
+}
 
 
 function updateLapTimesTable() {
