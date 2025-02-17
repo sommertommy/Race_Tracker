@@ -370,6 +370,7 @@ async function getCameras() {
         });
 
         console.log("✅ Kamera-dropdown opdateret!");
+
         return videoDevices;
     } catch (err) {
         console.error("❌ Fejl ved hentning af kameraer:", err);
