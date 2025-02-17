@@ -338,6 +338,71 @@ async function stopCamera() {
         }, 200); // 🕒 **Kort forsinkelse, før kameraet slukkes helt**
     });
 }
+
+async function startSelectedCamera() {
+    if (!selectedCameraId) {
+        alert("Vælg et kamera først!");
+        return;
+    }
+
+    if (cameraActive) {
+        console.warn("⚠️ Kameraet kører allerede. Afbryder ekstra anmodning.");
+        return;
+    }
+
+    console.log("🎥 Prøver at starte kamera:", selectedCameraId);
+    cameraActive = true;
+
+    await stopCamera(); // 🔥 **Vent på, at kameraet stopper først**
+
+    navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: selectedCameraId } } })
+        .then(stream => {
+            console.log("📷 Kamera stream modtaget!", stream);
+            
+            activeStream = stream;  // ✅ **Nu bliver `activeStream` sat rigtigt!**
+            console.log("✅ activeStream ER SAT:", activeStream);
+
+            const videoElement = document.getElementById("video");
+            if (!videoElement) {
+                console.error("❌ Fejl: videoElement blev ikke fundet!");
+                return;
+            }
+
+            videoElement.srcObject = stream;
+            return videoElement.play();
+        })
+        .then(() => {
+            console.log("🎥 Kameraet er nu aktivt!");
+
+            const videoElement = document.getElementById("video");
+            if (videoElement) {
+                videoElement.style.display = "block";
+                videoElement.style.opacity = "1";
+                videoElement.style.visibility = "visible";
+            }
+
+            const colorPickerOverlay = document.getElementById("colorPickerOverlay");
+            if (colorPickerOverlay) {
+                colorPickerOverlay.style.display = "flex";
+            }
+
+            const cameraPlaceholder = document.getElementById("cameraPlaceholder");
+            if (cameraPlaceholder) {
+                cameraPlaceholder.style.display = "none";
+            }
+        })
+        .catch(err => {
+            console.error("❌ Fejl ved afspilning af video:", err);
+            cameraActive = false;
+        });
+}
+
+// Sørg for, at `startSelectedCamera` er globalt tilgængelig.
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("✅ DOM er nu indlæst!");
+});
+
+
 // 🎯 **Funktion til at acceptere farvevalg**
 function acceptColorHandler() {
     console.log("✅ Farvevalg accepteret:", selectedColor);
