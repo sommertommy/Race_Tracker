@@ -158,6 +158,12 @@ async function startSelectedCamera() {
         return;
     }
 
+    // 🛑 **Tjek om racet er stoppet - hvis ja, afbryd!**
+    if (!raceActive) {
+        console.warn("🚫 Race er stoppet – starter ikke kamera.");
+        return;
+    }
+
     console.log("🎥 Prøver at starte kamera:", selectedCameraId);
     cameraActive = true;
 
@@ -1216,12 +1222,6 @@ function detectColorInRace() {
         return;
     }
 
-    if (hiddenVideo.videoWidth === 0 || hiddenVideo.videoHeight === 0) {
-        console.error("❌ Fejl: Video ikke klar – prøver igen om 100ms...");
-        setTimeout(detectColorInRace, 100);
-        return;
-    }
-
     trackingInterval = setInterval(() => {
         if (!raceActive) {
             console.warn("⏸ detectColorInRace stoppet, da raceActive er false.");
@@ -1241,12 +1241,12 @@ function detectColorInRace() {
         raceCanvas.height = hiddenVideo.videoHeight;
         const raceCtx = raceCanvas.getContext("2d");
 
-        if (raceCanvas.width === 0 || raceCanvas.height === 0) {
-            console.error("🚨 Kameraet er ikke klar – prøver igen...");
-            return;
-        }
-
-        raceCtx.drawImage(hiddenVideo, 0, 0, raceCanvas.width, raceCanvas.height);
+        // **Drej billedet korrekt**
+        raceCtx.save();
+        raceCtx.translate(raceCanvas.width / 2, raceCanvas.height / 2);
+        raceCtx.rotate(Math.PI / 2); // 🔄 Roter 90 grader
+        raceCtx.drawImage(hiddenVideo, -raceCanvas.width / 2, -raceCanvas.height / 2, raceCanvas.width, raceCanvas.height);
+        raceCtx.restore();
 
         const imageData = raceCtx.getImageData(0, 0, raceCanvas.width, raceCanvas.height);
         const data = imageData.data;
@@ -1268,6 +1268,11 @@ function detectColorInRace() {
             });
         }
 
+        if (raceCanvas.width === 0 || raceCanvas.height === 0) {
+            console.error("🚨 Kameraet er ikke klar – prøver igen...");
+            return;
+        }
+
         Object.keys(colorCounts).forEach(playerId => {
             let player = players.find(p => p.id == playerId);
             let percentage = (colorCounts[playerId] / totalPixels) * 100;
@@ -1276,6 +1281,15 @@ function detectColorInRace() {
 
             const now = Date.now();
 
+            // **Ignorer første registrering**
+            if (!player.firstDetectionSkipped) {
+                player.firstDetectionSkipped = true;
+                player.lastDetectionTime = now;
+                console.log(`✅ Første registrering ignoreret for ${player.name}`);
+                return;
+            }
+
+            // **Tjek om det er tid til en ny omgang**
             if (!player.lastDetectionTime || now - player.lastDetectionTime > 2000) {
                 updatePlayerLaps(player.id);
                 player.lastDetectionTime = now;
