@@ -115,30 +115,26 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // 🎥 **Hent tilgængelige kameraer**
-    function getCameras() {
-        console.log("📸 Henter tilgængelige kameraer...");
-        navigator.mediaDevices.enumerateDevices()
-            .then(devices => {
-                const videoDevices = devices.filter(device => device.kind === "videoinput");
-                if (videoDevices.length === 0) {
-                    console.error("❌ Ingen kameraer fundet!");
-                    alert("Ingen kameraer fundet. Tjek din enhed.");
-                    return;
-                }
-                cameraList.innerHTML = "";
-                videoDevices.forEach((device, index) => {
-                    let option = document.createElement("option");
-                    option.value = device.deviceId;
-                    option.textContent = device.label || `Kamera ${index + 1}`;
-                    cameraList.appendChild(option);
-                });
-                console.log("🎥 Fundne kameraer:", videoDevices);
-            })
-            .catch(err => {
-                console.error("⚠️ Fejl ved hentning af kameraer:", err);
-                alert("Kunne ikke hente kameraer. Tjek kameraindstillinger.");
-            });
+    async function getCameras() {
+    try {
+        // 🔥 Tvinger adgang først
+        await navigator.mediaDevices.getUserMedia({ video: true });
+        console.log("✅ Kamera adgang givet!");
+
+        // 🎥 Hent tilgængelige kameraer
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(device => device.kind === "videoinput");
+
+        if (videoDevices.length === 0) {
+            console.warn("🚨 Ingen kameraer fundet!");
+            return;
+        }
+
+        console.log("🎥 Fundne kameraer:", videoDevices);
+    } catch (err) {
+        console.error("🚨 Fejl ved kameraadgang:", err);
     }
+}
 
     // 🎥 **Start det valgte kamera**
 async function startSelectedCamera() {
