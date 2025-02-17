@@ -448,7 +448,7 @@ function resetPlayerForm() {
     // 🎯 Sørg for at tolerancejusteringen starter forfra
     tolerance = 50;
     threshold = 100;
-}
+} 
 
 
 // 🎥 **Lyt efter valg af kamera i dropdown-menuen**
