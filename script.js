@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     
 // 🎯 **Åbn kamera-overlay og hent kameraer**
-// 🎯 **Åbn kamera-overlay og hent kameraer**
+// 🎯 **Åbn kamera-overlay og start kameraet**
 openColorPickerButton.addEventListener("click", async () => {
     console.log("📸 Åbner farvevalg-overlay...");
 
@@ -135,14 +135,14 @@ openColorPickerButton.addEventListener("click", async () => {
     // ✅ **Stop eksisterende kamera først**
     await stopCamera();
 
-    // ✅ **Hent kameraer og opdater dropdown**
-    const availableCameras = await getCameras(); 
+    // ✅ **Hent kameraer og vent på opdatering af dropdown**
+    const availableCameras = await getCameras();
 
-    // ✅ **Vælg et kamera, hvis ingen er valgt**
+    // ✅ **Hvis intet kamera er valgt, vælg automatisk det første**
     if (!selectedCameraId && availableCameras.length > 0) {
         selectedCameraId = availableCameras[0].deviceId;
-        console.log(`✅ Automatisk valgt første kamera: ${selectedCameraId}`);
         document.getElementById("cameraSelect").value = selectedCameraId; // Opdater dropdown
+        console.log(`✅ Automatisk valgt første kamera: ${selectedCameraId}`);
     }
 
     // ✅ **Vent kort tid, og start kameraet**
@@ -297,8 +297,13 @@ function stopCamera() {
     });
 }
 
-    // 🎥 **Start det valgte kamera**
+ // 🎥 **Start det valgte kamera**
 async function startSelectedCamera() {
+    // ✅ **Brug gemt kamera fra localStorage, hvis muligt**
+    if (!selectedCameraId) {
+        selectedCameraId = localStorage.getItem("selectedCamera") || null;
+    }
+
     if (!selectedCameraId) {
         alert("Vælg et kamera først!");
         return;
@@ -343,9 +348,10 @@ async function startSelectedCamera() {
         cameraActive = false;
     }
 }
+
 let selectedCameraId = null;
 
-// 🎯 **Hent tilgængelige kameraer og opdater dropdown**
+// 🎥 **Hent tilgængelige kameraer og opdater dropdown**
 async function getCameras() {
     try {
         const devices = await navigator.mediaDevices.enumerateDevices();
@@ -362,14 +368,22 @@ async function getCameras() {
         const cameraSelect = document.getElementById("cameraSelect");
         cameraSelect.innerHTML = ""; // Rens dropdown først
 
-        videoDevices.forEach(device => {
+        videoDevices.forEach((device, index) => {
             const option = document.createElement("option");
             option.value = device.deviceId;
-            option.textContent = device.label || `Kamera ${cameraSelect.length + 1}`;
+            option.textContent = device.label || `Kamera ${index + 1}`;
             cameraSelect.appendChild(option);
         });
 
         console.log("✅ Kamera-dropdown opdateret!");
+
+        // ✅ **Vælg automatisk første kamera, hvis intet kamera er gemt i localStorage**
+        if (!selectedCameraId) {
+            selectedCameraId = videoDevices[0].deviceId;
+            localStorage.setItem("selectedCamera", selectedCameraId); // Gem valg
+            cameraSelect.value = selectedCameraId; // Opdater dropdown
+            console.log(`✅ Automatisk valgt første kamera: ${selectedCameraId}`);
+        }
 
         return videoDevices;
     } catch (err) {
@@ -381,6 +395,7 @@ async function getCameras() {
 // 🎯 **Opdater selectedCameraId, når brugeren vælger et nyt kamera i dropdown**
 document.getElementById("cameraSelect").addEventListener("change", (event) => {
     selectedCameraId = event.target.value;
+    localStorage.setItem("selectedCamera", selectedCameraId); // Gem valg, så det huskes efter refresh
     console.log(`🎥 Valgt kamera ændret til: ${selectedCameraId}`);
 });
 
