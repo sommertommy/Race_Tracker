@@ -165,19 +165,23 @@ async function startSelectedCamera() {
 
     
     // 🎯 **Når man trykker på "Vælg bil via kamera"**
-    openColorPickerButton.addEventListener("click", () => {
-        console.log("📸 Åbner farvevalg-overlay...");
-        colorPickerOverlay.classList.add("show");
-        colorPickerOverlay.style.display = "flex";
-        setTimeout(() => {
-            colorPickerOverlay.style.opacity = "1";
-        }, 10);
-        if (selectedCameraId) {
-            startSelectedCamera();
-        } else {
-            console.warn("⚠️ Intet kamera valgt – brugeren skal vælge et.");
-        }
-    });
+   openColorPickerButton.addEventListener("click", async () => {
+    console.log("📸 Åbner farvevalg-overlay...");
+    colorPickerOverlay.classList.add("show");
+    colorPickerOverlay.style.display = "flex";
+    setTimeout(() => {
+        colorPickerOverlay.style.opacity = "1";
+    }, 10);
+
+    // 🔥 Sørg for, at kameraerne er fundet først!
+    await getCameras();
+
+    if (selectedCameraId) {
+        startSelectedCamera();
+    } else {
+        console.warn("⚠️ Intet kamera valgt – brugeren skal vælge et.");
+    }
+});
 
     // 🎯 **Når man lukker farvevalg-overlayet**
     closeColorPickerButton.addEventListener("click", async () => {
