@@ -341,38 +341,35 @@ async function startSelectedCamera() {
 let selectedCameraId = null;
 
 // 🎥 **Hent tilgængelige kameraer**
+// 🎯 **Hent tilgængelige kameraer**
 async function getCameras() {
     try {
-        console.log("📸 Henter tilgængelige kameraer...");
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices.filter(device => device.kind === "videoinput");
 
         if (videoDevices.length === 0) {
             console.warn("🚨 Ingen kameraer fundet!");
-            cameraSelect.innerHTML = `<option value="">Ingen kameraer fundet</option>`;
-            return;
+            return [];
         }
 
-        // 🎯 Ryd dropdown og tilføj kameraer
-        cameraSelect.innerHTML = "";
-        videoDevices.forEach((device, index) => {
+        console.log("🎥 Fundne kameraer:", videoDevices);
+
+        // 🎯 **Opdater dropdown med kameraer**
+        const cameraSelect = document.getElementById("cameraSelect");
+        cameraSelect.innerHTML = ""; // Rens dropdown først
+
+        videoDevices.forEach(device => {
             const option = document.createElement("option");
             option.value = device.deviceId;
-            option.textContent = device.label || `Kamera ${index + 1}`;
+            option.textContent = device.label || `Kamera ${cameraSelect.length + 1}`;
             cameraSelect.appendChild(option);
         });
 
-        // 🎯 Vælg første kamera automatisk, hvis intet er valgt
-        if (!selectedCameraId) {
-            selectedCameraId = videoDevices[0].deviceId;
-        }
-
-        cameraSelect.value = selectedCameraId;
         console.log("✅ Kamera-dropdown opdateret!");
-
+        return videoDevices;
     } catch (err) {
-        console.error("🚨 Fejl ved kameraadgang:", err);
-        alert("Der opstod en fejl ved hentning af kameraer.");
+        console.error("❌ Fejl ved hentning af kameraer:", err);
+        return [];
     }
 }
 
