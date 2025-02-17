@@ -731,12 +731,16 @@ function updateLapTimesTable() {
 function resetRaceData() {
     console.log("♻️ Nulstiller race-data...");
     raceActive = false;
+    
+    // 🔄 Sikrer at tracking kan starte rent igen
+    trackingInterval = null;
+    isTracking = true; 
 
     players.forEach(player => {
         player.laps = 0;
         player.finishTime = null;
         player.lastDetectionTime = null;
-        player.firstDetectionSkipped = false; // 🔥 Sørg for at første registrering ignoreres i næste løb
+        player.firstDetectionSkipped = false; // 🔥 Sørger for at første registrering ignoreres i næste løb
         player.lapTimes = [];
     });
 
