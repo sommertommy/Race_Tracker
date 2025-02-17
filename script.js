@@ -280,6 +280,7 @@ const cameraSelect = document.getElementById("cameraSelect");
 
 // 🎯 **Globale variabler**
 
+let waitingForVideo = false; // 🔥 Ny variabel
 let raceTimer = null; // Gem timer reference
 let selectedCameraId = null;
 let activeStream = null;
@@ -305,31 +306,27 @@ let cameraStarted = false;
 // 🎥 **Tving kameraet til at stoppe**
 function stopCamera() {
     return new Promise(resolve => {
-        const videoElement = document.getElementById("video");
-
-        console.log("🛑 stopCamera() FUNKTIONEN BLEV KALDT!");
-        console.log("🎥 activeStream-status før stop:", activeStream);
-
-        if (activeStream) {
-            console.log("📸 Stopper aktiv kamera-stream...");
-            activeStream.getTracks().forEach(track => {
-                console.log(`🚫 Stopper track: ${track.kind}`);
-                track.stop();
-            });
-
-            activeStream = null; // 🔥 **Nulstil stream korrekt**
-            cameraActive = false;
-            console.log("✅ Kamera er nu deaktiveret!");
-        } else {
+        if (!activeStream) {
             console.warn("⚠️ Ingen aktiv stream at stoppe!");
+            return resolve();
         }
 
+        console.log("📸 Stopper aktiv kamera-stream...");
+        activeStream.getTracks().forEach(track => {
+            console.log(`🚫 Stopper track: ${track.kind}`);
+            track.stop();
+        });
+
+        activeStream = null;
+        cameraActive = false;
+        console.log("✅ Kamera er nu deaktiveret!");
+
+        const videoElement = document.getElementById("video");
         if (videoElement) {
             console.log("🔄 Nulstiller videoElement.srcObject...");
             videoElement.srcObject = null;
         }
 
-        console.log("🎥 activeStream-status EFTER stop:", activeStream);  // ✅ Tjek om den bliver nulstillet korrekt
         resolve();
     });
 }
@@ -1300,17 +1297,21 @@ function updateCanvasSize() {
         return;
     }
 
-    // Vent på, at videoen er klar (metadata indlæst)
-    if (video.videoWidth === 0 || video.videoHeight === 0) {
+    // **Vent kun, hvis videoen ikke er klar, og vi ikke allerede venter**
+    if ((video.videoWidth === 0 || video.videoHeight === 0) && !waitingForVideo) {
+        waitingForVideo = true; // 🔥 Sæt flag, så vi ikke kalder funktionen igen med det samme
         console.warn("⏳ Video ikke klar, prøver igen...");
-        setTimeout(updateCanvasSize, 100);
+        setTimeout(() => {
+            waitingForVideo = false; // ✅ Nulstil flag, så vi kan prøve igen
+            updateCanvasSize();
+        }, 500);
         return;
     }
 
-    // **Sæt canvas til at matche videoens faktiske opløsning**
+    // 🎯 Hvis vi når hertil, er videoen klar:
+    waitingForVideo = false; // ✅ Video er klar, så vi kan fortsætte
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-
     console.log(`📏 Canvas opdateret til: ${canvas.width}x${canvas.height}`);
 }
 
@@ -1413,7 +1414,7 @@ adjustColorButton.addEventListener("click", () => {
 // 🎯 **Track farve og vis som sort/hvid (Tolerance & Threshold)**
 function trackColor() {
     if (!selectedColor || !isTracking) {
-        console.warn("⏹ trackColor() stoppet.");
+        console.warn("⏹ trackColor() stoppet – ingen farve valgt eller tracking inaktiv.");
         return;
     }
 
@@ -1425,7 +1426,7 @@ function trackColor() {
 
     if (video.videoWidth === 0 || video.videoHeight === 0) {
         console.warn("⏹ Video ikke klar, forsøger igen...");
-        requestAnimationFrame(trackColor);
+        setTimeout(trackColor, 100);
         return;
     }
 
@@ -1441,7 +1442,7 @@ function trackColor() {
         const brightness = (r + g + b) / 3;
 
         if (colorMatch(r, g, b, selectedColor, tolerance) && brightness >= threshold) {
-            data[i] = data[i + 1] = data[i + 2] = 255; 
+            data[i] = data[i + 1] = data[i + 2] = 255;
         } else {
             data[i] = data[i + 1] = data[i + 2] = 0;
         }
@@ -1449,8 +1450,9 @@ function trackColor() {
 
     ctx.putImageData(imageData, 0, 0);
 
+    // **🚀 Stop tracking korrekt ved at afbryde animationFrame**
     if (!isTracking) {
-        console.warn("⏹ trackColor() stoppet.");
+        console.warn("⏹ trackColor() stoppet – tracking blev deaktiveret.");
         return;
     }
 
