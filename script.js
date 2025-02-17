@@ -116,13 +116,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     
 
-// 🎥 **Start det valgte kamera**
+    // 🎥 **Start det valgte kamera**
 async function startSelectedCamera() {
-    if (!selectedCameraId) {
-        console.warn("⚠️ Ingen `selectedCameraId` sat – forsøger at hente kamera igen...");
-        await getCameras(); // Prøv at hente kamera igen
-    }
-
     if (!selectedCameraId) {
         alert("Vælg et kamera først!");
         return;
@@ -136,7 +131,7 @@ async function startSelectedCamera() {
     console.log("🎥 Prøver at starte kamera:", selectedCameraId);
     cameraActive = true;
 
-    await stopCamera();
+    await stopCamera(); 
 
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: selectedCameraId } } });
@@ -167,37 +162,22 @@ async function startSelectedCamera() {
         cameraActive = false;
     }
 }
+
     
     // 🎯 **Når man trykker på "Vælg bil via kamera"**
-     openColorPickerButton.addEventListener("click", async () => {
-    console.log("📸 Åbner farvevalg-overlay...");
-    colorPickerOverlay.classList.add("show");
-    colorPickerOverlay.style.display = "flex";
-    setTimeout(() => {
-        colorPickerOverlay.style.opacity = "1";
-    }, 10);
-
-    // 🔥 **Vent på at kameraerne bliver fundet først!**
-    await getCameras();
-
-    if (!selectedCameraId) {
-        console.warn("⚠️ Intet kamera valgt – forsøger at vælge et automatisk...");
-        const videoDevices = await navigator.mediaDevices.enumerateDevices();
-        const availableCameras = videoDevices.filter(device => device.kind === "videoinput");
-        
-        if (availableCameras.length > 0) {
-            selectedCameraId = availableCameras[0].deviceId;
-            console.log("✅ Automatisk valgt kamera:", selectedCameraId);
+    openColorPickerButton.addEventListener("click", () => {
+        console.log("📸 Åbner farvevalg-overlay...");
+        colorPickerOverlay.classList.add("show");
+        colorPickerOverlay.style.display = "flex";
+        setTimeout(() => {
+            colorPickerOverlay.style.opacity = "1";
+        }, 10);
+        if (selectedCameraId) {
+            startSelectedCamera();
+        } else {
+            console.warn("⚠️ Intet kamera valgt – brugeren skal vælge et.");
         }
-    }
-
-    if (selectedCameraId) {
-        console.log("🎥 Starter kamera:", selectedCameraId);
-        startSelectedCamera();
-    } else {
-        console.warn("⚠️ Intet kamera valgt – brugeren skal vælge et.");
-    }
-});
+    });
 
     // 🎯 **Når man lukker farvevalg-overlayet**
     closeColorPickerButton.addEventListener("click", async () => {
@@ -328,21 +308,35 @@ function stopCamera() {
 }
 
 // 🎥 **Hent tilgængelige kameraer**
-// 🎥 **Hent tilgængelige kameraer**
-async function getCameras() {
+    async function getCameras() {
     try {
-        console.log("📸 Prøver at få adgang til kameraerne...");
-
+        // 🔥 Tjek om moderne API'er findes
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            console.warn("⚠️ Din browser understøtter ikke moderne WebRTC API'er.");
+            console.warn("⚠️ Din browser understøtter ikke moderne WebRTC API'er. Prøver fallback...");
+            
+            // Fallback til gammel getUserMedia API (kun hvis tilgængelig)
+            navigator.getUserMedia = navigator.getUserMedia || 
+                                     navigator.webkitGetUserMedia || 
+                                     navigator.mozGetUserMedia;
+
+            if (!navigator.getUserMedia) {
+                console.error("🚨 Denne browser understøtter ikke webcam-adgang!");
+                return;
+            }
+
+            navigator.getUserMedia({ video: true }, 
+                (stream) => console.log("✅ Fallback: Kamera virker!", stream),
+                (err) => console.error("🚨 Fallback-fejl ved kameraadgang:", err)
+            );
             return;
         }
 
-        // 🚀 Få midlertidig adgang til kamera for at registrere enheder
-        let tempStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        // 🔥 Tving adgang til kamera for at sikre, at enheder registreres
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+
         console.log("✅ Kamera adgang givet!");
 
-        // 🎥 Hent enhedsliste
+        // 🎥 Hent tilgængelige enheder
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices.filter(device => device.kind === "videoinput");
 
@@ -353,27 +347,20 @@ async function getCameras() {
 
         console.log("🎥 Fundne kameraer:", videoDevices);
 
-        // 🎯 **Opdater dropdown-menuen**
-        const cameraDropdown = document.getElementById("cameraDropdown"); // Sørg for at ID'et matcher dit dropdown-element
-        cameraDropdown.innerHTML = ""; // Rens dropdown
+        // 🔄 Vælg et gyldigt kamera-id
+        let selectedDeviceId = videoDevices.find(d => d.deviceId && d.deviceId !== "")?.deviceId || videoDevices[0]?.deviceId;
 
-        videoDevices.forEach((device, index) => {
-            console.log(`🎥 Kamera ${index + 1}: ID = ${device.deviceId}, Label = "${device.label}"`);
-
-            let option = document.createElement("option");
-            option.value = device.deviceId;
-            option.textContent = device.label || `Kamera ${index + 1}`;
-            cameraDropdown.appendChild(option);
-        });
-
-        // ✅ **Sæt global `selectedCameraId`** (hvis den ikke allerede er valgt)
-        if (!selectedCameraId) {
-            selectedCameraId = videoDevices[0].deviceId;
-            console.log("✅ Bruger kamera:", selectedCameraId);
+        if (!selectedDeviceId) {
+            console.warn("🚨 Kunne ikke finde et gyldigt kamera-id!");
+            return;
         }
 
-        // 🎥 Luk test-stream
-        tempStream.getTracks().forEach(track => track.stop());
+        console.log("✅ Bruger kamera:", selectedDeviceId);
+
+        // 🔄 Stopper stream igen for at frigøre ressourcer
+        stream.getTracks().forEach(track => track.stop());
+
+        return selectedDeviceId;
 
     } catch (err) {
         console.error("🚨 Fejl ved kameraadgang:", err);
@@ -448,15 +435,7 @@ function resetPlayerForm() {
     // 🎯 Sørg for at tolerancejusteringen starter forfra
     tolerance = 50;
     threshold = 100;
-} 
-
-
-// 🎥 **Lyt efter valg af kamera i dropdown-menuen**
-document.getElementById("cameraDropdown").addEventListener("change", (event) => {
-    selectedCameraId = event.target.value;
-    console.log("🎥 Kamera skiftet til:", selectedCameraId);
-    startSelectedCamera(); // Start kameraet igen med det nye valg
-});
+}
 
 
 // 🎯 **Funktion til at styre skærmene**
@@ -751,27 +730,13 @@ function updateLapTimesTable() {
 
 function resetRaceData() {
     console.log("♻️ Nulstiller race-data...");
-    
     raceActive = false;
-    
-    // 🚀 Nulstil tracking-variabler
-    clearInterval(trackingInterval);
-    trackingInterval = null;
-    isTracking = false; 
-    firstDetectionSkipped = false;
-
-    console.log("♻️ Nulstiller race-data uden at slette spillere...");
 
     players.forEach(player => {
-        if (!player.id) {
-            console.warn("⚠️ Spilleren mangler ID, undgår nulstilling!", player);
-            return;
-        }
-
         player.laps = 0;
         player.finishTime = null;
         player.lastDetectionTime = null;
-        player.firstDetectionSkipped = false;
+        player.firstDetectionSkipped = false; // 🔥 Sørg for at første registrering ignoreres i næste løb
         player.lapTimes = [];
     });
 
@@ -784,22 +749,19 @@ async function stopRace() {
     console.log("🏁 Race afsluttet!");
     console.log("🛑 stopRace() kaldt fra:", new Error().stack);
 
-    // 🛑 Stopper timer
+    // Stop timer hvis aktiv
     if (raceTimer) {
         clearInterval(raceTimer);
         raceTimer = null;
         console.log("⏹ Timer stoppet!");
     }
 
-    // 🚀 Stop tracking korrekt
     if (trackingInterval) {
-        console.log("⏸ Stopper tracking korrekt...");
         clearInterval(trackingInterval);
         trackingInterval = null;
     }
 
     isTracking = false;
-    firstDetectionSkipped = false;
 
     // 🚀 **Sluk kameraet korrekt**
     await stopCamera();
@@ -808,11 +770,11 @@ async function stopRace() {
     const countdownElement = document.getElementById("countdownTimer");
     if (countdownElement) {
         if (raceSettings.mode === "FastestLap") {
-            countdownElement.innerText = "Race is over";
-            countdownElement.classList.add("race-over");
+            countdownElement.innerText = "Race is over"; // ❗ Skriv "Race is over"
+            countdownElement.classList.add("race-over"); // Tilføj styling
             console.log("⏳ Countdown opdateret til 'Race is over'");
         } else {
-            countdownElement.style.display = "none";
+            countdownElement.style.display = "none"; // ❗ Skjul kun i LapCounts mode
             console.log("⏳ Countdown skjult!");
         }
     }
@@ -998,20 +960,8 @@ async function startRace() {
     }
 
     // **Start farvesporing kun hvis ikke allerede aktiv**
-        setTimeout(() => {
-        console.log("🔄 Nulstiller tracking-status før detectColorInRace starter...");
-        
-        clearInterval(trackingInterval);
-        trackingInterval = null;
-        isTracking = false;
-
-        players.forEach(player => {
-            player.firstDetectionSkipped = false;
-            player.lastDetectionTime = null;
-        });
-
+    setTimeout(() => {
         if (!trackingInterval && raceActive) {
-            console.log("🚀 Starter detectColorInRace igen...");
             detectColorInRace();
         } else {
             console.warn("⚠️ detectColorInRace kører allerede eller race er stoppet.");
@@ -1283,7 +1233,7 @@ function detectColorInRace() {
 
             const now = Date.now();
 
-            if (!player.firstDetectionSkipped || raceStartTime > player.lastDetectionTime) {
+            if (!player.firstDetectionSkipped) {
                 player.firstDetectionSkipped = true;
                 player.lastDetectionTime = now;
                 console.log(`✅ Første registrering ignoreret for ${player.name}`);
