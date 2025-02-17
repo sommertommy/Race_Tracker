@@ -96,25 +96,25 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ DOM setup færdig!");
 
     // 🎯 **Åbn kameraoverlay og hent kameraer**
-    openCameraOverlayButton.addEventListener("click", () => {
-        console.log("📸 Åbner kamera-valg overlay...");
-        cameraSelectOverlay.style.display = "flex";
-        getCameras();
-    });
+     // openCameraOverlayButton.addEventListener("click", () => {
+     //     console.log("📸 Åbner kamera-valg overlay...");
+     //     cameraSelectOverlay.style.display = "flex";
+     //     getCameras();
+     // });
 
     // 🎯 **Luk kameraoverlay**
-    closeCameraOverlayButton.addEventListener("click", () => {
-        console.log("❌ Lukker kamera overlay...");
-        cameraSelectOverlay.style.display = "none";
-    });
+     // closeCameraOverlayButton.addEventListener("click", () => {
+     //     console.log("❌ Lukker kamera overlay...");
+     //     cameraSelectOverlay.style.display = "none";
+    //  });
 
     // 🎯 **Bekræft valgte kamera**
-    confirmCameraButton.addEventListener("click", () => {
-        selectedCameraId = cameraList.value;
-        console.log(`🎥 Valgt kamera: ${selectedCameraId}`);
-        localStorage.setItem("selectedCamera", selectedCameraId);
-        cameraSelectOverlay.style.display = "none";
-    });
+    //  confirmCameraButton.addEventListener("click", () => {
+    //      selectedCameraId = cameraList.value;
+    //      console.log(`🎥 Valgt kamera: ${selectedCameraId}`);
+    //      localStorage.setItem("selectedCamera", selectedCameraId);
+    //      cameraSelectOverlay.style.display = "none";
+   //   });
 
     
 
