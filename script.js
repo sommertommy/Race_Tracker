@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const cameraList = document.getElementById("cameraList");
     const confirmCameraButton = document.getElementById("confirmCameraSelection");
     const closeCameraOverlayButton = document.getElementById("closeCameraOverlay");
-    let colorSelectionActive = false;
     
     // RACING MODE SELECTOR   
     // RACING MODE SELECTOR
@@ -133,13 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     option.textContent = device.label || `Kamera ${index + 1}`;
                     cameraList.appendChild(option);
                 });
-
                 console.log("🎥 Fundne kameraer:", videoDevices);
-
-                // 🔥 **Vælg automatisk det tidligere valgte kamera, hvis det findes**
-                if (selectedCameraId && videoDevices.some(device => device.deviceId === selectedCameraId)) {
-                    cameraList.value = selectedCameraId;
-                }
             })
             .catch(err => {
                 console.error("⚠️ Fejl ved hentning af kameraer:", err);
@@ -147,198 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
 
-        // 🎥 **Start det valgte kamera**
-// 🎥 **Start det valgte kamera**
-function stopCamera() {
-    return new Promise(resolve => {
-        if (!activeStream) {
-            console.warn("⚠️ Ingen aktiv stream at stoppe!");
-            resolve();
-            return;
-        }
-
-        console.log("🛑 stopCamera() FUNKTIONEN BLEV KALDT!");
-        console.log("🎥 activeStream-status før stop:", activeStream);
-
-        activeStream.getTracks().forEach(track => {
-            console.log(`🚫 Stopper track: ${track.kind}`);
-            track.stop();
-        });
-
-        activeStream = null;
-        cameraActive = false;
-        console.log("✅ Kamera er nu deaktiveret!");
-
-        const videoElement = document.getElementById("video");
-        if (videoElement) {
-            console.log("🔄 Nulstiller videoElement.srcObject...");
-            videoElement.srcObject = null;
-        }
-
-        console.log("🎥 activeStream-status EFTER stop:", activeStream);
-        setTimeout(() => {
-            console.log("⏳ Kamera er nu HELT stoppet.");
-            resolve();
-        }, 500); // **Lidt længere forsinkelse for at sikre deaktivering**
-    });
-}
-    
-    // 🎯 **Når man trykker på "Vælg bil via kamera"**
-    openColorPickerButton.addEventListener("click", () => {
-        console.log("📸 Åbner farvevalg-overlay...");
-        colorSelectionActive = true; // ✅ **Sæt aktiv status, når farvevælger åbnes**
-        colorPickerOverlay.classList.add("show");
-        colorPickerOverlay.style.display = "flex";
-    
-        setTimeout(() => {
-            colorPickerOverlay.style.opacity = "1";
-        }, 10);
-    
-        if (selectedCameraId) {
-            startSelectedCamera();
-        } else {
-            console.warn("⚠️ Intet kamera valgt – brugeren skal vælge et.");
-        }
-    });
-    
-    // 🎯 **Når man lukker farvevalg-overlayet**
-    closeColorPickerButton.addEventListener("click", async () => {
-        console.log("❌ Lukker farvevalg-overlay...");
-        colorSelectionActive = false; // ✅ **Sæt den tilbage til false**
-        colorPickerOverlay.style.opacity = "0";
-    
-        setTimeout(() => {
-            colorPickerOverlay.classList.remove("show");
-            colorPickerOverlay.style.display = "none";
-        }, 300);
-    
-        await stopCamera(); // 🔥 Sørg for, at kameraet 100% er stoppet
-    });
-
-    // 🚀 **Start kamera i spilleroprettelse, hvis der allerede er valgt et kamera**
-    document.getElementById("addPlayer").addEventListener("click", () => {
-        console.log("➕ Tilføjer ny spiller...");
-        if (selectedCameraId) {
-            console.log("🎥 Starter automatisk tidligere valgte kamera:", selectedCameraId);
-            startSelectedCamera();
-        }
-    });
-
-    
-});
-
-
-// 🎯 **Hent DOM-elementer**
-const canvas = document.getElementById("overlayCanvas");
-const video = document.getElementById("video");
-const ctx = canvas.getContext("2d", { willReadFrequently: true });
-
-const startScreen = document.getElementById("startScreen");
-const colorSetupScreen = document.getElementById("colorSetupScreen");
-const raceSetupScreen = document.getElementById("raceSetupScreen");
-
-const addPlayerButton = document.getElementById("addPlayer");
-const setupRaceButton = document.getElementById("setupRace");
-const saveRaceButton = document.getElementById("saveRace");
-const backToStartRaceButton = document.getElementById("backToStartRace");
-
-const savePlayerButton = document.getElementById("savePlayer");
-const backToStartButton = document.getElementById("backToStart");
-
-const playerList = document.getElementById("playerList");
-const roundsInput = document.getElementById("rounds");
-const timeLimitInput = document.getElementById("timeLimitInput");
-//const raceModeSelector = document.getElementById("raceMode");
-
-const cameraPlaceholder = document.getElementById("cameraPlaceholder");
-const overlayCanvas = document.getElementById("overlayCanvas");
-
-const toleranceSlider = document.getElementById("tolerance");
-const thresholdSlider = document.getElementById("threshold");
-const colorDisplay = document.getElementById("selectedColor");
-const playerNameInput = document.getElementById("playerName");
-
-const toleranceValue = document.getElementById("toleranceValue");
-const thresholdValue = document.getElementById("thresholdValue");
-const toleranceControls = document.getElementById("toleranceControls");
-
-const adjustToleranceButton = document.getElementById("adjustTolerance");
-const adjustColorButton = document.getElementById("adjustColor");
-
-const useSelectedCameraButton = document.getElementById("useSelectedCamera");
-
-// 🎯 **Hent referencer til race UI-elementer**
-const startRaceButton = document.getElementById("startRace");
-const raceScreen = document.getElementById("raceScreen");
-const raceVideo = document.getElementById("raceVideo");
-const currentPlayerDisplay = document.getElementById("currentPlayer");
-const currentLapsDisplay = document.getElementById("currentLapsDisplay");
-const backToSetupRaceButton = document.getElementById("backToSetupRace");
-
-const openColorPickerButton = document.getElementById("openColorPicker");
-const closeColorPickerButton = document.getElementById("closeColorPickerButton");
-const colorPickerOverlay = document.getElementById("colorPickerOverlay");
-const cameraSelect = document.getElementById("cameraSelect");
-
-// 🎯 **Globale variabler**
-
-
-let raceTimer = null; // Gem timer reference
-let selectedCameraId = null;
-let activeStream = null;
-let acceptColorSelectionButton; // Definer variablen globalt
-let colorCounts = {}; // Holder styr på hvor mange gange hver farve er fundet
-let editingPlayerIndex = null; // 🔥 Sporer om en spiller redigeres
-let selectedColor = null;
-let tolerance = 50;
-let threshold = 100;
-let isTracking = false;
-let players = [];
-let raceSettings = { rounds: 10 };
-
-let raceStartTime = 0; // 🔥 Gem starttidspunkt
-let raceActive = false;
-let trackingInterval = null; // 🔥 Stopper flere samtidige tracking-løkker
-let lastDetectionTime = 0;
-
-let selectedProfilePicture = "Reddriver.png"; // Standardbillede
-let editingPlayerId = null; // 🔥 Holder styr på den spiller, der redigeres
-let cameraStarted = false;
-
-// 🎥 **Tving kameraet til at stoppe**
-async function stopCamera() {
-    return new Promise(resolve => {
-        if (!activeStream) {
-            console.warn("⚠️ Ingen aktiv stream at stoppe!");
-            resolve();
-            return;
-        }
-
-        console.log("🛑 stopCamera() FUNKTIONEN BLEV KALDT!");
-        console.log("🎥 activeStream-status før stop:", activeStream);
-
-        setTimeout(() => {
-            activeStream.getTracks().forEach(track => {
-                console.log(`🚫 Stopper track: ${track.kind}`);
-                track.stop();
-            });
-
-            activeStream = null;
-            cameraActive = false;
-            console.log("✅ Kamera er nu deaktiveret!");
-
-            const videoElement = document.getElementById("video");
-            if (videoElement) {
-                console.log("🔄 Nulstiller videoElement.srcObject...");
-                videoElement.srcObject = null;
-            }
-
-            console.log("🎥 activeStream-status EFTER stop:", activeStream);
-            resolve();
-        }, 200); // 🕒 **Kort forsinkelse, før kameraet slukkes helt**
-    });
-}
-
+    // 🎥 **Start det valgte kamera**
 async function startSelectedCamera() {
     if (!selectedCameraId) {
         alert("Vælg et kamera først!");
@@ -397,10 +199,152 @@ async function startSelectedCamera() {
         });
 }
 
-// Sørg for, at `startSelectedCamera` er globalt tilgængelig.
-document.addEventListener("DOMContentLoaded", () => {
-    console.log("✅ DOM er nu indlæst!");
+    
+    // 🎯 **Når man trykker på "Vælg bil via kamera"**
+    openColorPickerButton.addEventListener("click", () => {
+        console.log("📸 Åbner farvevalg-overlay...");
+        colorPickerOverlay.classList.add("show");
+        colorPickerOverlay.style.display = "flex";
+        setTimeout(() => {
+            colorPickerOverlay.style.opacity = "1";
+        }, 10);
+        if (selectedCameraId) {
+            startSelectedCamera();
+        } else {
+            console.warn("⚠️ Intet kamera valgt – brugeren skal vælge et.");
+        }
+    });
+
+    // 🎯 **Når man lukker farvevalg-overlayet**
+    closeColorPickerButton.addEventListener("click", async () => {
+        console.log("❌ Lukker farvevalg-overlay...");
+        colorPickerOverlay.style.opacity = "0";
+    
+        setTimeout(() => {
+            colorPickerOverlay.classList.remove("show");
+            colorPickerOverlay.style.display = "none";
+        }, 300);
+    
+        await stopCamera(); // 🔥 Sørg for, at kameraet 100% er stoppet
+    });
+
+    // 🚀 **Start kamera i spilleroprettelse, hvis der allerede er valgt et kamera**
+    document.getElementById("addPlayer").addEventListener("click", () => {
+        console.log("➕ Tilføjer ny spiller...");
+        if (selectedCameraId) {
+            console.log("🎥 Kamera er allerede valgt, men starter ikke automatisk.");
+        }
+    });
 });
+
+
+// 🎯 **Hent DOM-elementer**
+const canvas = document.getElementById("overlayCanvas");
+const video = document.getElementById("video");
+const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+const startScreen = document.getElementById("startScreen");
+const colorSetupScreen = document.getElementById("colorSetupScreen");
+const raceSetupScreen = document.getElementById("raceSetupScreen");
+
+const addPlayerButton = document.getElementById("addPlayer");
+const setupRaceButton = document.getElementById("setupRace");
+const saveRaceButton = document.getElementById("saveRace");
+const backToStartRaceButton = document.getElementById("backToStartRace");
+
+const savePlayerButton = document.getElementById("savePlayer");
+const backToStartButton = document.getElementById("backToStart");
+
+const playerList = document.getElementById("playerList");
+const roundsInput = document.getElementById("rounds");
+const timeLimitInput = document.getElementById("timeLimitInput");
+//const raceModeSelector = document.getElementById("raceMode");
+
+const cameraPlaceholder = document.getElementById("cameraPlaceholder");
+const overlayCanvas = document.getElementById("overlayCanvas");
+
+const toleranceSlider = document.getElementById("tolerance");
+const thresholdSlider = document.getElementById("threshold");
+const colorDisplay = document.getElementById("selectedColor");
+const playerNameInput = document.getElementById("playerName");
+
+const toleranceValue = document.getElementById("toleranceValue");
+const thresholdValue = document.getElementById("thresholdValue");
+const toleranceControls = document.getElementById("toleranceControls");
+
+const adjustToleranceButton = document.getElementById("adjustTolerance");
+const adjustColorButton = document.getElementById("adjustColor");
+
+const useSelectedCameraButton = document.getElementById("useSelectedCamera");
+
+// 🎯 **Hent referencer til race UI-elementer**
+const startRaceButton = document.getElementById("startRace");
+const raceScreen = document.getElementById("raceScreen");
+const raceVideo = document.getElementById("raceVideo");
+const currentPlayerDisplay = document.getElementById("currentPlayer");
+const currentLapsDisplay = document.getElementById("currentLapsDisplay");
+const backToSetupRaceButton = document.getElementById("backToSetupRace");
+
+const openColorPickerButton = document.getElementById("openColorPicker");
+const closeColorPickerButton = document.getElementById("closeColorPickerButton");
+const colorPickerOverlay = document.getElementById("colorPickerOverlay");
+const cameraSelect = document.getElementById("cameraSelect");
+
+// 🎯 **Globale variabler**
+
+let raceTimer = null; // Gem timer reference
+let selectedCameraId = null;
+let activeStream = null;
+let acceptColorSelectionButton; // Definer variablen globalt
+let colorCounts = {}; // Holder styr på hvor mange gange hver farve er fundet
+let editingPlayerIndex = null; // 🔥 Sporer om en spiller redigeres
+let selectedColor = null;
+let tolerance = 50;
+let threshold = 100;
+let isTracking = false;
+let players = [];
+let raceSettings = { rounds: 10 };
+
+let raceStartTime = 0; // 🔥 Gem starttidspunkt
+let raceActive = false;
+let trackingInterval = null; // 🔥 Stopper flere samtidige tracking-løkker
+let lastDetectionTime = 0;
+
+let selectedProfilePicture = "Reddriver.png"; // Standardbillede
+let editingPlayerId = null; // 🔥 Holder styr på den spiller, der redigeres
+let cameraStarted = false;
+
+// 🎥 **Tving kameraet til at stoppe**
+function stopCamera() {
+    return new Promise(resolve => {
+        const videoElement = document.getElementById("video");
+
+        console.log("🛑 stopCamera() FUNKTIONEN BLEV KALDT!");
+        console.log("🎥 activeStream-status før stop:", activeStream);
+
+        if (activeStream) {
+            console.log("📸 Stopper aktiv kamera-stream...");
+            activeStream.getTracks().forEach(track => {
+                console.log(`🚫 Stopper track: ${track.kind}`);
+                track.stop();
+            });
+
+            activeStream = null; // 🔥 **Nulstil stream korrekt**
+            cameraActive = false;
+            console.log("✅ Kamera er nu deaktiveret!");
+        } else {
+            console.warn("⚠️ Ingen aktiv stream at stoppe!");
+        }
+
+        if (videoElement) {
+            console.log("🔄 Nulstiller videoElement.srcObject...");
+            videoElement.srcObject = null;
+        }
+
+        console.log("🎥 activeStream-status EFTER stop:", activeStream);  // ✅ Tjek om den bliver nulstillet korrekt
+        resolve();
+    });
+}
 
 
 // 🎯 **Funktion til at acceptere farvevalg**
@@ -678,17 +622,6 @@ function formatTime(ms) {
     }
 }
 
-// Når farvevælgeren åbnes
-function openColorPicker() {
-    colorSelectionActive = true; 
-    document.getElementById("colorPickerOverlay").style.display = "flex";
-}
-
-// Når farvevælgeren lukkes
-function closeColorPicker() {
-    colorSelectionActive = false;
-    document.getElementById("colorPickerOverlay").style.display = "none";
-}
 
 
 function updateLapTimesTable() {
@@ -1312,7 +1245,6 @@ function detectColorInRace() {
 
             const now = Date.now();
 
-            // **Ignorer første registrering**
             if (!player.firstDetectionSkipped) {
                 player.firstDetectionSkipped = true;
                 player.lastDetectionTime = now;
@@ -1320,7 +1252,6 @@ function detectColorInRace() {
                 return;
             }
 
-            // **Tjek om det er tid til en ny omgang**
             if (!player.lastDetectionTime || now - player.lastDetectionTime > 2000) {
                 updatePlayerLaps(player.id);
                 player.lastDetectionTime = now;
@@ -1359,6 +1290,7 @@ let cameraActive = false;
 
 
 
+// 🎬 **Start valgte kamera**
 useSelectedCameraButton.addEventListener("click", () => {
     if (!cameraSelect.value) {
         alert("Vælg et kamera fra listen!");
@@ -1369,7 +1301,6 @@ useSelectedCameraButton.addEventListener("click", () => {
 
     stopCamera(); // Luk eksisterende kamera først
     selectedCameraId = cameraSelect.value; // Gem det valgte kamera
-    localStorage.setItem("selectedCamera", selectedCameraId); // 🔥 GEM ID PERMANENT
     startSelectedCamera();
 });
 
