@@ -146,7 +146,8 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
 
-    // 🎥 **Start det valgte kamera**
+        // 🎥 **Start det valgte kamera**
+// 🎥 **Start det valgte kamera**
 async function startSelectedCamera() {
     if (!selectedCameraId) {
         alert("Vælg et kamera først!");
@@ -158,8 +159,8 @@ async function startSelectedCamera() {
         return;
     }
 
-    // 🛑 **Tjek om racet er stoppet - hvis ja, afbryd!**
-    if (!raceActive) {
+    // 🛑 **Tjek om racet er stoppet - men tillad farvevalg**
+    if (!raceActive && !colorSelectionActive) {
         console.warn("🚫 Race er stoppet – starter ikke kamera.");
         return;
     }
@@ -167,10 +168,13 @@ async function startSelectedCamera() {
     console.log("🎥 Prøver at starte kamera:", selectedCameraId);
     cameraActive = true;
 
-    // 🔥 **Vent på at stopCamera() er færdig**
-    await stopCamera();
-
     try {
+        // 🚨 **Luk det gamle kamera, men kun hvis vi ikke er i farvevalg!**
+        if (!colorSelectionActive) {
+            await stopCamera();
+        }
+
+        // 📸 **Hent kamerastream**
         const stream = await navigator.mediaDevices.getUserMedia({
             video: {
                 deviceId: { exact: selectedCameraId },
@@ -189,14 +193,11 @@ async function startSelectedCamera() {
             return;
         }
 
-        videoElement.pause();
-        videoElement.srcObject = null;
-        videoElement.load();
-
-        // 🔥 **Vent 300ms, før videoen sættes**
-        setTimeout(() => {
-            videoElement.srcObject = stream;
-
+        // 🎥 **Indstil video stream**
+        videoElement.srcObject = null; // **Ryd tidligere stream først**
+        videoElement.srcObject = stream;
+        
+        videoElement.onloadedmetadata = () => {
             videoElement.play()
                 .then(() => {
                     console.log("🎥 Kameraet er nu aktivt!");
@@ -204,21 +205,18 @@ async function startSelectedCamera() {
                     videoElement.style.opacity = "1";
                     videoElement.style.visibility = "visible";
 
-                    // 📏 Opdater videoens opløsning
-                    setTimeout(() => {
-                        videoElement.width = videoElement.videoWidth;
-                        videoElement.height = videoElement.videoHeight;
-                        console.log(`📏 Kameraopløsning sat til: ${videoElement.width}x${videoElement.height}`);
-                    }, 500);
+                    // 📏 **Opdater videoens opløsning**
+                    console.log(`📏 Kameraopløsning: ${videoElement.videoWidth}x${videoElement.videoHeight}`);
                 })
                 .catch(err => {
                     console.error("❌ Fejl ved afspilning af video:", err);
                 });
+        };
 
-        }, 300); // **Lidt længere forsinkelse**
-
-        // 🎨 Vis farvevælger-overlay
-        document.getElementById("colorPickerOverlay").style.display = "flex";
+        // 🎨 Vis farvevælger-overlay (hvis aktivt)
+        if (colorSelectionActive) {
+            document.getElementById("colorPickerOverlay").style.display = "flex";
+        }
 
         // 🚀 Skjul pladsholder
         document.getElementById("cameraPlaceholder").style.display = "none";
