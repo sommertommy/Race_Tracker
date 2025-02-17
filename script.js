@@ -730,18 +730,20 @@ function updateLapTimesTable() {
 
 function resetRaceData() {
     console.log("♻️ Nulstiller race-data...");
+    
     raceActive = false;
     
-    // 🔄 Sikrer at tracking starter rent i nyt løb
+    // 🚀 Nulstil tracking-variabler
     clearInterval(trackingInterval);
     trackingInterval = null;
     isTracking = false; 
+    firstDetectionSkipped = false;
 
     players.forEach(player => {
         player.laps = 0;
         player.finishTime = null;
         player.lastDetectionTime = null;
-        player.firstDetectionSkipped = false; // 🔥 Sørger for at første registrering ignoreres i næste løb
+        player.firstDetectionSkipped = false; // 🔥 Sørg for at første registrering ignoreres i næste løb
         player.lapTimes = [];
     });
 
@@ -754,19 +756,22 @@ async function stopRace() {
     console.log("🏁 Race afsluttet!");
     console.log("🛑 stopRace() kaldt fra:", new Error().stack);
 
-    // Stop timer hvis aktiv
+    // 🛑 Stopper timer
     if (raceTimer) {
         clearInterval(raceTimer);
         raceTimer = null;
         console.log("⏹ Timer stoppet!");
     }
 
+    // 🚀 Stop tracking korrekt
     if (trackingInterval) {
+        console.log("⏸ Stopper tracking korrekt...");
         clearInterval(trackingInterval);
         trackingInterval = null;
     }
 
     isTracking = false;
+    firstDetectionSkipped = false;
 
     // 🚀 **Sluk kameraet korrekt**
     await stopCamera();
@@ -775,11 +780,11 @@ async function stopRace() {
     const countdownElement = document.getElementById("countdownTimer");
     if (countdownElement) {
         if (raceSettings.mode === "FastestLap") {
-            countdownElement.innerText = "Race is over"; // ❗ Skriv "Race is over"
-            countdownElement.classList.add("race-over"); // Tilføj styling
+            countdownElement.innerText = "Race is over";
+            countdownElement.classList.add("race-over");
             console.log("⏳ Countdown opdateret til 'Race is over'");
         } else {
-            countdownElement.style.display = "none"; // ❗ Skjul kun i LapCounts mode
+            countdownElement.style.display = "none";
             console.log("⏳ Countdown skjult!");
         }
     }
@@ -966,10 +971,14 @@ async function startRace() {
 
     // **Start farvesporing kun hvis ikke allerede aktiv**
     setTimeout(() => {
-        if (!trackingInterval) {
-            console.log("🚀 Genstarter detectColorInRace...");
-            trackingInterval = null; // Sikrer at variablen er nulstillet
-            isTracking = true;
+        console.log("🔄 Nulstiller tracking-status før detectColorInRace starter...");
+        clearInterval(trackingInterval);
+        trackingInterval = null;
+        isTracking = false;
+        firstDetectionSkipped = false;
+
+        if (!trackingInterval && raceActive) {
+            console.log("🚀 Starter detectColorInRace igen...");
             detectColorInRace();
         } else {
             console.warn("⚠️ detectColorInRace kører allerede eller race er stoppet.");
