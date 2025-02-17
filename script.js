@@ -739,11 +739,18 @@ function resetRaceData() {
     isTracking = false; 
     firstDetectionSkipped = false;
 
+    console.log("♻️ Nulstiller race-data uden at slette spillere...");
+
     players.forEach(player => {
+        if (!player.id) {
+            console.warn("⚠️ Spilleren mangler ID, undgår nulstilling!", player);
+            return;
+        }
+
         player.laps = 0;
         player.finishTime = null;
         player.lastDetectionTime = null;
-        player.firstDetectionSkipped = false; // 🔥 Sørg for at første registrering ignoreres i næste løb
+        player.firstDetectionSkipped = false;
         player.lapTimes = [];
     });
 
@@ -970,12 +977,17 @@ async function startRace() {
     }
 
     // **Start farvesporing kun hvis ikke allerede aktiv**
-    setTimeout(() => {
+        setTimeout(() => {
         console.log("🔄 Nulstiller tracking-status før detectColorInRace starter...");
+        
         clearInterval(trackingInterval);
         trackingInterval = null;
         isTracking = false;
-        firstDetectionSkipped = false;
+
+        players.forEach(player => {
+            player.firstDetectionSkipped = false;
+            player.lastDetectionTime = null;
+        });
 
         if (!trackingInterval && raceActive) {
             console.log("🚀 Starter detectColorInRace igen...");
@@ -1250,7 +1262,7 @@ function detectColorInRace() {
 
             const now = Date.now();
 
-            if (!player.firstDetectionSkipped) {
+            if (!player.firstDetectionSkipped || raceStartTime > player.lastDetectionTime) {
                 player.firstDetectionSkipped = true;
                 player.lastDetectionTime = now;
                 console.log(`✅ Første registrering ignoreret for ${player.name}`);
