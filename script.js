@@ -24,6 +24,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const raceModeSelector = document.getElementById("raceMode");
     const raceModeLabel = document.getElementById("raceModeLabel");
     const raceModeInput = document.getElementById("raceModeInput");
+
+    const cameraSelect = document.getElementById("cameraSelect");
+    if (!cameraSelect) {
+        console.error("❌ FEJL: Kamera-dropdown (`cameraSelect`) ikke fundet i DOM'en!");
+    }
     
     
    // 🎯 Funktion til at opdatere UI baseret på valgt race-mode
@@ -49,28 +54,28 @@ document.addEventListener("DOMContentLoaded", () => {
     updateRaceModeUI();
     
     // 🎯 Gem race-indstillinger, når brugeren trykker på "Start Race"
+        
         startRaceButton.addEventListener("click", () => {
-        const selectedValue = parseInt(document.getElementById("raceModeInput").value);
-    
-        if (isNaN(selectedValue) || (raceModeSelector.value === "LapCounts" && selectedValue < 1) || 
-            (raceModeSelector.value === "FastestLap" && selectedValue < 10)) {
-            alert("Indtast en gyldig værdi!");
-            return;
-        }
-    
-        if (raceModeSelector.value === "LapCounts") {
-            raceSettings = { mode: "LapCounts", rounds: selectedValue };
-        } else {
-            raceSettings = { mode: "FastestLap", timeLimit: selectedValue };
-        }
-    
-        console.log("✅ Race gemt:", raceSettings);
-    
-        // 🎥 Start countdown video og vent til den er færdig før racet starter
-        playCountdownVideo().then(() => {
-            startRace();
-        });
-    });
+            const selectedValue = parseInt(document.getElementById("raceModeInput").value);
+        
+            if (isNaN(selectedValue) || (raceModeSelector.value === "LapCounts" && selectedValue < 1) || 
+                (raceModeSelector.value === "FastestLap" && selectedValue < 10)) {
+                alert("Indtast en gyldig værdi!");
+                return;
+            }
+        
+            raceSettings = {
+                mode: raceModeSelector.value,
+                rounds: raceModeSelector.value === "LapCounts" ? selectedValue : null,
+                timeLimit: raceModeSelector.value === "FastestLap" ? selectedValue : null
+            };
+        
+            console.log("✅ Race gemt:", raceSettings);
+        
+            playCountdownVideo().then(() => {
+                startRace();
+            });
+});
     // RACING MODE SELECTOR
     // RACING MODE SELECTOR
     // RACING MODE SELECTOR
@@ -114,106 +119,90 @@ document.addEventListener("DOMContentLoaded", () => {
         cameraSelectOverlay.style.display = "none";
     });
 
-    // 🎥 **Hent tilgængelige kameraer**
-    function getCameras() {
-        console.log("📸 Henter tilgængelige kameraer...");
-        navigator.mediaDevices.enumerateDevices()
-            .then(devices => {
-                const videoDevices = devices.filter(device => device.kind === "videoinput");
-                if (videoDevices.length === 0) {
-                    console.error("❌ Ingen kameraer fundet!");
-                    alert("Ingen kameraer fundet. Tjek din enhed.");
-                    return;
-                }
-                cameraList.innerHTML = "";
-                videoDevices.forEach((device, index) => {
-                    let option = document.createElement("option");
-                    option.value = device.deviceId;
-                    option.textContent = device.label || `Kamera ${index + 1}`;
-                    cameraList.appendChild(option);
-                });
-                console.log("🎥 Fundne kameraer:", videoDevices);
-            })
-            .catch(err => {
-                console.error("⚠️ Fejl ved hentning af kameraer:", err);
-                alert("Kunne ikke hente kameraer. Tjek kameraindstillinger.");
-            });
+    
+
+// 🎥 **Start det valgte kamera**
+async function startSelectedCamera() {
+    if (!selectedCameraId) {
+        console.warn("⚠️ Ingen `selectedCameraId` sat – forsøger at hente kamera igen...");
+        await getCameras(); // Prøv at hente kamera igen
     }
 
-    // 🎥 **Start det valgte kamera**
-async function startSelectedCamera() {
     if (!selectedCameraId) {
         alert("Vælg et kamera først!");
         return;
     }
 
     if (cameraActive) {
-        console.warn("⚠️ Kameraet kører allerede. Afbryder ekstra anmodning.");
+        console.warn("⚠️ Kameraet kører allerede.");
         return;
     }
 
     console.log("🎥 Prøver at starte kamera:", selectedCameraId);
     cameraActive = true;
 
-    await stopCamera(); // 🔥 **Vent på, at kameraet stopper først**
+    await stopCamera();
 
-    navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: selectedCameraId } } })
-        .then(stream => {
-            console.log("📷 Kamera stream modtaget!", stream);
-            
-            activeStream = stream;  // ✅ **Nu bliver `activeStream` sat rigtigt!**
-            console.log("✅ activeStream ER SAT:", activeStream);
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: selectedCameraId } } });
 
-            const videoElement = document.getElementById("video");
-            if (!videoElement) {
-                console.error("❌ Fejl: videoElement blev ikke fundet!");
-                return;
-            }
+        activeStream = stream;
+        const videoElement = document.getElementById("video");
 
-            videoElement.srcObject = stream;
-            return videoElement.play();
-        })
-        .then(() => {
+        if (!videoElement) {
+            console.error("❌ Fejl: videoElement blev ikke fundet!");
+            return;
+        }
+
+        videoElement.srcObject = stream;
+
+        videoElement.oncanplay = () => {
             console.log("🎥 Kameraet er nu aktivt!");
+            videoElement.style.display = "block";
+            videoElement.play().catch(err => console.error("⚠️ Fejl ved videoafspilning:", err));
+        };
 
-            const videoElement = document.getElementById("video");
-            if (videoElement) {
-                videoElement.style.display = "block";
-                videoElement.style.opacity = "1";
-                videoElement.style.visibility = "visible";
-            }
+        const cameraPlaceholder = document.getElementById("cameraPlaceholder");
+        if (cameraPlaceholder) {
+            cameraPlaceholder.style.display = "none";
+        }
 
-            const colorPickerOverlay = document.getElementById("colorPickerOverlay");
-            if (colorPickerOverlay) {
-                colorPickerOverlay.style.display = "flex";
-            }
-
-            const cameraPlaceholder = document.getElementById("cameraPlaceholder");
-            if (cameraPlaceholder) {
-                cameraPlaceholder.style.display = "none";
-            }
-        })
-        .catch(err => {
-            console.error("❌ Fejl ved afspilning af video:", err);
-            cameraActive = false;
-        });
+    } catch (err) {
+        console.error("❌ Fejl ved kamera-tilgang:", err);
+        cameraActive = false;
+    }
 }
-
     
     // 🎯 **Når man trykker på "Vælg bil via kamera"**
-    openColorPickerButton.addEventListener("click", () => {
-        console.log("📸 Åbner farvevalg-overlay...");
-        colorPickerOverlay.classList.add("show");
-        colorPickerOverlay.style.display = "flex";
-        setTimeout(() => {
-            colorPickerOverlay.style.opacity = "1";
-        }, 10);
-        if (selectedCameraId) {
-            startSelectedCamera();
-        } else {
-            console.warn("⚠️ Intet kamera valgt – brugeren skal vælge et.");
+     openColorPickerButton.addEventListener("click", async () => {
+    console.log("📸 Åbner farvevalg-overlay...");
+    colorPickerOverlay.classList.add("show");
+    colorPickerOverlay.style.display = "flex";
+    setTimeout(() => {
+        colorPickerOverlay.style.opacity = "1";
+    }, 10);
+
+    // 🔥 **Vent på at kameraerne bliver fundet først!**
+    await getCameras();
+
+    if (!selectedCameraId) {
+        console.warn("⚠️ Intet kamera valgt – forsøger at vælge et automatisk...");
+        const videoDevices = await navigator.mediaDevices.enumerateDevices();
+        const availableCameras = videoDevices.filter(device => device.kind === "videoinput");
+        
+        if (availableCameras.length > 0) {
+            selectedCameraId = availableCameras[0].deviceId;
+            console.log("✅ Automatisk valgt kamera:", selectedCameraId);
         }
-    });
+    }
+
+    if (selectedCameraId) {
+        console.log("🎥 Starter kamera:", selectedCameraId);
+        startSelectedCamera();
+    } else {
+        console.warn("⚠️ Intet kamera valgt – brugeren skal vælge et.");
+    }
+});
 
     // 🎯 **Når man lukker farvevalg-overlayet**
     closeColorPickerButton.addEventListener("click", async () => {
@@ -242,6 +231,8 @@ async function startSelectedCamera() {
 const canvas = document.getElementById("overlayCanvas");
 const video = document.getElementById("video");
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+const cameraSelect = document.getElementById("cameraSelect");
 
 const startScreen = document.getElementById("startScreen");
 const colorSetupScreen = document.getElementById("colorSetupScreen");
@@ -288,10 +279,10 @@ const backToSetupRaceButton = document.getElementById("backToSetupRace");
 const openColorPickerButton = document.getElementById("openColorPicker");
 const closeColorPickerButton = document.getElementById("closeColorPickerButton");
 const colorPickerOverlay = document.getElementById("colorPickerOverlay");
-const cameraSelect = document.getElementById("cameraSelect");
 
 // 🎯 **Globale variabler**
 
+let waitingForVideo = false; // 🔥 Ny variabel
 let raceTimer = null; // Gem timer reference
 let selectedCameraId = null;
 let activeStream = null;
@@ -317,33 +308,82 @@ let cameraStarted = false;
 // 🎥 **Tving kameraet til at stoppe**
 function stopCamera() {
     return new Promise(resolve => {
-        const videoElement = document.getElementById("video");
-
-        console.log("🛑 stopCamera() FUNKTIONEN BLEV KALDT!");
-        console.log("🎥 activeStream-status før stop:", activeStream);
-
-        if (activeStream) {
-            console.log("📸 Stopper aktiv kamera-stream...");
-            activeStream.getTracks().forEach(track => {
-                console.log(`🚫 Stopper track: ${track.kind}`);
-                track.stop();
-            });
-
-            activeStream = null; // 🔥 **Nulstil stream korrekt**
-            cameraActive = false;
-            console.log("✅ Kamera er nu deaktiveret!");
-        } else {
+        if (!activeStream) {
             console.warn("⚠️ Ingen aktiv stream at stoppe!");
+            return resolve();
         }
 
+        console.log("📸 Stopper aktiv kamera-stream...");
+        activeStream.getTracks().forEach(track => {
+            console.log(`🚫 Stopper track: ${track.kind}`);
+            track.stop();
+        });
+
+        activeStream = null;
+        cameraActive = false;
+        console.log("✅ Kamera er nu deaktiveret!");
+
+        const videoElement = document.getElementById("video");
         if (videoElement) {
             console.log("🔄 Nulstiller videoElement.srcObject...");
             videoElement.srcObject = null;
         }
 
-        console.log("🎥 activeStream-status EFTER stop:", activeStream);  // ✅ Tjek om den bliver nulstillet korrekt
         resolve();
     });
+}
+
+// 🎥 **Hent tilgængelige kameraer**
+// 🎥 **Hent tilgængelige kameraer**
+async function getCameras() {
+    try {
+        console.log("📸 Prøver at få adgang til kameraerne...");
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            console.warn("⚠️ Din browser understøtter ikke moderne WebRTC API'er.");
+            return;
+        }
+
+        // 🚀 Få midlertidig adgang til kamera for at registrere enheder
+        let tempStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        console.log("✅ Kamera adgang givet!");
+
+        // 🎥 Hent enhedsliste
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(device => device.kind === "videoinput");
+
+        if (videoDevices.length === 0) {
+            console.warn("🚨 Ingen kameraer fundet!");
+            return;
+        }
+
+        console.log("🎥 Fundne kameraer:", videoDevices);
+
+        // 🎯 **Opdater dropdown-menuen**
+        const cameraDropdown = document.getElementById("cameraDropdown"); // Sørg for at ID'et matcher dit dropdown-element
+        cameraDropdown.innerHTML = ""; // Rens dropdown
+
+        videoDevices.forEach((device, index) => {
+            console.log(`🎥 Kamera ${index + 1}: ID = ${device.deviceId}, Label = "${device.label}"`);
+
+            let option = document.createElement("option");
+            option.value = device.deviceId;
+            option.textContent = device.label || `Kamera ${index + 1}`;
+            cameraDropdown.appendChild(option);
+        });
+
+        // ✅ **Sæt global `selectedCameraId`** (hvis den ikke allerede er valgt)
+        if (!selectedCameraId) {
+            selectedCameraId = videoDevices[0].deviceId;
+            console.log("✅ Bruger kamera:", selectedCameraId);
+        }
+
+        // 🎥 Luk test-stream
+        tempStream.getTracks().forEach(track => track.stop());
+
+    } catch (err) {
+        console.error("🚨 Fejl ved kameraadgang:", err);
+    }
 }
 
 
@@ -414,7 +454,15 @@ function resetPlayerForm() {
     // 🎯 Sørg for at tolerancejusteringen starter forfra
     tolerance = 50;
     threshold = 100;
-}
+} 
+
+
+// 🎥 **Lyt efter valg af kamera i dropdown-menuen**
+document.getElementById("cameraDropdown").addEventListener("change", (event) => {
+    selectedCameraId = event.target.value;
+    console.log("🎥 Kamera skiftet til:", selectedCameraId);
+    startSelectedCamera(); // Start kameraet igen med det nye valg
+});
 
 
 // 🎯 **Funktion til at styre skærmene**
@@ -536,15 +584,13 @@ function addPlayer(name) {
 // Funktion der opdaterer en spillers runder og opdaterer leaderboardet, Her sikrer vi, at en spillers runder aldrig overstiger det valgte antal runder:
 function updatePlayerLaps(playerId) {
     let player = players.find(p => p.id === playerId);
-    if (!player) return;
+    if (!player || player.finished) return;
 
-    console.log("🏁 Aktuelt raceMode:", raceSettings.mode); // 🔥 Debug log
+    console.log("🏁 Aktuelt raceMode:", raceSettings.mode);
 
     const now = Date.now();
-
     if (!player.lapTimes) {
         player.lapTimes = [];
-        console.warn(`🔧 Oprettede lapTimes for ${player.name}`);
     }
 
     let lapTime = player.lapTimes.length === 0 
@@ -559,10 +605,10 @@ function updatePlayerLaps(playerId) {
     if (raceSettings.mode === "LapCounts") {
         player.laps++;
 
-        if (player.laps === raceSettings.rounds) {
+        if (player.laps >= raceSettings.rounds) {
             player.finishTime = now;
+            player.finished = true;
             console.log(`🏁 ${player.name} har FULDFØRT racet! 🎉`);
-            
             launchConfetti();
             playApplauseSound();
         }
@@ -711,13 +757,27 @@ function updateLapTimesTable() {
 
 function resetRaceData() {
     console.log("♻️ Nulstiller race-data...");
+    
     raceActive = false;
+    
+    // 🚀 Nulstil tracking-variabler
+    clearInterval(trackingInterval);
+    trackingInterval = null;
+    isTracking = false; 
+    firstDetectionSkipped = false;
+
+    console.log("♻️ Nulstiller race-data uden at slette spillere...");
 
     players.forEach(player => {
+        if (!player.id) {
+            console.warn("⚠️ Spilleren mangler ID, undgår nulstilling!", player);
+            return;
+        }
+
         player.laps = 0;
         player.finishTime = null;
         player.lastDetectionTime = null;
-        player.firstDetectionSkipped = false; // 🔥 Sørg for at første registrering ignoreres i næste løb
+        player.firstDetectionSkipped = false;
         player.lapTimes = [];
     });
 
@@ -728,20 +788,24 @@ function resetRaceData() {
 async function stopRace() {
     raceActive = false;
     console.log("🏁 Race afsluttet!");
+    console.log("🛑 stopRace() kaldt fra:", new Error().stack);
 
-    // Stop timer hvis aktiv
+    // 🛑 Stopper timer
     if (raceTimer) {
         clearInterval(raceTimer);
         raceTimer = null;
         console.log("⏹ Timer stoppet!");
     }
 
+    // 🚀 Stop tracking korrekt
     if (trackingInterval) {
+        console.log("⏸ Stopper tracking korrekt...");
         clearInterval(trackingInterval);
         trackingInterval = null;
     }
 
     isTracking = false;
+    firstDetectionSkipped = false;
 
     // 🚀 **Sluk kameraet korrekt**
     await stopCamera();
@@ -750,11 +814,11 @@ async function stopRace() {
     const countdownElement = document.getElementById("countdownTimer");
     if (countdownElement) {
         if (raceSettings.mode === "FastestLap") {
-            countdownElement.innerText = "Race is over"; // ❗ Skriv "Race is over"
-            countdownElement.classList.add("race-over"); // Tilføj styling
+            countdownElement.innerText = "Race is over";
+            countdownElement.classList.add("race-over");
             console.log("⏳ Countdown opdateret til 'Race is over'");
         } else {
-            countdownElement.style.display = "none"; // ❗ Skjul kun i LapCounts mode
+            countdownElement.style.display = "none";
             console.log("⏳ Countdown skjult!");
         }
     }
@@ -940,8 +1004,20 @@ async function startRace() {
     }
 
     // **Start farvesporing kun hvis ikke allerede aktiv**
-    setTimeout(() => {
+        setTimeout(() => {
+        console.log("🔄 Nulstiller tracking-status før detectColorInRace starter...");
+        
+        clearInterval(trackingInterval);
+        trackingInterval = null;
+        isTracking = false;
+
+        players.forEach(player => {
+            player.firstDetectionSkipped = false;
+            player.lastDetectionTime = null;
+        });
+
         if (!trackingInterval && raceActive) {
+            console.log("🚀 Starter detectColorInRace igen...");
             detectColorInRace();
         } else {
             console.warn("⚠️ detectColorInRace kører allerede eller race er stoppet.");
@@ -1036,38 +1112,6 @@ saveRaceButton.addEventListener("click", () => {
     raceSetupScreen.style.display = "none";
     startScreen.style.display = "block";
 });
-
-// 🎥 **Hent kameraer dynamisk**
-function getCameras() {
-    console.log("📸 Henter tilgængelige kameraer...");
-
-    navigator.mediaDevices.enumerateDevices()
-        .then(devices => {
-            const videoDevices = devices.filter(device => device.kind === "videoinput");
-
-            if (videoDevices.length === 0) {
-                console.error("❌ Ingen kameraer fundet!");
-                alert("Ingen kameraer fundet. Tjek din enhed.");
-                return;
-            }
-
-            cameraSelect.innerHTML = ""; // Ryd dropdown før tilføjelse
-
-            videoDevices.forEach((device, index) => {
-                let option = document.createElement("option");
-                option.value = device.deviceId;
-                option.textContent = device.label || `Kamera ${index + 1}`;
-                cameraSelect.appendChild(option);
-            });
-
-            console.log(`🎥 Fundne kameraer:`, videoDevices);
-        })
-        .catch(err => {
-            console.error("⚠️ Fejl ved hentning af kameraer:", err);
-            alert("Kunne ikke hente kameraer. Tjek kameraindstillinger.");
-        });
-}
-
 
 
 
@@ -1194,7 +1238,7 @@ function detectColorInRace() {
             return;
         }
 
-        if (players.every(p => p.laps >= raceSettings.rounds)) {
+        if (raceSettings.mode === "LapCounts" && players.every(p => p.laps >= raceSettings.rounds)) {
             console.log("🏁 Alle spillere er færdige! Stopper tracking.");
             stopRace();
             return;
@@ -1245,7 +1289,7 @@ function detectColorInRace() {
 
             const now = Date.now();
 
-            if (!player.firstDetectionSkipped) {
+            if (!player.firstDetectionSkipped || raceStartTime > player.lastDetectionTime) {
                 player.firstDetectionSkipped = true;
                 player.lastDetectionTime = now;
                 console.log(`✅ Første registrering ignoreret for ${player.name}`);
@@ -1314,17 +1358,21 @@ function updateCanvasSize() {
         return;
     }
 
-    // Vent på, at videoen er klar (metadata indlæst)
-    if (video.videoWidth === 0 || video.videoHeight === 0) {
+    // **Vent kun, hvis videoen ikke er klar, og vi ikke allerede venter**
+    if ((video.videoWidth === 0 || video.videoHeight === 0) && !waitingForVideo) {
+        waitingForVideo = true; // 🔥 Sæt flag, så vi ikke kalder funktionen igen med det samme
         console.warn("⏳ Video ikke klar, prøver igen...");
-        setTimeout(updateCanvasSize, 100);
+        setTimeout(() => {
+            waitingForVideo = false; // ✅ Nulstil flag, så vi kan prøve igen
+            updateCanvasSize();
+        }, 500);
         return;
     }
 
-    // **Sæt canvas til at matche videoens faktiske opløsning**
+    // 🎯 Hvis vi når hertil, er videoen klar:
+    waitingForVideo = false; // ✅ Video er klar, så vi kan fortsætte
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-
     console.log(`📏 Canvas opdateret til: ${canvas.width}x${canvas.height}`);
 }
 
@@ -1437,10 +1485,9 @@ function trackColor() {
         return;
     }
 
-    // Hvis videoen ikke er klar, vent og prøv igen
     if (video.videoWidth === 0 || video.videoHeight === 0) {
         console.warn("⏹ Video ikke klar, forsøger igen...");
-        requestAnimationFrame(trackColor);
+        setTimeout(trackColor, 100);
         return;
     }
 
@@ -1456,15 +1503,15 @@ function trackColor() {
         const brightness = (r + g + b) / 3;
 
         if (colorMatch(r, g, b, selectedColor, tolerance) && brightness >= threshold) {
-            data[i] = data[i + 1] = data[i + 2] = 255; // Hvid
+            data[i] = data[i + 1] = data[i + 2] = 255;
         } else {
-            data[i] = data[i + 1] = data[i + 2] = 0; // Sort
+            data[i] = data[i + 1] = data[i + 2] = 0;
         }
     }
 
     ctx.putImageData(imageData, 0, 0);
 
-    // 🚀 Stop tracking hvis `isTracking` er sat til false
+    // **🚀 Stop tracking korrekt ved at afbryde animationFrame**
     if (!isTracking) {
         console.warn("⏹ trackColor() stoppet – tracking blev deaktiveret.");
         return;
