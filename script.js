@@ -1369,41 +1369,42 @@ video.addEventListener("click", (event) => {
         return;
     }
 
-    // 🎯 Hent videoens reelle størrelse i browseren (som den vises)
+    // 📏 **Hent videoens viste størrelse på skærmen**
     const rect = video.getBoundingClientRect();
 
-    // 🎯 Beregn korrekt skalering mellem videoens visning og dens interne opløsning
-    const scaleX = video.videoWidth / rect.width;  // Skalering i X-retning
-    const scaleY = video.videoHeight / rect.height; // Skalering i Y-retning
+    // 📐 **Beregn præcis skalering for begge akser**
+    const scaleX = video.videoWidth / rect.width;
+    const scaleY = video.videoHeight / rect.height;
 
-    // 🎯 Juster klikkoordinaterne i forhold til videoens faktiske opløsning
+    // 📍 **Find korrekt klikkoordinat baseret på videoens faktiske opløsning**
     const x = Math.floor((event.clientX - rect.left) * scaleX);
     const y = Math.floor((event.clientY - rect.top) * scaleY);
 
-    // 🎯 Opret midlertidigt canvas for at hente farven
+    // 🎨 **Opret en canvas for at hente farven**
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = video.videoWidth;
     tempCanvas.height = video.videoHeight;
     const tempCtx = tempCanvas.getContext("2d");
-    tempCtx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
 
-    // 🎯 Hent farven fra den justerede pixel
-    const pixel = tempCtx.getImageData(x, y, 1, 1).data;
-    selectedColor = { r: pixel[0], g: pixel[1], b: pixel[2] };
+    // 🔄 **Vent kort før vi tegner billedet, for at sikre korrekt synkronisering**
+    setTimeout(() => {
+        tempCtx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
+        const pixel = tempCtx.getImageData(x, y, 1, 1).data;
+        selectedColor = { r: pixel[0], g: pixel[1], b: pixel[2] };
 
-    // 🎯 Opdater UI med den valgte farve
-    if (colorDisplay) {
-        colorDisplay.style.backgroundColor = `rgb(${selectedColor.r}, ${selectedColor.g}, ${selectedColor.b})`;
-    } else {
-        console.warn("⚠️ colorDisplay ikke fundet!");
-    }
+        // 🎯 **Opdater UI med den valgte farve**
+        if (colorDisplay) {
+            colorDisplay.style.backgroundColor = `rgb(${selectedColor.r}, ${selectedColor.g}, ${selectedColor.b})`;
+        } else {
+            console.warn("⚠️ colorDisplay ikke fundet!");
+        }
 
-    // 🔍 Debugging-log for at tjekke præcisionen
-    console.log(`📌 Klik: Skærmkoordinater = X:${event.clientX}, Y:${event.clientY}`);
-    console.log(`🎯 Justerede videokoordinater = X:${x}, Y:${y}`);
-    console.log(`🎨 Valgt farve: RGB(${selectedColor.r}, ${selectedColor.g}, ${selectedColor.b})`);
+        // 📝 **Debugging for at bekræfte præcisionen**
+        console.log(`📌 Klik: Skærmkoordinater = X:${event.clientX}, Y:${event.clientY}`);
+        console.log(`🎯 Justerede videokoordinater = X:${x}, Y:${y}`);
+        console.log(`🎨 Valgt farve: RGB(${selectedColor.r}, ${selectedColor.g}, ${selectedColor.b})`);
+    }, 10); // 🚀 Lidt forsinkelse kan sikre mere præcise data på ældre hardware.
 });
-
 // 🎯 **Opdater tolerance live**
 toleranceSlider.addEventListener("input", (e) => {
     tolerance = parseInt(e.target.value);
