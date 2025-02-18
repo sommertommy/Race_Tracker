@@ -1070,11 +1070,11 @@ async function startRace() {
                 clearInterval(raceTimer);
                 raceTimer = null; // ✅ Sørg for at variablen nulstilles
                 stopRace();
-
+                launchConfetti();
                 // 🔥 Skift countdown-tekst til "Race is over"
                 countdownElement.innerText = "Race is over";
                 countdownElement.classList.add("race-over");
-                launchConfetti()
+                
             }
         }, 1000);
     } else {
