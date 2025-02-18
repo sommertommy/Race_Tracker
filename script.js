@@ -877,6 +877,7 @@ async function stopRace() {
             countdownElement.innerText = "Race is over"; // ❗ Skriv "Race is over"
             countdownElement.classList.add("race-over"); // Tilføj styling
             console.log("⏳ Countdown opdateret til 'Race is over'");
+            launchConfetti()
         } else {
             countdownElement.style.display = "none"; // ❗ Skjul kun i LapCounts mode
             console.log("⏳ Countdown skjult!");
