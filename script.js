@@ -1014,6 +1014,13 @@ backToStartRaceButton.addEventListener("click", () => {
 
 
 async function startRace() {
+    // ✅ **Stop en gammel race-timer hvis den findes**
+    if (raceTimer) {
+        clearInterval(raceTimer);
+        raceTimer = null;
+        console.log("🛑 Gammel raceTimer stoppet!");
+    }
+
     resetRaceData();
     raceStartTime = Date.now();
     
@@ -1055,6 +1062,7 @@ async function startRace() {
             } else {
                 console.log("⏳ Tid er gået! Race stoppes.");
                 clearInterval(raceTimer);
+                raceTimer = null; // ✅ Sørg for at variablen nulstilles
                 stopRace();
 
                 // 🔥 Skift countdown-tekst til "Race is over"
