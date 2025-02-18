@@ -1194,6 +1194,8 @@ function startRaceCamera() {
 
 
 function detectColorInRace() {
+    console.log("🔄 trackingInterval status før start:", trackingInterval);
+
     if (trackingInterval !== null) {
         console.warn("⚠️ detectColorInRace kører allerede, undgår dobbelt-opstart.");
         return;
@@ -1217,6 +1219,7 @@ function detectColorInRace() {
             console.warn("⏸ detectColorInRace stoppet, da raceActive er false.");
             clearInterval(trackingInterval);
             trackingInterval = null;
+            console.log("⏹ trackingInterval ryddet!");
             return;
         }
 
@@ -1267,9 +1270,14 @@ function detectColorInRace() {
             let player = players.find(p => p.id == playerId);
             let percentage = (colorCounts[playerId] / totalPixels) * 100;
 
+            console.log(`🎯 ${player.name}: ${percentage.toFixed(2)}% af billedet matcher`);
+
             if (percentage < 0.1) return; 
 
             const now = Date.now();
+
+            console.log(`🔍 ${player.name} - Første registrering status:`, player.firstDetectionSkipped);
+            console.log(`⏳ ${player.name} - Sidste registreringstid før opdatering:`, player.lastDetectionTime);
 
             if (!player.firstDetectionSkipped) {
                 player.firstDetectionSkipped = true;
@@ -1279,6 +1287,7 @@ function detectColorInRace() {
             }
 
             if (!player.lastDetectionTime || now - player.lastDetectionTime > 2000) {
+                console.log(`🆕 ${player.name} registreret!`);
                 updatePlayerLaps(player.id);
                 player.lastDetectionTime = now;
             
@@ -1289,6 +1298,8 @@ function detectColorInRace() {
                     playApplauseSound();
                 }
             }
+
+            console.log(`⏳ ${player.name} - Sidste registreringstid efter opdatering:`, player.lastDetectionTime);
         });
 
     }, 100);
