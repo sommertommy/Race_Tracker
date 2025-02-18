@@ -24,9 +24,10 @@ body {
 #lapTimesContainer {
     max-height: 400px; /* Juster højden efter behov */
     overflow-y: auto;  /* Scrollbar vises kun, hvis nødvendigt */
-    border: 1px solid #ccc; /* Valgfrit: Tilføjer en kant omkring tabellen */
+    /* border: 1px solid #ccc; /* Valgfrit: Tilføjer en kant omkring tabellen */
     padding: 5px;
     background: white;
+    width: 100%;
 }
 
 #raceScreen{
@@ -494,7 +495,7 @@ overlay {
 }
 
 #lapTimesTable th, #lapTimesTable td {
-    padding: 10px;
+    /*padding: 10px;*/
     border: 1px solid #ccc;
 }
 
