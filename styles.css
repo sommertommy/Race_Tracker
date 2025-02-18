@@ -21,6 +21,14 @@ body {
     font-style: normal;
 }
 
+#lapTimesContainer {
+    max-height: 400px; /* Juster højden efter behov */
+    overflow-y: auto;  /* Scrollbar vises kun, hvis nødvendigt */
+    border: 1px solid #ccc; /* Valgfrit: Tilføjer en kant omkring tabellen */
+    padding: 5px;
+    background: white;
+}
+
 #raceScreen{
     background-image: url("raceday.jpg"); /* 🖼️ Brug din billedfil */
     background-size: cover;  /* 📌 Dækker hele skærmen */
@@ -504,7 +512,13 @@ overlay {
     width: auto; /* Sørg for, at de andre kolonner fylder det resterende */
     min-width: 120px;
 }
-
+/* Fast header når man scroller */
+#lapTimesTable thead {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 2;
+}
 
 .overlay-content {
     background: white;
