@@ -478,14 +478,14 @@ function startCountdown() {
         </div>
     `;
     document.body.appendChild(overlay);
-
+    
     const lightsDiv = document.getElementById("lights");
     const countdownText = document.getElementById("countdownText");
-
+    
     let count = 10;
     updateLights(count);
     countdownText.textContent = count;
-
+    
     const interval = setInterval(() => {
         count--;
         updateLights(count);
@@ -494,23 +494,25 @@ function startCountdown() {
         if (count < 0) {
             clearInterval(interval);
             overlay.remove(); // Fjern overlay når countdown er færdig
-            
-            // 🏁 Start racet automatisk efter countdown
             startRace();
         }
     }, 1000);
 }
 
 function updateLights(count) {
-    const colors = ["⚪️", "🔴", "🟡", "🟢"];
-    let lightColor = "⚪️";
-    if (count <= 5 && count > 3) lightColor = "🔴";
-    else if (count <= 3 && count > 0) lightColor = "🟡";
-    else if (count === 0) lightColor = "🟢";
+    let lights = "⚫️ ⚫️ ⚫️ ⚫️ ⚫️ ⚫️".split(" ");
     
-    document.getElementById("lights").innerHTML = lightColor.repeat(6);
+    if (count <= 9) lights[0] = "🔴";
+    if (count <= 8) lights[1] = "🔴";
+    if (count <= 7) lights[2] = "🔴";
+    if (count <= 6) lights[3] = "🔴";
+    if (count <= 5) lights[4] = "🔴";
+    if (count <= 4) lights[5] = "🔴";
+    if (count <= 3) lights.fill("🟡");
+    if (count === 0) lights.fill("🟢");
+    
+    document.getElementById("lights").innerHTML = lights.join(" ");
 }
-
 
 
 
