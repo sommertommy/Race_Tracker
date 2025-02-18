@@ -69,9 +69,9 @@ document.addEventListener("DOMContentLoaded", () => {
         
             console.log("✅ Race gemt:", raceSettings);
         
-            playCountdownVideo().then(() => {
-                startRace();
-            });
+            // 🔄 Udskift videoen med den nye countdown
+            startCountdown();  
+});
 });
     // RACING MODE SELECTOR
     // RACING MODE SELECTOR
@@ -478,14 +478,14 @@ function startCountdown() {
         </div>
     `;
     document.body.appendChild(overlay);
-    
+
     const lightsDiv = document.getElementById("lights");
     const countdownText = document.getElementById("countdownText");
-    
+
     let count = 10;
     updateLights(count);
     countdownText.textContent = count;
-    
+
     const interval = setInterval(() => {
         count--;
         updateLights(count);
@@ -494,6 +494,9 @@ function startCountdown() {
         if (count < 0) {
             clearInterval(interval);
             overlay.remove(); // Fjern overlay når countdown er færdig
+            
+            // 🏁 Start racet automatisk efter countdown
+            startRace();
         }
     }, 1000);
 }
