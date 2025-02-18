@@ -468,6 +468,49 @@ function resetPlayerForm() {
 }
 
 
+function startCountdown() {
+    const overlay = document.createElement("div");
+    overlay.id = "countdownOverlay";
+    overlay.innerHTML = `
+        <div id="countdownContainer">
+            <div id="lights"></div>
+            <p id="countdownText"></p>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    const lightsDiv = document.getElementById("lights");
+    const countdownText = document.getElementById("countdownText");
+    
+    let count = 10;
+    updateLights(count);
+    countdownText.textContent = count;
+    
+    const interval = setInterval(() => {
+        count--;
+        updateLights(count);
+        countdownText.textContent = count > 0 ? count : "GO!";
+
+        if (count < 0) {
+            clearInterval(interval);
+            overlay.remove(); // Fjern overlay når countdown er færdig
+        }
+    }, 1000);
+}
+
+function updateLights(count) {
+    const colors = ["⚪️", "🔴", "🟡", "🟢"];
+    let lightColor = "⚪️";
+    if (count <= 5 && count > 3) lightColor = "🔴";
+    else if (count <= 3 && count > 0) lightColor = "🟡";
+    else if (count === 0) lightColor = "🟢";
+    
+    document.getElementById("lights").innerHTML = lightColor.repeat(6);
+}
+
+
+
+
 // 🎯 **Funktion til at styre skærmene**
 function showScreen(targetScreen) {
     const screens = [startScreen, colorSetupScreen, raceSetupScreen, raceScreen];
