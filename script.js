@@ -93,8 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     ensureAcceptButtonExists();
 
-    console.log("✅ DOM setup færdig!");
-
+    
     // 🎯 **Åbn kameraoverlay og hent kameraer**
      openCameraOverlayButton.addEventListener("click", () => {
          console.log("📸 Åbner kamera-valg overlay...");
@@ -273,7 +272,7 @@ let cameraStarted = false;
 function stopCamera() {
     return new Promise(resolve => {
         if (!activeStream) {
-            console.warn("⚠️ Ingen aktiv stream at stoppe!");
+            //console.warn("⚠️ Ingen aktiv stream at stoppe!");
             return resolve();
         }
 
@@ -597,7 +596,7 @@ function updatePlayerLaps(playerId) {
     let player = players.find(p => p.id === playerId);
     if (!player || player.finished) return;
 
-    console.log("🏁 Aktuelt raceMode:", raceSettings.mode);
+    //console.log("🏁 Aktuelt raceMode:", raceSettings.mode);
 
     const now = Date.now();
     if (!player.lapTimes) {
@@ -821,7 +820,7 @@ async function stopRace() {
 }
 
 function updateLeaderboard() {
-    console.log("✅ Leaderboard opdateret");
+    //console.log("✅ Leaderboard opdateret");
     const leaderboardDiv = document.getElementById("leaderboard");
 
     if (!leaderboardDiv) {
@@ -1059,7 +1058,7 @@ const observer = new MutationObserver(() => {
     let lapsDisplay = document.getElementById("currentLapsDisplay");
 
     if (!lapsDisplay) {
-        console.warn("⚠️ currentLapsDisplay forsvandt! Opretter igen...");
+        //console.warn("⚠️ currentLapsDisplay forsvandt! Opretter igen...");
         lapsDisplay = document.createElement("p");
         lapsDisplay.id = "currentLapsDisplay";
         lapsDisplay.textContent = `Runder: 0/${raceSettings.rounds}`;
@@ -1299,7 +1298,7 @@ function detectColorInRace() {
 }
 
         if (!player.lastDetectionTime || now - player.lastDetectionTime > 2000) {
-            console.log(`🆕 ${player.name} registreret!`);
+            //console.log(`🆕 ${player.name} registreret!`);
             updatePlayerLaps(player.id);
             
             player.lastDetectionTime = now;  // ✅ Opdater her, så vi ikke får gentagne registreringer for hurtigt
@@ -1312,7 +1311,7 @@ function detectColorInRace() {
             }
         }
 
-            console.log(`⏳ ${player.name} - Sidste registreringstid efter opdatering:`, player.lastDetectionTime);
+            //console.log(`⏳ ${player.name} - Sidste registreringstid efter opdatering:`, player.lastDetectionTime);
         });
 
     }, 100);
@@ -1492,7 +1491,7 @@ adjustColorButton.addEventListener("click", () => {
 // 🎯 **Track farve og vis som sort/hvid (Tolerance & Threshold)**
 function trackColor() {
     if (!selectedColor || !isTracking) {
-        console.warn("⏹ trackColor() stoppet – ingen farve valgt eller tracking inaktiv.");
+        //console.warn("⏹ trackColor() stoppet – ingen farve valgt eller tracking inaktiv.");
         return;
     }
 
