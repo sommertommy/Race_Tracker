@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
             // 🔄 Udskift videoen med den nye countdown
             startCountdown();  
-});
+
 });
     // RACING MODE SELECTOR
     // RACING MODE SELECTOR
