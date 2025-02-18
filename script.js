@@ -975,7 +975,11 @@ setupRaceButton.addEventListener("click", () => {
     roundsInput.value = raceSettings.rounds;
 });
 
-
+backToStartButton.addEventListener("click", () => {
+    console.log("🔙 Tilbage til startskærm trykket!");
+    // 📺 Skift tilbage til startskærmen
+    showScreen(startScreen);
+});
 
 backToStartRaceButton.addEventListener("click", () => {
     console.log("🔙 Tilbage til startskærm trykket!");
