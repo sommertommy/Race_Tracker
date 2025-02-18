@@ -1340,21 +1340,31 @@ function updateCanvasSize() {
         return;
     }
 
-    // **Vent kun, hvis videoen ikke er klar, og vi ikke allerede venter**
-    if ((video.videoWidth === 0 || video.videoHeight === 0) && !waitingForVideo) {
-        waitingForVideo = true; // 🔥 Sæt flag, så vi ikke kalder funktionen igen med det samme
+    // Tjek om video er klar
+    if (video.videoWidth === 0 || video.videoHeight === 0) {
         console.warn("⏳ Video ikke klar, prøver igen...");
-        setTimeout(() => {
-            waitingForVideo = false; // ✅ Nulstil flag, så vi kan prøve igen
-            updateCanvasSize();
-        }, 500);
+        
+        // Prøv igen maks 10 gange
+        if (!updateCanvasSize.retryCount) {
+            updateCanvasSize.retryCount = 0;
+        }
+
+        if (updateCanvasSize.retryCount < 10) {
+            updateCanvasSize.retryCount++;
+            setTimeout(updateCanvasSize, 500);
+        } else {
+            console.error("❌ Video kunne ikke loade efter 10 forsøg.");
+        }
         return;
     }
 
-    // 🎯 Hvis vi når hertil, er videoen klar:
-    waitingForVideo = false; // ✅ Video er klar, så vi kan fortsætte
+    // Reset retryCount efter succes
+    updateCanvasSize.retryCount = 0;
+
+    // Opdater canvas størrelse til at matche video
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
+
     console.log(`📏 Canvas opdateret til: ${canvas.width}x${canvas.height}`);
 }
 
