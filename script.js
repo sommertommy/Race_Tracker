@@ -494,7 +494,9 @@ function startCountdown() {
 
         // 🎵 Afspil startred.mp3 fra 9 til 4 sekunder
         if (count <= 9 && count >= 4) {
-            new Audio("startred.mp3").play();
+            const startRedAudio = new Audio("startred.mp3");
+            startRedAudio.volume = 0.5; // Sæt volume til 50%
+            startRedAudio.play();
         }
 
         // 🎵 Afspil startgreen.mp3 ved 0 sekunder
@@ -512,6 +514,15 @@ function startCountdown() {
     }, 1000);
 }
 
+function updateCountdown(secondsRemaining) {
+    const countdownElement = document.getElementById("countdownTimer");
+    if (!countdownElement) return;
+    
+    let minutes = Math.floor(secondsRemaining / 60);
+    let seconds = secondsRemaining % 60;
+    countdownElement.innerText = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
 function updateLights(count) {
     let lights = "⚪️ ⚪️ ⚪️ ⚪️ ⚪️ ⚪️".split(" ");
     
@@ -526,6 +537,7 @@ function updateLights(count) {
     
     document.getElementById("lights").innerHTML = lights.join(" ");
 }
+
 
 
 // 🎯 **Funktion til at styre skærmene**
