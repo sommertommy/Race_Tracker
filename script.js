@@ -858,7 +858,7 @@ async function stopRace() {
         clearInterval(raceTimer);
         raceTimer = null;
         console.log("⏹ Timer stoppet!");
-        launchConfetti()
+        
     }
 
     if (trackingInterval) {
@@ -1074,6 +1074,7 @@ async function startRace() {
                 // 🔥 Skift countdown-tekst til "Race is over"
                 countdownElement.innerText = "Race is over";
                 countdownElement.classList.add("race-over");
+                launchConfetti()
             }
         }, 1000);
     } else {
