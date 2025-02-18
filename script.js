@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const cameraPlaceholder = document.getElementById("cameraPlaceholder");
     const openColorPickerButton = document.getElementById("openColorPicker");
     const closeColorPickerButton = document.getElementById("closeColorPickerButton");
-
+ 
     // 🎥 **Kameravalg overlay**
     const openCameraOverlayButton = document.getElementById("openCameraSelectOverlay");
     const cameraSelectOverlay = document.getElementById("cameraSelectOverlay");
@@ -1199,7 +1199,7 @@ function detectColorInRace() {
     console.log("🔄 trackingInterval status før start:", trackingInterval);
 
     if (trackingInterval !== null) {
-        console.warn("⚠️ detectColorInRace kører allerede, undgår dobbelt-opstart.");
+        //console.warn("⚠️ detectColorInRace kører allerede, undgår dobbelt-opstart.");
         return;
     }
 
@@ -1221,8 +1221,8 @@ function detectColorInRace() {
         console.log(`♻️ Nulstiller trackingdata for ${player.name}:`);
         player.lastDetectionTime = null;
         player.firstDetectionSkipped = false;
-        console.log(`   ⏳ lastDetectionTime: ${player.lastDetectionTime}`);
-        console.log(`   🔍 firstDetectionSkipped: ${player.firstDetectionSkipped}`);
+        //console.log(`   ⏳ lastDetectionTime: ${player.lastDetectionTime}`);
+        //console.log(`   🔍 firstDetectionSkipped: ${player.firstDetectionSkipped}`);
     });
 
     trackingInterval = setInterval(() => {
@@ -1273,7 +1273,7 @@ function detectColorInRace() {
         }
 
         if (raceCanvas.width === 0 || raceCanvas.height === 0) {
-            console.error("🚨 Kameraet er ikke klar – prøver igen...");
+            //console.error("🚨 Kameraet er ikke klar – prøver igen...");
             return;
         }
 
@@ -1281,15 +1281,15 @@ function detectColorInRace() {
             let player = players.find(p => p.id == playerId);
             let percentage = (colorCounts[playerId] / totalPixels) * 100;
 
-            console.log(`🎯 ${player.name}: ${percentage.toFixed(2)}% af billedet matcher`);
+            //console.log(`🎯 ${player.name}: ${percentage.toFixed(2)}% af billedet matcher`);
 
             if (percentage < 0.1) return; 
 
             const now = Date.now();
-            console.log(`⏳ ${player.name} - Tid siden sidste registrering: ${now - (player.lastDetectionTime || 0)} ms`);
+            //console.log(`⏳ ${player.name} - Tid siden sidste registrering: ${now - (player.lastDetectionTime || 0)} ms`);
 
-            console.log(`🔍 ${player.name} - Første registrering status:`, player.firstDetectionSkipped);
-            console.log(`⏳ ${player.name} - Sidste registreringstid før opdatering:`, player.lastDetectionTime);
+            //console.log(`🔍 ${player.name} - Første registrering status:`, player.firstDetectionSkipped);
+            //console.log(`⏳ ${player.name} - Sidste registreringstid før opdatering:`, player.lastDetectionTime);
 
             if (!player.firstDetectionSkipped) {
     player.firstDetectionSkipped = true;
