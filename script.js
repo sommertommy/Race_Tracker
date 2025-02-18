@@ -776,6 +776,7 @@ function resetRaceData() {
         player.lastDetectionTime = null;
         player.firstDetectionSkipped = false; // 🔥 Sørg for at første registrering ignoreres i næste løb
         player.lapTimes = [];
+        console.log(`♻️ ${player.name} nulstillet: laps=${player.laps}, lastDetectionTime=${player.lastDetectionTime}, firstDetectionSkipped=${player.firstDetectionSkipped}`);
     });
 
     updateLeaderboard();
@@ -1214,6 +1215,15 @@ function detectColorInRace() {
         return;
     }
 
+    // 🔄 Nulstil trackingdata for alle spillere, når nyt ræs starter
+    players.forEach(player => {
+        console.log(`♻️ Nulstiller trackingdata for ${player.name}:`);
+        player.lastDetectionTime = null;
+        player.firstDetectionSkipped = false;
+        console.log(`   ⏳ lastDetectionTime: ${player.lastDetectionTime}`);
+        console.log(`   🔍 firstDetectionSkipped: ${player.firstDetectionSkipped}`);
+    });
+
     trackingInterval = setInterval(() => {
         if (!raceActive) {
             console.warn("⏸ detectColorInRace stoppet, da raceActive er false.");
@@ -1275,6 +1285,7 @@ function detectColorInRace() {
             if (percentage < 0.1) return; 
 
             const now = Date.now();
+            console.log(`⏳ ${player.name} - Tid siden sidste registrering: ${now - (player.lastDetectionTime || 0)} ms`);
 
             console.log(`🔍 ${player.name} - Første registrering status:`, player.firstDetectionSkipped);
             console.log(`⏳ ${player.name} - Sidste registreringstid før opdatering:`, player.lastDetectionTime);
