@@ -176,13 +176,6 @@ closeColorPickerButton.addEventListener("click", async () => {
     }
 });
 
-    // 🚀 **Start kamera i spilleroprettelse, hvis der allerede er valgt et kamera**
-    document.getElementById("addPlayer").addEventListener("click", () => {
-        console.log("➕ Tilføjer ny spiller...");
-        if (selectedCameraId) {
-            console.log("🎥 Kamera er allerede valgt, men starter ikke automatisk.");
-        }
-    });
 });
 
 
