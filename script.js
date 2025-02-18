@@ -474,33 +474,46 @@ function startCountdown() {
     overlay.innerHTML = `
         <div id="countdownContainer">
             <div id="lights"></div>
-            <p id="countdownText"></p>
         </div>
     `;
     document.body.appendChild(overlay);
     
     const lightsDiv = document.getElementById("lights");
-    const countdownText = document.getElementById("countdownText");
     
     let count = 10;
     updateLights(count);
-    countdownText.textContent = count;
+
+    // 🎵 Afspil baggrundslyd gennem hele countdown
+    const startCarAudio = new Audio("startcar.wav");
+    startCarAudio.loop = true;
+    startCarAudio.play();
     
     const interval = setInterval(() => {
         count--;
         updateLights(count);
-        countdownText.textContent = count > 0 ? count : "GO!";
+
+        // 🎵 Afspil startred.mp3 fra 9 til 4 sekunder
+        if (count <= 9 && count >= 4) {
+            new Audio("startred.mp3").play();
+        }
+
+        // 🎵 Afspil startgreen.mp3 ved 0 sekunder
+        if (count === 0) {
+            new Audio("startgreen.mp3").play();
+        }
 
         if (count < 0) {
             clearInterval(interval);
             overlay.remove(); // Fjern overlay når countdown er færdig
+            startCarAudio.pause(); // Stop baggrundslyden
+            startCarAudio.currentTime = 0;
             startRace();
         }
     }, 1000);
 }
 
 function updateLights(count) {
-    let lights = "⚫️ ⚫️ ⚫️ ⚫️ ⚫️ ⚫️".split(" ");
+    let lights = "⚪️ ⚪️ ⚪️ ⚪️ ⚪️ ⚪️".split(" ");
     
     if (count <= 9) lights[0] = "🔴";
     if (count <= 8) lights[1] = "🔴";
@@ -513,7 +526,6 @@ function updateLights(count) {
     
     document.getElementById("lights").innerHTML = lights.join(" ");
 }
-
 
 
 // 🎯 **Funktion til at styre skærmene**
