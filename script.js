@@ -773,6 +773,7 @@ function resetRaceData() {
     players.forEach(player => {
         player.laps = 0;
         player.finishTime = null;
+        player.finished = false;
         player.lastDetectionTime = null;
         player.firstDetectionSkipped = false; // 🔥 Sørg for at første registrering ignoreres i næste løb
         player.lapTimes = [];
