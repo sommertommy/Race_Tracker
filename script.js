@@ -1008,23 +1008,26 @@ async function startRace() {
 
     const countdownElement = document.getElementById("countdownTimer");
 
+    // ✅ **Nulstil countdown UI**
+    countdownElement.style.display = "block"; // Sørg for at den er synlig
+    countdownElement.innerText = ""; // ❗ Slet evt. gammel tekst!
+    countdownElement.classList.remove("race-over"); // Fjern styling fra forrige løb
+
     // **FASTEST LAP MODE - START COUNTDOWN**
     if (raceSettings.mode === "FastestLap") {
-        const selectedTimeLimit = raceSettings.timeLimit || 120; // Default 120 sek
+        const selectedTimeLimit = raceSettings.timeLimit || 120;
         console.log(`⏳ FastestLap mode med tidsgrænse: ${selectedTimeLimit} sekunder.`);
 
-        countdownElement.style.display = "block"; // Vis countdown-boks
-        countdownElement.classList.remove("race-over"); // Fjern evt. "Race is over" styling
-        updateCountdown(selectedTimeLimit);
+        updateCountdown(selectedTimeLimit); // ✅ Brug din originale funktion
 
-        let timeRemaining = selectedTimeLimit;
+        let secondsRemaining = selectedTimeLimit;
 
         // **Start nedtælling**
         raceTimer = setInterval(() => {
-            timeRemaining--;
+            secondsRemaining--;
 
-            if (timeRemaining >= 0) {
-                updateCountdown(timeRemaining);
+            if (secondsRemaining >= 0) {
+                updateCountdown(secondsRemaining); // ✅ Brug `secondsRemaining` korrekt
             } else {
                 console.log("⏳ Tid er gået! Race stoppes.");
                 clearInterval(raceTimer);
@@ -1032,7 +1035,7 @@ async function startRace() {
 
                 // 🔥 Skift countdown-tekst til "Race is over"
                 countdownElement.innerText = "Race is over";
-                countdownElement.classList.add("race-over"); // Brug CSS til styling
+                countdownElement.classList.add("race-over");
             }
         }, 1000);
     } else {
