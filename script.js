@@ -1291,24 +1291,25 @@ function detectColorInRace() {
             console.log(`⏳ ${player.name} - Sidste registreringstid før opdatering:`, player.lastDetectionTime);
 
             if (!player.firstDetectionSkipped) {
-                player.firstDetectionSkipped = true;
-                player.lastDetectionTime = now;
-                console.log(`✅ Første registrering ignoreret for ${player.name}`);
-                return;
-            }
+    player.firstDetectionSkipped = true;
+    player.lastDetectionTime = now;  // ✅ Opdater tidspunktet her!
+    console.log(`✅ Første registrering ignoreret for ${player.name}`);
+    return;
+}
 
-            if (!player.lastDetectionTime || now - player.lastDetectionTime > 2000) {
-                console.log(`🆕 ${player.name} registreret!`);
-                updatePlayerLaps(player.id);
-                player.lastDetectionTime = now;
+        if (!player.lastDetectionTime || now - player.lastDetectionTime > 2000) {
+            console.log(`🆕 ${player.name} registreret!`);
+            updatePlayerLaps(player.id);
             
-                if (raceSettings.mode === "LapCounts" && player.laps >= raceSettings.rounds && !player.finishTime) {
-                    player.finishTime = now;
-                    console.log(`🏁 ${player.name} har FULDFØRT racet! 🎉`);
-                    launchConfetti();
-                    playApplauseSound();
-                }
+            player.lastDetectionTime = now;  // ✅ Opdater her, så vi ikke får gentagne registreringer for hurtigt
+        
+            if (raceSettings.mode === "LapCounts" && player.laps >= raceSettings.rounds && !player.finishTime) {
+                player.finishTime = now;
+                console.log(`🏁 ${player.name} har FULDFØRT racet! 🎉`);
+                launchConfetti();
+                playApplauseSound();
             }
+        }
 
             console.log(`⏳ ${player.name} - Sidste registreringstid efter opdatering:`, player.lastDetectionTime);
         });
