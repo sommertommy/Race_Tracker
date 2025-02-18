@@ -1297,16 +1297,16 @@ function detectColorInRace() {
         return;
     }
 
-    // 🔄 **NY KODE: Tjek om videoen er klar**
+    // ✅ **NYT: Sikrer, at videoen er klar, før tracking starter**
     if (hiddenVideo.videoWidth === 0 || hiddenVideo.videoHeight === 0) {
-        console.error("🚨 Fejl: Video har ingen gyldig størrelse! Venter og prøver igen...");
+        console.warn("🚨 Video ikke klar – prøver igen om 500ms...");
         setTimeout(detectColorInRace, 500);
         return;
     }
 
-    // 🔄 Nulstil trackingdata for alle spillere, når nyt ræs starter
+    // 🔄 **Nulstil trackingdata for alle spillere**
     players.forEach(player => {
-        console.log(`♻️ Nulstiller trackingdata for ${player.name}:`);
+        console.log(`♻️ Nulstiller trackingdata for ${player.name}`);
         player.lastDetectionTime = null;
         player.firstDetectionSkipped = false;
     });
@@ -1326,6 +1326,12 @@ function detectColorInRace() {
             return;
         }
 
+        // ✅ **NYT: Forhindre raceCanvas-fejl på MacBook Pro 2014**
+        if (hiddenVideo.videoWidth === 0 || hiddenVideo.videoHeight === 0) {
+            console.error("🚨 Kameraet er ikke klar – prøver igen...");
+            return;
+        }
+
         const raceCanvas = document.createElement("canvas");
         raceCanvas.width = hiddenVideo.videoWidth;
         raceCanvas.height = hiddenVideo.videoHeight;
@@ -1337,6 +1343,12 @@ function detectColorInRace() {
         raceCtx.rotate(Math.PI / 2);
         raceCtx.drawImage(hiddenVideo, -raceCanvas.width / 2, -raceCanvas.height / 2, raceCanvas.width, raceCanvas.height);
         raceCtx.restore();
+
+        // **Undgå fejl hvis canvas ikke har en gyldig størrelse**
+        if (raceCanvas.width === 0 || raceCanvas.height === 0) {
+            console.error("🚨 Fejl: raceCanvas har ugyldig størrelse!");
+            return;
+        }
 
         const imageData = raceCtx.getImageData(0, 0, raceCanvas.width, raceCanvas.height);
         const data = imageData.data;
@@ -1358,49 +1370,37 @@ function detectColorInRace() {
             });
         }
 
-        if (raceCanvas.width === 0 || raceCanvas.height === 0) {
-            return;
-        }
-
         Object.keys(colorCounts).forEach(playerId => {
             let player = players.find(p => p.id == playerId);
             let percentage = (colorCounts[playerId] / totalPixels) * 100;
 
-            if (percentage < 0.1) return; 
+            if (percentage < 0.1) return;
 
             const now = Date.now();
 
             if (!player.firstDetectionSkipped) {
                 player.firstDetectionSkipped = true;
-                player.lastDetectionTime = now;  
+                player.lastDetectionTime = now;
                 console.log(`✅ Første registrering ignoreret for ${player.name}`);
                 return;
             }
-        });
 
-    }, 100);
-}
+            if (!player.lastDetectionTime || now - player.lastDetectionTime > 2000) {
+                updatePlayerLaps(player.id);
+                player.lastDetectionTime = now;
 
-
-        if (!player.lastDetectionTime || now - player.lastDetectionTime > 2000) {
-            //console.log(`🆕 ${player.name} registreret!`);
-            updatePlayerLaps(player.id);
-            
-            player.lastDetectionTime = now;  // ✅ Opdater her, så vi ikke får gentagne registreringer for hurtigt
-        
-            if (raceSettings.mode === "LapCounts" && player.laps >= raceSettings.rounds && !player.finishTime) {
-                player.finishTime = now;
-                console.log(`🏁 ${player.name} har FULDFØRT racet! 🎉`);
-                launchConfetti();
-                playApplauseSound();
+                if (raceSettings.mode === "LapCounts" && player.laps >= raceSettings.rounds && !player.finishTime) {
+                    player.finishTime = now;
+                    console.log(`🏁 ${player.name} har FULDFØRT racet! 🎉`);
+                    launchConfetti();
+                    playApplauseSound();
+                }
             }
-        }
-
-            //console.log(`⏳ ${player.name} - Sidste registreringstid efter opdatering:`, player.lastDetectionTime);
         });
 
     }, 100);
 }
+
 
 
 function ensureVideoReady(callback) {
