@@ -148,6 +148,21 @@ openColorPickerButton.addEventListener("click", async () => {
     setTimeout(() => {
         if (selectedCameraId) {
             startSelectedCamera();
+
+            // 🛠 **DEBUGGING: Tjek videoens status efter start**
+            setTimeout(() => {
+                let videoElement = document.getElementById("video");
+                if (videoElement) {
+                    console.log(`🎥 Kamera startet: Width=${videoElement.videoWidth}, Height=${videoElement.videoHeight}`);
+
+                    if (videoElement.videoWidth === 0 || videoElement.videoHeight === 0) {
+                        console.error("🚨 FEJL: Kameraet har ingen dimensioner! Video starter muligvis ikke korrekt.");
+                    }
+                } else {
+                    console.error("❌ FEJL: Video-elementet blev ikke fundet!");
+                }
+            }, 1000); // 💡 Vent 1 sekund for at give kameraet tid til at starte
+
         } else {
             console.warn("⚠️ Intet kamera valgt – brugeren skal vælge et manuelt.");
         }
