@@ -336,19 +336,20 @@ body {
 
 .video-container {
     position: relative;
-    width: 100%;
-    max-width: 500px;
-    margin: auto;
-    overflow: hidden; /* Sikrer, at ingen dele af videoen strækker sig ud */
+    width: 100vw; /* Fylder hele skærmens bredde */
+    height: 100vh; /* Fylder hele skærmens højde */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Sikrer, at videoen ikke strækker sig udenfor */
 }
 
 video {
-    position: relative; /* Undgå absolut positionering, der kan forårsage skalering */
-    width: 100%; /* Fylder containerens bredde */
-    height: auto; /* Bevarer det naturlige billedforhold */
-    max-height: 90vh; /* Undgå at videoen bliver for stor */
-    object-fit: cover; /* Fylder hele boksen uden sorte bjælker */
-    display: none; /* Skjules fra start, men aktiveres via JS */
+    position: absolute; /* Sørger for at dække containeren */
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Dækker containeren fuldstændigt */
+    display: none; /* Skjules fra start */
 }
 
 #cameraPlaceholder {
