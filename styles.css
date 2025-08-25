@@ -646,9 +646,6 @@ th, td {
     cursor: pointer;
 }
 
-.selected-profile {
-    border: 5px solid #f44336; /* Gul kant til markeret profil */
-}
 
 .player-profile {
     display: flex;
@@ -768,10 +765,10 @@ th, td {
     cursor: pointer;
     object-fit: cover;
 }
-
-.driver-option.selected {
-    border-color: #ffcc00;
+.selected-driver {
+    border: 5px solid #f44336; /* Én fælles visuel markering */
 }
+
 
 .driver-upload-placeholder {
     background-color: #ddd;
