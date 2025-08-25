@@ -1004,7 +1004,7 @@ function updateLeaderboard() {
         let playerEntry = document.createElement("div");
         playerEntry.classList.add("leaderboard-player");
 
-        let profileImage = player.profilePicture ? player.profilePicture : "default.png";
+        let profileImage = player.profilePicture || "Reddriver.png";
 
         let medal = "";
         if (player.finishTime !== null && medalCount < medals.length) {
