@@ -77,24 +77,32 @@ document.addEventListener("DOMContentLoaded", () => {
     // RACING MODE SELECTOR
     // RACING MODE SELECTOR
 
-    function selectProfilePicture(imageSrc) {
+        function selectProfilePicture(imageSrc) {
         selectedProfilePicture = imageSrc;
     
-        // Fjern alle tidligere markeringer
+        // Fjern markering fra alle billeder
         document.querySelectorAll(".profile-pic-option, .driver-option").forEach(img => {
             img.classList.remove("selected");
         });
     
-        // Find det valgte billede og marker det
-        const selectedImg = [...document.querySelectorAll(".profile-pic-option, .driver-option")].find(img =>
-            img.src.includes(imageSrc) || img.getAttribute("data-src") === imageSrc
-        );
+        // Find det valgte billede baseret på datakilde
+        const selectedImg = [...document.querySelectorAll(".profile-pic-option, .driver-option")].find(img => {
+            const dataSrc = img.getAttribute("data-src");
+            if (dataSrc) {
+                return dataSrc === imageSrc;
+            } else {
+                // fallback for standardbilleder
+                const imgFilename = img.src.split("/").pop(); // fx "kevin.jpg"
+                return imgFilename === imageSrc;
+            }
+        });
     
         if (selectedImg) {
             selectedImg.classList.add("selected");
+        } else {
+            console.warn("⚠️ Kunne ikke finde billedet til markering:", imageSrc);
         }
     }
-
     let selectedCameraId = localStorage.getItem("selectedCamera") || null;
     
 
