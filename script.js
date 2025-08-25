@@ -103,7 +103,7 @@ function selectProfilePicture(imageSrc) {
         console.warn("⚠️ Kunne ikke finde billedet til markering:", imageSrc);
     }
 }
-
+window.selectProfilePicture = selectProfilePicture;
     
     let selectedCameraId = localStorage.getItem("selectedCamera") || null;
     
