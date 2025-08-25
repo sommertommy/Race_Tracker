@@ -1775,8 +1775,10 @@ function addNewPlayer() {
     // 🔥 Generér et unikt ID baseret på tidsstempel
     let newId = Date.now();
 
+    // ✅ Sæt en debug-log lige her
+    console.log("🎯 GEMMER VALGT BILLEDE:", selectedProfilePicture);
+
     let newPlayer = {
-        console.log("🎯 GEMMER VALGT BILLEDE:", selectedProfilePicture);
         id: newId,
         name: playerName,
         color: selectedColor,
