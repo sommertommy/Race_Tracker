@@ -116,6 +116,72 @@ document.addEventListener("DOMContentLoaded", () => {
      });
 
     
+// Hent gemte billeder fra localStorage og vis dem
+const savedImages = JSON.parse(localStorage.getItem("customDriverImages") || "[]");
+savedImages.forEach(src => {
+    addUploadedDriverImage(src);
+});
+
+function addUploadedDriverImage(src) {
+    const container = document.createElement("div");
+    container.classList.add("driver-uploaded-container");
+
+    const newImg = document.createElement("img");
+    newImg.src = src;
+    newImg.classList.add("driver-option");
+    newImg.setAttribute("data-src", src);
+
+    const removeBtn = document.createElement("span");
+    removeBtn.textContent = "×";
+    removeBtn.classList.add("remove-button");
+
+    removeBtn.addEventListener("click", () => {
+        container.remove();
+        removeImageFromLocalStorage(src);
+    });
+
+    newImg.addEventListener("click", function () {
+        document.querySelectorAll(".driver-option").forEach(el => el.classList.remove("selected"));
+        newImg.classList.add("selected");
+        selectedImageSrc = src;
+    });
+
+    container.appendChild(newImg);
+    container.appendChild(removeBtn);
+
+    const uploadPlaceholder = document.getElementById("uploadPlaceholder");
+    uploadPlaceholder.parentNode.insertBefore(container, uploadPlaceholder);
+}
+
+function removeImageFromLocalStorage(srcToRemove) {
+    const current = JSON.parse(localStorage.getItem("customDriverImages") || "[]");
+    const updated = current.filter(src => src !== srcToRemove);
+    localStorage.setItem("customDriverImages", JSON.stringify(updated));
+}
+
+// Upload-håndtering
+const uploadBtn = document.getElementById("uploadPlaceholder");
+const uploadInput = document.getElementById("driverImageUpload");
+
+uploadBtn.addEventListener("click", () => {
+    uploadInput.click();
+});
+
+uploadInput.addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (event) {
+        const base64 = event.target.result;
+        const current = JSON.parse(localStorage.getItem("customDriverImages") || "[]");
+        if (!current.includes(base64)) {
+            current.push(base64);
+            localStorage.setItem("customDriverImages", JSON.stringify(current));
+            addUploadedDriverImage(base64);
+        }
+    };
+    reader.readAsDataURL(file);
+});
 
 
 
