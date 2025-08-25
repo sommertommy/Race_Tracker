@@ -1743,6 +1743,7 @@ function colorMatch(r, g, b, color, tol, excludedColors = []) {
 
 // 🎯 **Gem spiller – Undgå duplikater!**
 savePlayerButton.onclick = async function () {
+    console.log("🎯 GEMMER VALGT BILLEDE:", selectedProfilePicture);
     let playerName = playerNameInput.value.trim();
     if (!selectedColor || !playerName) {
         alert("Vælg en farve og indtast et navn!");
@@ -1775,6 +1776,7 @@ function addNewPlayer() {
     let newId = Date.now();
 
     let newPlayer = {
+        console.log("🎯 GEMMER VALGT BILLEDE:", selectedProfilePicture);
         id: newId,
         name: playerName,
         color: selectedColor,
