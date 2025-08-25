@@ -78,21 +78,22 @@ document.addEventListener("DOMContentLoaded", () => {
     // RACING MODE SELECTOR
 
     function selectProfilePicture(imageSrc) {
-  selectedProfilePicture = imageSrc;
-
-  // Visuel markering
-  document.querySelectorAll(".profile-pic-option, .driver-option").forEach(img => {
-    img.classList.remove("selected");
-  });
-
-  const selectedImg = [...document.querySelectorAll(".profile-pic-option, .driver-option")].find(img =>
-    img.src.includes(imageSrc) || img.getAttribute("data-src") === imageSrc
-  );
-
-  if (selectedImg) {
-    selectedImg.classList.add("selected");
-  }
-}
+        selectedProfilePicture = imageSrc;
+    
+        // Fjern alle tidligere markeringer
+        document.querySelectorAll(".profile-pic-option, .driver-option").forEach(img => {
+            img.classList.remove("selected");
+        });
+    
+        // Find det valgte billede og marker det
+        const selectedImg = [...document.querySelectorAll(".profile-pic-option, .driver-option")].find(img =>
+            img.src.includes(imageSrc) || img.getAttribute("data-src") === imageSrc
+        );
+    
+        if (selectedImg) {
+            selectedImg.classList.add("selected");
+        }
+    }
 
     let selectedCameraId = localStorage.getItem("selectedCamera") || null;
     
@@ -158,10 +159,8 @@ function addUploadedDriverImage(src) {
     });
 
     newImg.addEventListener("click", function () {
-        document.querySelectorAll(".driver-option, .profile-pic-option").forEach(el => el.classList.remove("selected"));
-        newImg.classList.add("selected");
-        selectProfilePicture(src); // ⬅ dette er vigtigt!
-    });
+    selectProfilePicture(src); // ✅ håndterer al markering centralt
+});
 
     container.appendChild(newImg);
     container.appendChild(removeBtn);
